@@ -3,7 +3,7 @@ module Parser (Parser,
                satisfy,
                char,
                posInt,
-               posFloat,
+               posDouble,
                oneOrMore,
                zeroOrMore,
                spaces) where
@@ -66,8 +66,8 @@ posInt = MkParser f
         where (ns, rest) = span isDigit xs
 
 -- |Creates a Parser that accepts positive integers.
-posFloat :: Parser Float
-posFloat = read <$>
+posDouble :: Parser Double
+posDouble = read <$>
              liftA3 (\x y z -> x ++ [y] ++ z)
                     (MkParser f)
                     (char '.')
