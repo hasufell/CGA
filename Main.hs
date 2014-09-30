@@ -4,7 +4,6 @@ import Diagram
 import Diagrams.Prelude
 import Diagrams.Backend.Cairo
 import Diagrams.Backend.Cairo.Internal
-import Diagrams.Backend.Gtk
 import Graphics.UI.Gtk
 
 
@@ -22,7 +21,7 @@ main = do
       dw <- widgetGetDrawWindow da
       let (png, r) = renderDia Cairo
                              (CairoOptions "jo.svg" (Width 600) SVG False)
-                             (diagFromString $ mesh)
+                             (diagFromString mesh)
       png
       renderWithDrawable dw r
       return True

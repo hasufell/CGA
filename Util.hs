@@ -12,7 +12,7 @@ inRange (x, y) min' max'
 
 
 -- |Filter the valid coordinates.
-filterValidCoords :: Double             -- ^ min
+filterValidCoords :: Double               -- ^ min
                     -> Double             -- ^ max
                     -> [(Double, Double)] -- ^ unfiltered
                     -> [(Double, Double)] -- ^ filtered
