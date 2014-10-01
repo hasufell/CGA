@@ -58,6 +58,8 @@ main = do
                                                   da
   _ <- onClicked saveButton $ onClickedSaveButton fileButton
   _ <- onClicked quitButton mainQuit
+
+  -- hotkeys
   _ <- window `on` keyPressEvent $ tryEvent $ do
          [Control] <- eventModifier
          "q"       <- eventKeyName
