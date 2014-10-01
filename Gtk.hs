@@ -10,8 +10,8 @@ import Graphics.UI.Gtk.Windows.MessageDialog
 import System.Directory
 
 
-startGUI :: IO ()
-startGUI = do
+startGUI :: FilePath -> IO ()
+startGUI startFile = do
   homedir <- getHomeDirectory
 
   -- init gui
@@ -53,6 +53,7 @@ startGUI = do
   _ <- windowSetTypeHint window WindowTypeHintDialog
   containerSetBorderWidth box2 10
   _ <- fileChooserSetCurrentFolder fileButton homedir
+  _ <- fileChooserSetFilename fileButton startFile
 
   -- callbacks
   _ <- onDestroy window mainQuit

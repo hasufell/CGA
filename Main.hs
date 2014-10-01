@@ -1,4 +1,8 @@
 import Gtk
+import System.Environment
+
 
 main :: IO ()
-main = startGUI
+main = do
+  [a] <- getArgs
+  startGUI a
