@@ -11,3 +11,20 @@ inRange min' max' (x, y)
   | otherwise = False
 
 
+cmpExt :: String -> FilePath -> Bool
+cmpExt _ [] = False
+cmpExt ext fp = ext == getExt fp
+
+
+getExt :: FilePath -> String
+getExt = last           .
+  splitBy (== '.')      .
+  last                  .
+  splitBy (== '/')
+
+
+splitBy :: (a -> Bool) -> [a] -> [[a]]
+splitBy f s =  case dropWhile f s of
+                 [] -> []
+                 s' -> w : splitBy f s''
+                   where (w, s'') = break f s'
