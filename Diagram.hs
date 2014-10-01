@@ -6,6 +6,7 @@ import Meshparser
 import Util
 
 
+-- |Holds the properties for a Diagram, like thickness of 2d points etc.
 data DiagProp = MkProp {
   -- |Get the thickness of the dot.
   getThickness :: Double

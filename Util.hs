@@ -11,11 +11,13 @@ inRange min' max' (x, y)
   | otherwise = False
 
 
+-- |Compare the extension of a file with the given String.
 cmpExt :: String -> FilePath -> Bool
 cmpExt _ [] = False
 cmpExt ext fp = ext == getExt fp
 
 
+-- |Get the extension of a file.
 getExt :: FilePath -> String
 getExt = last           .
   splitBy (== '.')      .
@@ -23,7 +25,10 @@ getExt = last           .
   splitBy (== '/')
 
 
-splitBy :: (a -> Bool) -> [a] -> [[a]]
+-- |Split an array into subarrays depending on a given condition.
+splitBy :: (a -> Bool) -- ^ condition
+        -> [a]         -- ^ array to split
+        -> [[a]]       -- ^ splitted array
 splitBy f s =  case dropWhile f s of
                  [] -> []
                  s' -> w : splitBy f s''

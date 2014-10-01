@@ -10,6 +10,7 @@ import Graphics.UI.Gtk.Windows.MessageDialog
 import System.Directory
 
 
+-- |Handle the whole GTK gui.
 startGUI :: FilePath -> IO ()
 startGUI startFile = do
   homedir <- getHomeDirectory
@@ -84,6 +85,7 @@ startGUI startFile = do
   mainGUI
 
 
+-- |Callback when the "Draw" Button is clicked.
 onClickedDrawButton :: (WidgetClass widget, RangeClass scale)
                     => FileChooserButton
                     -> widget
@@ -98,6 +100,7 @@ onClickedDrawButton fcb da scale' = do
       showErrorDialog "No valid Mesh file!"
 
 
+-- |Callback when the "Save" Button is clicked.
 onClickedSaveButton :: FileChooserButton
                     -> IO ()
 onClickedSaveButton fcb = do
@@ -109,6 +112,7 @@ onClickedSaveButton fcb = do
       showErrorDialog "No valid Mesh file!"
 
 
+-- |Pops up an error Dialog with the given String.
 showErrorDialog :: String -> IO ()
 showErrorDialog str = do
   errorDialog <- messageDialogNew Nothing
@@ -120,6 +124,8 @@ showErrorDialog str = do
   widgetDestroy errorDialog
 
 
+-- |Draws a Diagram which is built from a given file to
+-- the gtk DrawingArea.
 drawDiag' :: (WidgetClass widget, RangeClass scale)
           => FilePath
           -> widget
@@ -136,6 +142,7 @@ drawDiag' fp da scale' = do
   renderWithDrawable dw r
 
 
+-- |Saves a Diagram which is built from a given file as an SVG.
 saveDiag' :: FilePath -> IO ()
 saveDiag' fp = do
   mesh <- readFile fp
