@@ -72,10 +72,10 @@ onClickedDrawButton fcb da = do
   case filename of
     Just x -> do
       mesh <- readFile x
-      dw <- widgetGetDrawWindow da
+      dw   <- widgetGetDrawWindow da
       let (_, r) = renderDia Cairo
-                             (CairoOptions "" (Width 600) SVG False)
-                             (diagFromString mesh)
+                     (CairoOptions "" (Width 600) SVG False)
+                     (diagFromString mesh)
       renderWithDrawable dw r
     Nothing -> do
       showErrorDialog "No valid Mesh file!"
@@ -89,8 +89,8 @@ onClickedSaveButton fcb = do
     Just x -> do
       mesh <- readFile x
       let (png, _) = renderDia Cairo
-                             (CairoOptions "out.svg" (Width 600) SVG False)
-                             (diagFromString mesh)
+                       (CairoOptions "out.svg" (Width 600) SVG False)
+                       (diagFromString mesh)
       png
     Nothing -> do
       showErrorDialog "No valid Mesh file!"
@@ -98,7 +98,8 @@ onClickedSaveButton fcb = do
 
 showErrorDialog :: String -> IO ()
 showErrorDialog str = do
-  errorDialog <- messageDialogNew Nothing [DialogDestroyWithParent]
+  errorDialog <- messageDialogNew Nothing
+                                  [DialogDestroyWithParent]
                                   MessageError
                                   ButtonsClose
                                   str
