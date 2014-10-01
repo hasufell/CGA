@@ -4,5 +4,7 @@ import System.Environment
 
 main :: IO ()
 main = do
-  [a] <- getArgs
-  startGUI a
+  a <- getArgs
+  case null a of
+    False -> startGUI (head a)
+    True  -> startGUI ""

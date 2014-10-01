@@ -8,6 +8,7 @@ import Diagrams.Backend.Cairo.Internal
 import Graphics.UI.Gtk
 import Graphics.UI.Gtk.Windows.MessageDialog
 import System.Directory
+import Util
 
 
 -- |Handle the whole GTK gui.
@@ -126,24 +127,32 @@ showErrorDialog str = do
 
 -- |Draws a Diagram which is built from a given file to
 -- the gtk DrawingArea.
+-- Prints an error dialog if no valid mesh file is found.
 drawDiag' :: (WidgetClass widget, RangeClass scale)
           => FilePath
           -> widget
           -> scale
           -> IO ()
-drawDiag' fp da scale' = do
-  mesh       <- readFile fp
-  dw         <- widgetGetDrawWindow da
-  adjustment <- rangeGetAdjustment scale'
-  scaleVal   <- adjustmentGetValue adjustment
-  let (_, r) = renderDia Cairo
-                 (CairoOptions "" (Width 600) SVG False)
-                 (diagFromString (MkProp scaleVal) mesh)
-  renderWithDrawable dw r
+drawDiag' fp da scale' =
+  case cmpExt "obj" fp of
+    True -> do
+      mesh       <- readFile fp
+      dw         <- widgetGetDrawWindow da
+      adjustment <- rangeGetAdjustment scale'
+      scaleVal   <- adjustmentGetValue adjustment
+      let (_, r) = renderDia Cairo
+                     (CairoOptions "" (Width 600) SVG False)
+                     (diagFromString (MkProp scaleVal) mesh)
+      renderWithDrawable dw r
+    False -> showErrorDialog "No valid Mesh file!"
 
 
 -- |Saves a Diagram which is built from a given file as an SVG.
+-- Prints an error dialog if no valid mesh file is found.
 saveDiag' :: FilePath -> IO ()
-saveDiag' fp = do
-  mesh <- readFile fp
-  renderCairo "out.svg" (Width 600) (diagFromString (MkProp 2) mesh)
+saveDiag' fp =
+  case cmpExt "obj" fp of
+    True -> do
+      mesh <- readFile fp
+      renderCairo "out.svg" (Width 600) (diagFromString (MkProp 2) mesh)
+    False -> showErrorDialog "No valid Mesh file!"
