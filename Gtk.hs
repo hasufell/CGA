@@ -21,13 +21,14 @@ startGUI startFile = do
   window          <- windowNew
   da              <- drawingAreaNew
   fileButton      <- fileChooserButtonNew "Select mesh"
-                     FileChooserActionOpen
+                       FileChooserActionOpen
   drawButton      <- buttonNew
   saveButton      <- buttonNew
   quitButton      <- buttonNew
-  box1 <- vBoxNew False 0
-  box2 <- hButtonBoxNew
-  box3 <- hButtonBoxNew
+  box1            <- vBoxNew False 0
+  box2            <- hButtonBoxNew
+  box3            <- hBoxNew False 0
+  hscale          <- hScaleNewWithRange 0.0 10 0.5
   drawButtonLabel <- labelNew $ Just "Draw"
   saveButtonLabel <- labelNew $ Just "Save"
   quitButtonLabel <- labelNew $ Just "Quit"
@@ -43,22 +44,24 @@ startGUI startFile = do
   boxPackStart box2 drawButton PackNatural 0
   boxPackStart box2 saveButton PackNatural 0
   boxPackStart box2 quitButton PackNatural 0
-  boxPackStart box3 fileButton PackNatural 0
+  boxPackStart box3 fileButton PackGrow 5
+  boxPackStart box3 hscale PackGrow 5
 
   -- adjust properties
   set window [windowDefaultWidth := 600, windowDefaultHeight := 700,
               windowTitle := "Computergrafik"]
   set box2 [buttonBoxLayoutStyle := ButtonboxCenter]
-  set box3 [buttonBoxLayoutStyle := ButtonboxCenter]
-  _ <- windowSetTypeHint window WindowTypeHintDialog
   containerSetBorderWidth box2 10
+  _ <- windowSetTypeHint window WindowTypeHintDialog
   _ <- fileChooserSetCurrentFolder fileButton homedir
   _ <- fileChooserSetFilename fileButton startFile
+  adjustment <- rangeGetAdjustment hscale
+  _ <- adjustmentSetValue adjustment 2
 
   -- callbacks
   _ <- onDestroy window mainQuit
   _ <- onClicked drawButton $ onClickedDrawButton fileButton
-                                                  da
+                                                  da hscale
   _ <- onClicked saveButton $ onClickedSaveButton fileButton
   _ <- onClicked quitButton mainQuit
 
@@ -74,22 +77,23 @@ startGUI startFile = do
   _ <- window `on` keyPressEvent $ tryEvent $ do
          [Control] <- eventModifier
          "d"       <- eventKeyName
-         liftIO $ onClickedDrawButton fileButton da
+         liftIO $ onClickedDrawButton fileButton da hscale
 
   -- draw widgets and start main loop
   widgetShowAll window
   mainGUI
 
 
-onClickedDrawButton :: WidgetClass widget
+onClickedDrawButton :: (WidgetClass widget, RangeClass scale)
                     => FileChooserButton
                     -> widget
+                    -> scale
                     -> IO ()
-onClickedDrawButton fcb da = do
+onClickedDrawButton fcb da scale' = do
   filename <- fileChooserGetFilename fcb
   case filename of
     Just x -> do
-      drawDiag' x da
+      drawDiag' x da scale'
     Nothing -> do
       showErrorDialog "No valid Mesh file!"
 
@@ -116,17 +120,23 @@ showErrorDialog str = do
   widgetDestroy errorDialog
 
 
-drawDiag' :: WidgetClass widget => FilePath -> widget -> IO ()
-drawDiag' fp da = do
-  mesh <- readFile fp
-  dw   <- widgetGetDrawWindow da
+drawDiag' :: (WidgetClass widget, RangeClass scale)
+          => FilePath
+          -> widget
+          -> scale
+          -> IO ()
+drawDiag' fp da scale' = do
+  mesh       <- readFile fp
+  dw         <- widgetGetDrawWindow da
+  adjustment <- rangeGetAdjustment scale'
+  scaleVal   <- adjustmentGetValue adjustment
   let (_, r) = renderDia Cairo
                  (CairoOptions "" (Width 600) SVG False)
-                 (diagFromString mesh)
+                 (diagFromString (MkProp scaleVal) mesh)
   renderWithDrawable dw r
 
 
 saveDiag' :: FilePath -> IO ()
 saveDiag' fp = do
   mesh <- readFile fp
-  renderCairo "out.svg" (Width 600) (diagFromString mesh)
+  renderCairo "out.svg" (Width 600) (diagFromString (MkProp 2) mesh)
