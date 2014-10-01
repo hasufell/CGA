@@ -14,7 +14,11 @@ inRange min' max' (x, y)
 -- |Compare the extension of a file with the given String.
 cmpExt :: String -> FilePath -> Bool
 cmpExt _ [] = False
-cmpExt ext fp = ext == getExt fp
+cmpExt checkExt fp
+  | actualExt == fp = False
+  | otherwise = checkExt == actualExt
+    where
+      actualExt = getExt fp
 
 
 -- |Get the extension of a file.
