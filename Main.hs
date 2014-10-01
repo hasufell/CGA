@@ -43,7 +43,7 @@ main = do
   boxPackStart box3 fileButton PackNatural 0
 
   -- adjust properties
-  set window [windowDefaultWidth := 700, windowDefaultHeight := 700,
+  set window [windowDefaultWidth := 600, windowDefaultHeight := 700,
               windowTitle := "Computergrafik"]
   set box2 [buttonBoxLayoutStyle := ButtonboxCenter]
   set box3 [buttonBoxLayoutStyle := ButtonboxCenter]
