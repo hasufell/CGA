@@ -28,7 +28,7 @@ startGUI startFile = do
   box1            <- vBoxNew False 0
   box2            <- hButtonBoxNew
   box3            <- hBoxNew False 0
-  hscale          <- hScaleNewWithRange 0.0 10 0.5
+  hscale          <- hScaleNewWithRange 0.1 10 0.5
   drawButtonLabel <- labelNew $ Just "Draw"
   saveButtonLabel <- labelNew $ Just "Save"
   quitButtonLabel <- labelNew $ Just "Quit"
