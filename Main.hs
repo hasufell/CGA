@@ -1,3 +1,4 @@
+import Control.Monad.IO.Class
 import Diagram
 import Diagrams.Prelude
 import Diagrams.Backend.Cairo
@@ -57,6 +58,18 @@ main = do
                                                   da
   _ <- onClicked saveButton $ onClickedSaveButton fileButton
   _ <- onClicked quitButton mainQuit
+  _ <- window `on` keyPressEvent $ tryEvent $ do
+         [Control] <- eventModifier
+         "q"       <- eventKeyName
+         liftIO $ mainQuit
+  _ <- window `on` keyPressEvent $ tryEvent $ do
+         [Control] <- eventModifier
+         "s"       <- eventKeyName
+         liftIO $ onClickedSaveButton fileButton
+  _ <- window `on` keyPressEvent $ tryEvent $ do
+         [Control] <- eventModifier
+         "d"       <- eventKeyName
+         liftIO $ onClickedDrawButton fileButton da
 
   -- draw widgets and start main loop
   widgetShowAll window
