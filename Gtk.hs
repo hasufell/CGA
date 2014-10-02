@@ -6,10 +6,14 @@ import Diagrams.Prelude
 import Diagrams.Backend.Cairo
 import Diagrams.Backend.Cairo.Internal
 import Graphics.UI.Gtk
+import Graphics.UI.Gtk.Glade
 import Graphics.UI.Gtk.Windows.MessageDialog
 import System.Directory
 import Util
 
+
+gladeFile :: FilePath
+gladeFile = "gtk2.glade"
 
 -- |Handle the whole GTK gui.
 makeGUI :: FilePath -> IO ()
@@ -19,46 +23,20 @@ makeGUI startFile = do
   -- init gui
   _ <- initGUI
 
-  -- create window and widgets
-  window          <- windowNew
-  da              <- drawingAreaNew
-  fileButton      <- fileChooserButtonNew "Select mesh"
-                       FileChooserActionOpen
-  drawButton      <- buttonNew
-  saveButton      <- buttonNew
-  quitButton      <- buttonNew
-  box1            <- vBoxNew False 0
-  box2            <- hButtonBoxNew
-  box3            <- hBoxNew False 0
-  hscale          <- hScaleNewWithRange 0.1 10 0.5
-  drawButtonLabel <- labelNew $ Just "Draw"
-  saveButtonLabel <- labelNew $ Just "Save"
-  quitButtonLabel <- labelNew $ Just "Quit"
-
-  -- containers and boxing
-  containerAdd drawButton drawButtonLabel
-  containerAdd saveButton saveButtonLabel
-  containerAdd quitButton quitButtonLabel
-  containerAdd window box1
-  boxPackStart box1 da PackGrow 0
-  boxPackStart box1 box2 PackNatural 0
-  boxPackStart box1 box3 PackNatural 0
-  boxPackStart box2 drawButton PackNatural 0
-  boxPackStart box2 saveButton PackNatural 0
-  boxPackStart box2 quitButton PackNatural 0
-  boxPackStart box3 fileButton PackGrow 5
-  boxPackStart box3 hscale PackGrow 5
+  -- load glade file
+  Just xml   <- xmlNew gladeFile
+  window     <- xmlGetWidget xml castToWindow "window1"
+  drawButton <- xmlGetWidget xml castToButton "drawButton"
+  saveButton <- xmlGetWidget xml castToButton "saveButton"
+  quitButton <- xmlGetWidget xml castToButton "quitButton"
+  fileButton <- xmlGetWidget xml castToFileChooserButton
+                  "filechooserButton"
+  da         <- xmlGetWidget xml castToDrawingArea "drawingarea"
+  hscale     <- xmlGetWidget xml castToHScale "hscale"
 
   -- adjust properties
-  set window [windowDefaultWidth := 600, windowDefaultHeight := 700,
-              windowTitle := "Computergrafik"]
-  set box2 [buttonBoxLayoutStyle := ButtonboxCenter]
-  containerSetBorderWidth box2 10
-  _ <- windowSetTypeHint window WindowTypeHintDialog
   _ <- fileChooserSetCurrentFolder fileButton homedir
   _ <- fileChooserSetFilename fileButton startFile
-  adjustment <- rangeGetAdjustment hscale
-  _ <- adjustmentSetValue adjustment 2
 
   -- callbacks
   _ <- onDestroy window mainQuit

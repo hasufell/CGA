@@ -60,7 +60,7 @@ executable CG2
   -- other-extensions:
 
   -- Other library packages from which modules are imported.
-  build-depends:       base >=4.7 && <4.8, diagrams-lib >=1.2 && <1.3, diagrams-cairo >=1.2 && <1.3, transformers >=0.4 && <0.5, gtk >=0.12 && <0.13, directory >=1.2 && <1.3
+  build-depends:       base >=4.7 && <4.8, diagrams-lib >=1.2 && <1.3, diagrams-cairo >=1.2 && <1.3, transformers >=0.4 && <0.5, glade >=0.12 && <0.13, gtk >=0.12 && <0.13, directory >=1.2 && <1.3
 
   -- Directories containing source files.
   -- hs-source-dirs:
