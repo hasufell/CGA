@@ -79,7 +79,11 @@ onClickedDrawButton fcb da scale' = do
   filename <- fileChooserGetFilename fcb
   case filename of
     Just x -> do
+      cId <- onExpose da (\x' -> do
+                          drawDiag' x da scale'
+                          return True)
       drawDiag' x da scale'
+      _ <- on fcb fileActivated (signalDisconnect cId)
     Nothing -> do
       showErrorDialog "No valid Mesh file!"
 
