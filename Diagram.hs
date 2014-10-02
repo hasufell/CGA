@@ -17,10 +17,11 @@ data DiagProp = MkProp {
 diagFromVTable :: DiagProp -> VTable -> Diagram Cairo R2
 diagFromVTable prop meshArr
   = position (zip (map mkPoint . filter (inRange 0 500) $ meshArr)
-                     (repeat dot)) # moveTo (p2(-250, -250))
-   `atop` square 500 # lwG 0.05 # bg white
-    where dot           = (circle $ getThickness prop :: Diagram Cairo R2) # fc black
-          mkPoint (x,y) = p2 (x,y)
+                  (repeat dot)) # moveTo (p2(-250, -250))
+     `atop` square 500 # lwG 0.05 # bg white
+        where dot           = (circle $
+                               getThickness prop :: Diagram Cairo R2) # fc black
+              mkPoint (x,y) = p2 (x,y)
 
 -- |Create the Diagram from a String.
 diagFromString :: DiagProp -> String -> Diagram Cairo R2
