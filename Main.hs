@@ -6,5 +6,5 @@ main :: IO ()
 main = do
   a <- getArgs
   case null a of
-    False -> startGUI (head a)
-    True  -> startGUI ""
+    False -> makeGUI (head a)
+    True  -> makeGUI ""

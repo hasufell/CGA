@@ -12,8 +12,8 @@ import Util
 
 
 -- |Handle the whole GTK gui.
-startGUI :: FilePath -> IO ()
-startGUI startFile = do
+makeGUI :: FilePath -> IO ()
+makeGUI startFile = do
   homedir <- getHomeDirectory
 
   -- init gui
