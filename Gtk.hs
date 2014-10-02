@@ -35,8 +35,13 @@ makeGUI startFile = do
   hscale     <- xmlGetWidget xml castToHScale "hscale"
 
   -- adjust properties
-  _ <- fileChooserSetCurrentFolder fileButton homedir
-  _ <- fileChooserSetFilename fileButton startFile
+  case startFile == "" of
+    True -> do
+            _ <- fileChooserSetCurrentFolder fileButton homedir
+            return ()
+    False -> do
+            _ <- fileChooserSetFilename fileButton startFile
+            return ()
 
   -- callbacks
   _ <- onDestroy window mainQuit
