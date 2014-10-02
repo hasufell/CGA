@@ -41,7 +41,7 @@ makeGUI startFile = do
   -- callbacks
   _ <- onDestroy window mainQuit
   _ <- onClicked drawButton $ onClickedDrawButton fileButton
-                                                  da hscale
+         da hscale
   _ <- onClicked saveButton $ onClickedSaveButton fileButton
   _ <- onClicked quitButton mainQuit
 

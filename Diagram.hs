@@ -15,8 +15,8 @@ data DiagProp = MkProp {
 
 -- |Create the Diagram from the VTable.
 diagFromVTable :: DiagProp -> VTable -> Diagram Cairo R2
-diagFromVTable prop meshArr
-  = position (zip (map mkPoint . filter (inRange 0 500) $ meshArr)
+diagFromVTable prop vt
+  = position (zip (map mkPoint . filter (inRange 0 500) $ vt)
                   (repeat dot)) # moveTo (p2(-250, -250))
      `atop` square 500 # lwG 0.05 # bg white
         where dot           = (circle $
