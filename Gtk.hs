@@ -79,11 +79,12 @@ onClickedDrawButton fcb da scale' = do
   filename <- fileChooserGetFilename fcb
   case filename of
     Just x -> do
-      cId <- onExpose da (\x' -> do
-                          drawDiag' x da scale'
-                          return True)
-      drawDiag' x da scale'
+      cId <- onExpose da (\x' -> drawDiag' x da scale')
       _ <- on fcb fileActivated (signalDisconnect cId)
+      ret <- drawDiag' x da scale'
+      case ret of
+        True  -> return ()
+        False -> showErrorDialog "No valid Mesh file!"
     Nothing -> do
       showErrorDialog "No valid Mesh file!"
 
@@ -95,7 +96,10 @@ onClickedSaveButton fcb = do
   filename <- fileChooserGetFilename fcb
   case filename of
     Just x -> do
-      saveDiag' x
+      ret <- saveDiag' x
+      case ret of
+        True  -> return ()
+        False -> showErrorDialog "No valid Mesh file!"
     Nothing -> do
       showErrorDialog "No valid Mesh file!"
 
@@ -114,12 +118,11 @@ showErrorDialog str = do
 
 -- |Draws a Diagram which is built from a given file to
 -- the gtk DrawingArea.
--- Prints an error dialog if no valid mesh file is found.
 drawDiag' :: (WidgetClass widget, RangeClass scale)
           => FilePath
           -> widget
           -> scale
-          -> IO ()
+          -> IO (Bool)
 drawDiag' fp da scale' =
   case cmpExt "obj" fp of
     True -> do
@@ -131,15 +134,16 @@ drawDiag' fp da scale' =
                      (CairoOptions "" (Width 600) SVG False)
                      (diagFromString (MkProp scaleVal) mesh)
       renderWithDrawable dw r
-    False -> showErrorDialog "No valid Mesh file!"
+      return True
+    False -> return False
 
 
 -- |Saves a Diagram which is built from a given file as an SVG.
--- Prints an error dialog if no valid mesh file is found.
-saveDiag' :: FilePath -> IO ()
+saveDiag' :: FilePath -> IO (Bool)
 saveDiag' fp =
   case cmpExt "obj" fp of
     True -> do
       mesh <- readFile fp
       renderCairo "out.svg" (Width 600) (diagFromString (MkProp 2) mesh)
-    False -> showErrorDialog "No valid Mesh file!"
+      return True
+    False -> return False
