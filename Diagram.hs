@@ -18,7 +18,9 @@ diagFromVTable :: DiagProp -> VTable -> Diagram Cairo R2
 diagFromVTable prop vt
   = position (zip (map mkPoint . filter (inRange 0 500) $ vt)
                   (repeat dot)) # moveTo (p2(-250, -250))
-     `atop` square 500 # lwG 0.00 # bg white
+     `atop` hrule 500 # centerX # moveTo (p2(0, -250))
+     `atop` vrule 500 # centerY # moveTo (p2(-250, 0))
+     `atop` square 550 # lwG 0.00 # bg white
         where dot           = (circle $
                                getThickness prop :: Diagram Cairo R2) # fc black
               mkPoint (x,y) = p2 (x,y)
