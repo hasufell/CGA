@@ -1,16 +1,26 @@
 module Diagram where
 
+import Defaults
 import Diagrams.Prelude
 import Diagrams.Backend.Cairo
 import Meshparser
 import Util
 
 
+instance Def DiagProp where
+    def = defaultProp
+
+
 -- |Holds the properties for a Diagram, like thickness of 2d points etc.
 data DiagProp = MkProp {
   -- |Get the thickness of the dot.
-  getThickness :: Double
+  t :: Double
 }
+
+
+-- |The default properties of the Diagram.
+defaultProp :: DiagProp
+defaultProp = MkProp 2
 
 
 -- |Create the Diagram from the VTable.
@@ -22,7 +32,7 @@ diagFromVTable prop vt
      `atop` vrule 500 # centerY # moveTo (p2(-250, 0))
      `atop` square 550 # lwG 0.00 # bg white
         where dot           = (circle $
-                               getThickness prop :: Diagram Cairo R2) # fc black
+                               t prop :: Diagram Cairo R2) # fc black
               mkPoint (x,y) = p2 (x,y)
 
 -- |Create the Diagram from a String.

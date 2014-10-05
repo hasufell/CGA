@@ -2,6 +2,7 @@ module Gtk where
 
 import Control.Monad.IO.Class
 import Control.Monad
+import Defaults
 import Diagram
 import Diagrams.Prelude
 import Diagrams.Backend.Cairo
@@ -126,7 +127,7 @@ drawDiag' fp da scale' =
       scaleVal   <- adjustmentGetValue adjustment
       let (_, r) = renderDia Cairo
                      (CairoOptions "" (Width 600) SVG False)
-                     (diagFromString (MkProp scaleVal) mesh)
+                     (diagFromString (def{t = scaleVal}) mesh)
       renderWithDrawable dw r
       return True
     else return False
@@ -138,6 +139,6 @@ saveDiag' fp =
   if cmpExt "obj" fp
     then do
       mesh <- readFile fp
-      renderCairo "out.svg" (Width 600) (diagFromString (MkProp 2) mesh)
+      renderCairo "out.svg" (Width 600) (diagFromString def mesh)
       return True
     else return False
