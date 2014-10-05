@@ -13,23 +13,41 @@ import Text.Read
 import Util
 
 
+-- |Monolithic object passed to various GUI functions in order
+-- to keep the API stable and not alter the parameters too much.
+-- This only holds GUI widgets that are needed to be read during
+-- runtime.
 data MyGUI = MkMyGUI {
+  -- |main Window
   win :: Window,
+  -- |delete Button
   dB  :: Button,
+  -- |save Button
   sB  :: Button,
+  -- |quit Button
   qB  :: Button,
+  -- |file chooser button
   fB  :: FileChooserButton,
+  -- |drawing area
   da  :: DrawingArea,
+  -- |scaler for point thickness
   hs  :: HScale,
+  -- |entry widget for lower x bound
   xl  :: Entry,
+  -- |entry widget for upper x bound
   xu  :: Entry,
+  -- |entry widget for lower y bound
   yl  :: Entry,
+  -- |entry widget for upper y bound
   yu  :: Entry,
+  -- |about dialog
   aD  :: AboutDialog,
+  -- |combo box for choosing the algorithm
   cB  :: ComboBox
 }
 
 
+-- |The glade file to load the UI from.
 gladeFile :: FilePath
 gladeFile = "gtk2.glade"
 
@@ -57,7 +75,7 @@ makeMyGladeGUI = do
   return $ MkMyGUI win' dB' sB' qB' fB' da' hs' xl' xu' yl' yu' aD' cB'
 
 
--- |Handle the whole GTK gui.
+-- |Main entry point for the GTK GUI routines.
 makeGUI :: FilePath -> IO ()
 makeGUI startFile = do
   homedir <- getHomeDirectory
