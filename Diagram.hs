@@ -32,8 +32,8 @@ diagFromVTable :: DiagProp -> VTable -> Diagram Cairo R2
 diagFromVTable prop vt
   = position (zip (map mkPoint . filter (inRange (dX prop) (dY prop)) $ vt)
                   (repeat dot))   # moveTo (p2(xOffset, yOffset))
-     `atop` hrule (xuD - xlD)     # centerX # moveTo (p2(0, yOffset))
-     `atop` vrule (yuD - ylD)     # centerY # moveTo (p2(xOffset, 0))
+     `atop` hrule (xuD - xlD)     # moveTo (p2(0, yOffset))
+     `atop` vrule (yuD - ylD)     # moveTo (p2(xOffset, 0))
      `atop` emptyRect (xuD - xlD + 50) (yuD - ylD + 50)
         where dot           = (circle $
                                t prop :: Diagram Cairo R2) # fc black
