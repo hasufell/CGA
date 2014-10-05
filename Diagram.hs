@@ -35,6 +35,7 @@ diagFromVTable prop vt
                                t prop :: Diagram Cairo R2) # fc black
               mkPoint (x,y) = p2 (x,y)
 
+
 -- |Create the Diagram from a String.
 diagFromString :: DiagProp -> String -> Diagram Cairo R2
 diagFromString prop mesh

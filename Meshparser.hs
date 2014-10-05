@@ -10,7 +10,7 @@ type VTable = [(Double, Double)]
 -- an array of float tuples.
 meshToArr :: String   -- ^ the string to convert
           -> VTable   -- ^ the resulting vertice table
-meshToArr xs = fmap (\(Just (x, _)) -> x)     .
+meshToArr xs = fmap (\(Just (x, _)) -> x)      .
                  filter (/= Nothing)           .
                  fmap (runParser parseVertice) .
                  lines                         $
