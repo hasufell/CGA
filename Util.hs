@@ -1,14 +1,15 @@
 module Util where
 
 
--- |Checks whether the Coordinates are in a given range.
-inRange :: Double           -- ^ min
-        -> Double           -- ^ max
-        -> (Double, Double) -- ^ Coordinates to check
+-- |Checks whether the Coordinates are in a given dimension.
+inRange :: (Double, Double) -- ^ X dimension
+        -> (Double, Double) -- ^ Y dimension
+        -> (Double, Double) -- ^ Coordinates
         -> Bool             -- ^ result
-inRange min' max' (x, y)
-  | x <= max' && x >= min' && y <= max' && y >= min' = True
-  | otherwise = False
+inRange (xlD, xuD) (ylD, yuD) (x,y)
+  | x <= xuD && x >= xlD &&
+    y <= yuD && y >= ylD    = True
+  | otherwise               = False
 
 
 -- |Compare the extension of a file with the given String.

@@ -13,27 +13,41 @@ instance Def DiagProp where
 
 -- |Holds the properties for a Diagram, like thickness of 2d points etc.
 data DiagProp = MkProp {
-  -- |Get the thickness of the dot.
-  t :: Double
+  -- |The thickness of the dots.
+  t :: Double,
+  -- |The dimensions of the x-axis.
+  dX :: (Double, Double),
+  -- |The dimensions of the y-axis.
+  dY :: (Double, Double)
 }
 
 
 -- |The default properties of the Diagram.
 defaultProp :: DiagProp
-defaultProp = MkProp 2
+defaultProp = MkProp 2 (0,500) (0,500)
 
 
 -- |Create the Diagram from the VTable.
 diagFromVTable :: DiagProp -> VTable -> Diagram Cairo R2
 diagFromVTable prop vt
-  = position (zip (map mkPoint . filter (inRange 0 500) $ vt)
-                  (repeat dot)) # moveTo (p2(-250, -250))
-     `atop` hrule 500 # centerX # moveTo (p2(0, -250))
-     `atop` vrule 500 # centerY # moveTo (p2(-250, 0))
-     `atop` square 550 # lwG 0.00 # bg white
+  = position (zip (map mkPoint . filter (inRange (dX prop) (dY prop)) $ vt)
+                  (repeat dot))   # moveTo (p2(xOffset, yOffset))
+     `atop` hrule (xuD - xlD)     # centerX # moveTo (p2(0, yOffset))
+     `atop` vrule (yuD - ylD)     # centerY # moveTo (p2(xOffset, 0))
+     `atop` rect (xuD - xlD + 50)
+                 (yuD - ylD + 50) # lwG 0.00 # bg white
         where dot           = (circle $
                                t prop :: Diagram Cairo R2) # fc black
               mkPoint (x,y) = p2 (x,y)
+              xlD           = fst $ dX prop
+              xuD           = snd $ dX prop
+              ylD           = fst $ dY prop
+              yuD           = snd $ dY prop
+              -- 'Diagrams' sets (0,0) to be in the middle of the
+              -- drawing area, so we need to shift it depending
+              -- on the given dimensions.
+              xOffset       = (negate xlD / 2) - (xuD / 2)
+              yOffset       = (negate ylD / 2) - (yuD / 2)
 
 
 -- |Create the Diagram from a String which is supposed to be the contents
