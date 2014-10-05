@@ -1,7 +1,6 @@
 module Gtk where
 
 import Control.Monad.IO.Class
-import Control.Monad
 import Defaults
 import Diagram
 import Diagrams.Prelude
@@ -10,6 +9,7 @@ import Diagrams.Backend.Cairo.Internal
 import Graphics.UI.Gtk
 import Graphics.UI.Gtk.Glade
 import System.Directory
+import Text.Read
 import Util
 
 
@@ -106,10 +106,14 @@ onClickedDrawButton mygui = do
   filename <- fileChooserGetFilename fcb
   case filename of
     Just x -> do
-      cId <- onExpose (da mygui) (\_ -> drawDiag' x mygui)
+      cId <- onExpose (da mygui) (\_ -> drawDiag' x mygui >>=
+                                        (\_ -> return True))
       _   <- on fcb fileActivated (signalDisconnect cId)
       ret <- drawDiag' x mygui
-      unless ret $ showErrorDialog "No valid Mesh file!"
+      case ret of
+        1 -> showErrorDialog "No valid x/y dimensions!"
+        2 -> showErrorDialog "No valid Mesh file!"
+        _ -> return ()
     Nothing -> showErrorDialog "No valid Mesh file!"
 
 
@@ -121,7 +125,10 @@ onClickedSaveButton mygui = do
   case filename of
     Just x -> do
       ret <- saveDiag' x mygui
-      unless ret $ showErrorDialog "No valid Mesh file!"
+      case ret of
+        1 -> showErrorDialog "No valid x/y dimensions!"
+        2 -> showErrorDialog "No valid Mesh file!"
+        _ -> return ()
     Nothing -> showErrorDialog "No valid Mesh file!"
 
 
@@ -141,7 +148,7 @@ showErrorDialog str = do
 -- the gtk DrawingArea.
 drawDiag' :: FilePath
           -> MyGUI
-          -> IO Bool
+          -> IO Int
 drawDiag' fp mygui =
   if cmpExt "obj" fp
     then do
@@ -157,23 +164,29 @@ drawDiag' fp mygui =
       -- clear drawing area
       clearDiag mygui
 
-      let xD     = (read xlD, read xuD) :: (Double, Double)
-          yD     = (read ylD, read yuD) :: (Double, Double)
-          (_, r) = renderDia Cairo
-                     (CairoOptions "" (Width 600) SVG False)
-                     (diagFromString (def{t  = scaleVal,
-                                          dX = xD,
-                                          dY = yD})
-                                     mesh)
-      renderWithDrawable dw r
-      return True
-    else return False
+      let xD = (,) <$> readMaybe xlD <*> readMaybe xuD :: Maybe (Double,
+                                                                 Double)
+          yD = (,) <$> readMaybe ylD <*> readMaybe yuD :: Maybe (Double,
+                                                                 Double)
+      case (xD, yD) of
+        (Just xD', Just yD') -> do
+          let (_, r) = renderDia Cairo
+                         (CairoOptions "" (Width 600) SVG False)
+                         (diagFromString (def{t  = scaleVal,
+                                              dX = xD',
+                                              dY = yD'})
+                                         mesh)
+          renderWithDrawable dw r
+          return 0
+        _ -> return 1
+
+    else return 2
 
 
 -- |Saves a Diagram which is built from a given file as an SVG.
 saveDiag' :: FilePath
           -> MyGUI
-          -> IO Bool
+          -> IO Int
 saveDiag' fp mygui =
   if cmpExt "obj" fp
     then do
@@ -185,15 +198,21 @@ saveDiag' fp mygui =
       ylD        <- entryGetText (yl mygui)
       yuD        <- entryGetText (yu mygui)
 
-      let xD     = (read xlD, read xuD) :: (Double, Double)
-          yD     = (read ylD, read yuD) :: (Double, Double)
-      renderCairo "out.svg" (Width 600)
-          (diagFromString (def{t  = scaleVal,
-                               dX = xD,
-                               dY = yD})
-                           mesh)
-      return True
-    else return False
+      let xD = (,) <$> readMaybe xlD <*> readMaybe xuD :: Maybe (Double,
+                                                                 Double)
+          yD = (,) <$> readMaybe ylD <*> readMaybe yuD :: Maybe (Double,
+                                                                 Double)
+      case (xD, yD) of
+        (Just xD', Just yD') -> do
+          renderCairo "out.svg" (Width 600)
+            (diagFromString (def{t  = scaleVal,
+                                 dX = xD',
+                                 dY = yD'})
+                             mesh)
+          return 0
+        _ -> return 1
+
+    else return 2
 
 
 -- |Clears the drawing area by painting a white rectangle.
