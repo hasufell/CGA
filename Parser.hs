@@ -17,7 +17,7 @@ newtype Parser a = MkParser { runParser :: String -> Maybe (a, String) }
 
 -- |Functor instance.
 instance Functor Parser where
-  fmap f p = (inParser . fmap . fmap . first $ f) p
+  fmap = inParser . fmap . fmap . first
 
 -- |Applicative functor instance.
 instance Applicative Parser where

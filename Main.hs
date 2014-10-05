@@ -5,6 +5,4 @@ import System.Environment
 main :: IO ()
 main = do
   a <- getArgs
-  case null a of
-    False -> makeGUI (head a)
-    True  -> makeGUI ""
+  makeGUI (if null a then head a else "")
