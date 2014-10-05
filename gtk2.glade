@@ -378,7 +378,7 @@ Malte Flender &lt;malte.flender@fh-bielefeld.de&gt;</property>
   </widget>
   <widget class="GtkWindow" id="window1">
     <property name="width_request">600</property>
-    <property name="height_request">700</property>
+    <property name="height_request">750</property>
     <property name="can_focus">False</property>
     <property name="type_hint">dialog</property>
     <child>
@@ -696,6 +696,18 @@ Malte Flender &lt;malte.flender@fh-bielefeld.de&gt;</property>
             <property name="expand">False</property>
             <property name="fill">False</property>
             <property name="position">3</property>
+          </packing>
+        </child>
+        <child>
+          <widget class="GtkComboBox" id="comboalgo">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="items" translatable="yes">Show points</property>
+          </widget>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">False</property>
+            <property name="position">4</property>
           </packing>
         </child>
       </widget>

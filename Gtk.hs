@@ -25,7 +25,8 @@ data MyGUI = MkMyGUI {
   xu  :: Entry,
   yl  :: Entry,
   yu  :: Entry,
-  aD  :: AboutDialog
+  aD  :: AboutDialog,
+  cB  :: ComboBox
 }
 
 
@@ -51,8 +52,9 @@ makeMyGladeGUI = do
   yl'  <- xmlGetWidget xml castToEntry "ylD"
   yu'  <- xmlGetWidget xml castToEntry "yuD"
   aD'  <- xmlGetWidget xml castToAboutDialog "aboutdialog"
+  cB'  <- xmlGetWidget xml castToComboBox "comboalgo"
 
-  return $ MkMyGUI win' dB' sB' qB' fB' da' hs' xl' xu' yl' yu' aD'
+  return $ MkMyGUI win' dB' sB' qB' fB' da' hs' xl' xu' yl' yu' aD' cB'
 
 
 -- |Handle the whole GTK gui.
@@ -74,6 +76,7 @@ makeGUI startFile = do
     else do
       _ <- fileChooserSetFilename (fB mygui) startFile
       return ()
+  comboBoxSetActive (cB mygui) 0
 
   -- callbacks
   _ <- onDestroy  (win mygui) mainQuit
