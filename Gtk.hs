@@ -1,6 +1,7 @@
 module Gtk where
 
 import Control.Monad.IO.Class
+import Control.Monad
 import Diagram
 import Diagrams.Prelude
 import Diagrams.Backend.Cairo
@@ -35,13 +36,13 @@ makeGUI startFile = do
   hscale     <- xmlGetWidget xml castToHScale "hscale"
 
   -- adjust properties
-  case startFile == "" of
-    True -> do
-            _ <- fileChooserSetCurrentFolder fileButton homedir
-            return ()
-    False -> do
-            _ <- fileChooserSetFilename fileButton startFile
-            return ()
+  if startFile == ""
+    then do
+      _ <- fileChooserSetCurrentFolder fileButton homedir
+      return ()
+    else do
+      _ <- fileChooserSetFilename fileButton startFile
+      return ()
 
   -- callbacks
   _ <- onDestroy window mainQuit
@@ -54,7 +55,7 @@ makeGUI startFile = do
   _ <- window `on` keyPressEvent $ tryEvent $ do
          [Control] <- eventModifier
          "q"       <- eventKeyName
-         liftIO $ mainQuit
+         liftIO mainQuit
   _ <- window `on` keyPressEvent $ tryEvent $ do
          [Control] <- eventModifier
          "s"       <- eventKeyName
@@ -79,14 +80,11 @@ onClickedDrawButton fcb da scale' = do
   filename <- fileChooserGetFilename fcb
   case filename of
     Just x -> do
-      cId <- onExpose da (\x' -> drawDiag' x da scale')
+      cId <- onExpose da (\_ -> drawDiag' x da scale')
       _ <- on fcb fileActivated (signalDisconnect cId)
       ret <- drawDiag' x da scale'
-      case ret of
-        True  -> return ()
-        False -> showErrorDialog "No valid Mesh file!"
-    Nothing -> do
-      showErrorDialog "No valid Mesh file!"
+      unless ret $ showErrorDialog "No valid Mesh file!"
+    Nothing -> showErrorDialog "No valid Mesh file!"
 
 
 -- |Callback when the "Save" Button is clicked.
@@ -97,11 +95,8 @@ onClickedSaveButton fcb = do
   case filename of
     Just x -> do
       ret <- saveDiag' x
-      case ret of
-        True  -> return ()
-        False -> showErrorDialog "No valid Mesh file!"
-    Nothing -> do
-      showErrorDialog "No valid Mesh file!"
+      unless ret $ showErrorDialog "No valid Mesh file!"
+    Nothing -> showErrorDialog "No valid Mesh file!"
 
 
 -- |Pops up an error Dialog with the given String.
@@ -122,10 +117,10 @@ drawDiag' :: (WidgetClass widget, RangeClass scale)
           => FilePath
           -> widget
           -> scale
-          -> IO (Bool)
+          -> IO Bool
 drawDiag' fp da scale' =
-  case cmpExt "obj" fp of
-    True -> do
+  if cmpExt "obj" fp
+    then do
       mesh       <- readFile fp
       dw         <- widgetGetDrawWindow da
       adjustment <- rangeGetAdjustment scale'
@@ -135,15 +130,15 @@ drawDiag' fp da scale' =
                      (diagFromString (MkProp scaleVal) mesh)
       renderWithDrawable dw r
       return True
-    False -> return False
+    else return False
 
 
 -- |Saves a Diagram which is built from a given file as an SVG.
-saveDiag' :: FilePath -> IO (Bool)
+saveDiag' :: FilePath -> IO Bool
 saveDiag' fp =
-  case cmpExt "obj" fp of
-    True -> do
+  if cmpExt "obj" fp
+    then do
       mesh <- readFile fp
       renderCairo "out.svg" (Width 600) (diagFromString (MkProp 2) mesh)
       return True
-    False -> return False
+    else return False

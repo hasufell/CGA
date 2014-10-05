@@ -18,6 +18,6 @@ meshToArr xs = fmap (\(Just (x, _)) -> x)     .
 
 -- | Creates a Parser that accepts a single vertice, such as 'v 1.0 2.0'.
 parseVertice :: Parser (Double, Double)
-parseVertice = liftA2 (,)
-                 (char 'v' *> spaces *> posDouble)
+parseVertice = (,)                                 <$>
+                 (char 'v' *> spaces *> posDouble) <*>
                  (spaces *> posDouble)
