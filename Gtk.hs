@@ -8,7 +8,6 @@ import Diagrams.Backend.Cairo
 import Diagrams.Backend.Cairo.Internal
 import Graphics.UI.Gtk
 import Graphics.UI.Gtk.Glade
-import Graphics.UI.Gtk.Windows.MessageDialog
 import System.Directory
 import Util
 
