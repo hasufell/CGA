@@ -36,7 +36,8 @@ diagFromVTable prop vt
               mkPoint (x,y) = p2 (x,y)
 
 
--- |Create the Diagram from a String.
+-- |Create the Diagram from a String which is supposed to be the contents
+-- of an obj file.
 diagFromString :: DiagProp -> String -> Diagram Cairo R2
 diagFromString prop mesh
   = diagFromVTable prop .
