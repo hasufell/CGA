@@ -24,7 +24,8 @@ data MyGUI = MkMyGUI {
   xl  :: Entry,
   xu  :: Entry,
   yl  :: Entry,
-  yu  :: Entry
+  yu  :: Entry,
+  aD  :: AboutDialog
 }
 
 
@@ -49,8 +50,9 @@ makeMyGladeGUI = do
   xu'  <- xmlGetWidget xml castToEntry "xuD"
   yl'  <- xmlGetWidget xml castToEntry "ylD"
   yu'  <- xmlGetWidget xml castToEntry "yuD"
+  aD'  <- xmlGetWidget xml castToAboutDialog "aboutdialog"
 
-  return $ MkMyGUI win' dB' sB' qB' fB' da' hs' xl' xu' yl' yu'
+  return $ MkMyGUI win' dB' sB' qB' fB' da' hs' xl' xu' yl' yu' aD'
 
 
 -- |Handle the whole GTK gui.
@@ -74,10 +76,13 @@ makeGUI startFile = do
       return ()
 
   -- callbacks
-  _ <- onDestroy (win mygui) mainQuit
-  _ <- onClicked (dB mygui) $ onClickedDrawButton mygui
-  _ <- onClicked (sB mygui) $ onClickedSaveButton mygui
-  _ <- onClicked (qB mygui) mainQuit
+  _ <- onDestroy  (win mygui) mainQuit
+  _ <- onClicked  (dB mygui) $ onClickedDrawButton mygui
+  _ <- onClicked  (sB mygui) $ onClickedSaveButton mygui
+  _ <- onClicked  (qB mygui) mainQuit
+  _ <- onResponse (aD mygui) (\x -> case x of
+                                ResponseCancel -> widgetHideAll (aD mygui)
+                                _ -> return ())
 
   -- hotkeys
   _ <- win mygui `on` keyPressEvent $ tryEvent $ do
@@ -92,6 +97,10 @@ makeGUI startFile = do
          [Control] <- eventModifier
          "d"       <- eventKeyName
          liftIO $ onClickedDrawButton mygui
+  _ <- win mygui `on` keyPressEvent $ tryEvent $ do
+         [Control] <- eventModifier
+         "a"       <- eventKeyName
+         liftIO $ widgetShowAll (aD mygui)
 
   -- draw widgets and start main loop
   widgetShowAll (win mygui)
