@@ -34,8 +34,7 @@ diagFromVTable prop vt
                   (repeat dot))   # moveTo (p2(xOffset, yOffset))
      `atop` hrule (xuD - xlD)     # centerX # moveTo (p2(0, yOffset))
      `atop` vrule (yuD - ylD)     # centerY # moveTo (p2(xOffset, 0))
-     `atop` rect (xuD - xlD + 50)
-                 (yuD - ylD + 50) # lwG 0.00 # bg white
+     `atop` emptyRect (xuD - xlD + 50) (yuD - ylD + 50)
         where dot           = (circle $
                                t prop :: Diagram Cairo R2) # fc black
               mkPoint (x,y) = p2 (x,y)
@@ -57,3 +56,8 @@ diagFromString prop mesh
   = diagFromVTable prop .
       meshToArr         $
       mesh
+
+
+-- |Create a white rectangle with the given width and height.
+emptyRect :: Double -> Double -> Diagram Cairo R2
+emptyRect x y = rect x y # lwG 0.00 # bg white

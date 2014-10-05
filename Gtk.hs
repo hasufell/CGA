@@ -34,6 +34,10 @@ makeGUI startFile = do
                   "filechooserButton"
   da         <- xmlGetWidget xml castToDrawingArea "drawingarea"
   hscale     <- xmlGetWidget xml castToHScale "hscale"
+  xlDE       <- xmlGetWidget xml castToEntry "xlD"
+  xlUE       <- xmlGetWidget xml castToEntry "xlU"
+  ylDE       <- xmlGetWidget xml castToEntry "ylD"
+  ylUE       <- xmlGetWidget xml castToEntry "ylU"
 
   -- adjust properties
   if startFile == ""
@@ -47,8 +51,9 @@ makeGUI startFile = do
   -- callbacks
   _ <- onDestroy window mainQuit
   _ <- onClicked drawButton $ onClickedDrawButton fileButton
-         da hscale
+         da hscale (xlDE, xlUE) (ylDE, ylUE)
   _ <- onClicked saveButton $ onClickedSaveButton fileButton
+         hscale (xlDE, xlUE) (ylDE, ylUE)
   _ <- onClicked quitButton mainQuit
 
   -- hotkeys
@@ -60,10 +65,12 @@ makeGUI startFile = do
          [Control] <- eventModifier
          "s"       <- eventKeyName
          liftIO $ onClickedSaveButton fileButton
+           hscale (xlDE, xlUE) (ylDE, ylUE)
   _ <- window `on` keyPressEvent $ tryEvent $ do
          [Control] <- eventModifier
          "d"       <- eventKeyName
          liftIO $ onClickedDrawButton fileButton da hscale
+           (xlDE, xlUE) (ylDE, ylUE)
 
   -- draw widgets and start main loop
   widgetShowAll window
@@ -75,26 +82,32 @@ onClickedDrawButton :: (WidgetClass widget, RangeClass scale)
                     => FileChooserButton
                     -> widget
                     -> scale
+                    -> (Entry, Entry)
+                    -> (Entry, Entry)
                     -> IO ()
-onClickedDrawButton fcb da scale' = do
+onClickedDrawButton fcb da scale' dXE dYE = do
   filename <- fileChooserGetFilename fcb
   case filename of
     Just x -> do
-      cId <- onExpose da (\_ -> drawDiag' x da scale')
-      _ <- on fcb fileActivated (signalDisconnect cId)
-      ret <- drawDiag' x da scale'
+      cId <- onExpose da (\_ -> drawDiag' x da scale' dXE dYE)
+      _   <- on fcb fileActivated (signalDisconnect cId)
+      ret <- drawDiag' x da scale' dXE dYE
       unless ret $ showErrorDialog "No valid Mesh file!"
     Nothing -> showErrorDialog "No valid Mesh file!"
 
 
 -- |Callback when the "Save" Button is clicked.
-onClickedSaveButton :: FileChooserButton
+onClickedSaveButton :: RangeClass scale
+                    => FileChooserButton
+                    -> scale
+                    -> (Entry, Entry)
+                    -> (Entry, Entry)
                     -> IO ()
-onClickedSaveButton fcb = do
+onClickedSaveButton fcb scale' dXE dYE = do
   filename <- fileChooserGetFilename fcb
   case filename of
     Just x -> do
-      ret <- saveDiag' x
+      ret <- saveDiag' x scale' dXE dYE
       unless ret $ showErrorDialog "No valid Mesh file!"
     Nothing -> showErrorDialog "No valid Mesh file!"
 
@@ -117,28 +130,74 @@ drawDiag' :: (WidgetClass widget, RangeClass scale)
           => FilePath
           -> widget
           -> scale
+          -> (Entry, Entry)
+          -> (Entry, Entry)
           -> IO Bool
-drawDiag' fp da scale' =
+drawDiag' fp da scale' dXE dYE =
   if cmpExt "obj" fp
     then do
       mesh       <- readFile fp
       dw         <- widgetGetDrawWindow da
       adjustment <- rangeGetAdjustment scale'
       scaleVal   <- adjustmentGetValue adjustment
-      let (_, r) = renderDia Cairo
+      xlD        <- entryGetText $ fst dXE
+      xlU        <- entryGetText $ snd dXE
+      ylD        <- entryGetText $ fst dYE
+      ylU        <- entryGetText $ snd dYE
+
+      -- clear drawing area
+      clearDiag da
+
+      let xD     = (read xlD, read xlU) :: (Double, Double)
+          yD     = (read ylD, read ylU) :: (Double, Double)
+          (_, r) = renderDia Cairo
                      (CairoOptions "" (Width 600) SVG False)
-                     (diagFromString (def{t = scaleVal}) mesh)
+                     (diagFromString (def{t  = scaleVal,
+                                          dX = xD,
+                                          dY = yD})
+                                     mesh)
       renderWithDrawable dw r
       return True
     else return False
 
 
 -- |Saves a Diagram which is built from a given file as an SVG.
-saveDiag' :: FilePath -> IO Bool
-saveDiag' fp =
+saveDiag' :: RangeClass scale
+          => FilePath
+          -> scale
+          -> (Entry, Entry)
+          -> (Entry, Entry)
+          -> IO Bool
+saveDiag' fp scale' dXE dYE =
   if cmpExt "obj" fp
     then do
-      mesh <- readFile fp
-      renderCairo "out.svg" (Width 600) (diagFromString def mesh)
+      mesh       <- readFile fp
+      adjustment <- rangeGetAdjustment scale'
+      scaleVal   <- adjustmentGetValue adjustment
+      xlD        <- entryGetText $ fst dXE
+      xlU        <- entryGetText $ snd dXE
+      ylD        <- entryGetText $ fst dYE
+      ylU        <- entryGetText $ snd dYE
+
+      let xD     = (read xlD, read xlU) :: (Double, Double)
+          yD     = (read ylD, read ylU) :: (Double, Double)
+      renderCairo "out.svg" (Width 600)
+          (diagFromString (def{t  = scaleVal,
+                               dX = xD,
+                               dY = yD})
+                           mesh)
       return True
     else return False
+
+
+-- |Clears the drawing area by painting a white rectangle.
+clearDiag :: WidgetClass widget
+          => widget
+          -> IO ()
+clearDiag da = do
+  dw <- widgetGetDrawWindow da
+
+  let (_, r) = renderDia Cairo
+               (CairoOptions "" (Width 600) SVG False)
+               (emptyRect 600 600)
+  renderWithDrawable dw r
