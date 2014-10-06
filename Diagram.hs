@@ -16,7 +16,7 @@ import Meshparser
 import Util
 
 
--- |Represents a Cairo Diagram. This allow us to create multiple
+-- |Represents a Cairo Diagram. This allows us to create multiple
 -- diagrams with different algorithms but based on the same
 -- coordinates and common properties.
 data Diag = Diag {
