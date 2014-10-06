@@ -113,10 +113,10 @@ showYAxis = Diag f
 
 -- |Creates a Diagram that shows a white rectangle which is a little
 -- bit bigger as both X and Y axis dimensions from DiagProp.
-showEmptyRectB :: Diag
-showEmptyRectB = Diag f
+showWhiteRectB :: Diag
+showWhiteRectB = Diag f
   where
-    f p _ = emptyRect (xuD p - xlD p + 50) (yuD p - ylD p + 50)
+    f p _ = whiteRect (xuD p - xlD p + 50) (yuD p - ylD p + 50)
 
 
 
@@ -124,7 +124,7 @@ showEmptyRectB = Diag f
 diag :: DiagProp -> VTable -> Diagram Cairo R2
 diag p = case alg p of
   0 -> mkDiag
-         (mconcat [showCoordinates, showXAxis, showYAxis, showEmptyRectB])
+         (mconcat [showCoordinates, showXAxis, showYAxis, showWhiteRectB])
          p
   _ -> mempty
 
@@ -139,5 +139,5 @@ diagS p mesh
 
 
 -- |Create a white rectangle with the given width and height.
-emptyRect :: Double -> Double -> Diagram Cairo R2
-emptyRect x y = rect x y # lwG 0.00 # bg white
+whiteRect :: Double -> Double -> Diagram Cairo R2
+whiteRect x y = rect x y # lwG 0.00 # bg white

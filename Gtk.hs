@@ -253,5 +253,5 @@ clearDiag mygui = do
 
   let (_, r) = renderDia Cairo
                (CairoOptions "" (Width 600) SVG False)
-               (emptyRect 600 600)
+               (whiteRect 600 600)
   renderWithDrawable dw r
