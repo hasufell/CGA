@@ -14,20 +14,25 @@ inRange (xlD, xuD) (ylD, yuD) (x,y)
 
 -- |Compare the extension of a file with the given String.
 cmpExt :: String -> FilePath -> Bool
-cmpExt _ [] = False
-cmpExt checkExt fp
-  | actualExt == fp = False
-  | otherwise = checkExt == actualExt
-    where
-      actualExt = getExt fp
+cmpExt checkExt = (==) checkExt . getExt
 
 
 -- |Get the extension of a file.
 getExt :: FilePath -> String
-getExt = last           .
-  splitBy (== '.')      .
-  last                  .
-  splitBy (== '/')
+getExt fp
+  | hasExt fp = last   .
+      splitBy (== '.') .
+      last             .
+      splitBy (== '/') $
+      fp
+  | otherwise = ""
+
+
+-- |Check if the file has an extension.
+hasExt :: FilePath -> Bool
+hasExt fp
+  | (<= 1) . length . splitBy (== '.') $ fp = False
+  | otherwise = True
 
 
 -- |Split an array into subarrays depending on a given condition.
