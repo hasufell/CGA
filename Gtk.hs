@@ -1,4 +1,4 @@
-module Gtk where
+module Gtk (makeGUI) where
 
 import Control.Monad.IO.Class
 import Defaults
