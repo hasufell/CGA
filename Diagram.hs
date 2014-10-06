@@ -126,7 +126,6 @@ showWhiteRectB = Diag f
     f p _ = whiteRect (xuD p - xlD p + 50) (yuD p - ylD p + 50)
 
 
-
 -- |Create the Diagram from the VTable.
 diag :: DiagProp -> VTable -> Diagram Cairo R2
 diag p = case alg p of
