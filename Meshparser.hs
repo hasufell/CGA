@@ -1,4 +1,4 @@
-module Meshparser where
+module Meshparser (VTable, meshToArr) where
 
 import Control.Applicative
 import Parser
