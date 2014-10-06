@@ -1,4 +1,11 @@
-module Diagram where
+module Diagram (t,
+                dX,
+                dY,
+                alg,
+                defaultProp,
+                diag,
+                diagS,
+                whiteRect) where
 
 import Defaults
 import Diagrams.Prelude
