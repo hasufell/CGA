@@ -32,9 +32,7 @@ getExt fp
 
 -- |Check if the file has an extension.
 hasExt :: FilePath -> Bool
-hasExt fp
-  | (<= 1) . length . splitBy (== '.') $ fp = False
-  | otherwise = True
+hasExt = (>1) . length . splitBy (== '.')
 
 
 -- |Split an array into subarrays depending on a given condition.
