@@ -186,26 +186,26 @@ drawDiag' fp mygui =
       dw         <- widgetGetDrawWindow (da mygui)
       adjustment <- rangeGetAdjustment (hs mygui)
       scaleVal   <- adjustmentGetValue adjustment
-      xlD        <- entryGetText (xl mygui)
-      xuD        <- entryGetText (xu mygui)
-      ylD        <- entryGetText (yl mygui)
-      yuD        <- entryGetText (yu mygui)
+      xlD'        <- entryGetText (xl mygui)
+      xuD'        <- entryGetText (xu mygui)
+      ylD'        <- entryGetText (yl mygui)
+      yuD'        <- entryGetText (yu mygui)
 
       -- clear drawing area
       clearDiag mygui
 
-      let xD = (,) <$> readMaybe xlD <*> readMaybe xuD :: Maybe (Double,
+      let xD = (,) <$> readMaybe xlD' <*> readMaybe xuD' :: Maybe (Double,
                                                                  Double)
-          yD = (,) <$> readMaybe ylD <*> readMaybe yuD :: Maybe (Double,
+          yD = (,) <$> readMaybe ylD' <*> readMaybe yuD' :: Maybe (Double,
                                                                  Double)
       case (xD, yD) of
         (Just xD', Just yD') -> do
           let (_, r) = renderDia Cairo
                          (CairoOptions "" (Width 600) SVG False)
-                         (diagFromString (def{t  = scaleVal,
-                                              dX = xD',
-                                              dY = yD'})
-                                         mesh)
+                         (diagS (def{t  = scaleVal,
+                                          dX = xD',
+                                          dY = yD'})
+                                 mesh)
           renderWithDrawable dw r
           return 0
         _ -> return 1
@@ -223,22 +223,22 @@ saveDiag' fp mygui =
       mesh       <- readFile fp
       adjustment <- rangeGetAdjustment (hs mygui)
       scaleVal   <- adjustmentGetValue adjustment
-      xlD        <- entryGetText (xl mygui)
-      xuD        <- entryGetText (xu mygui)
-      ylD        <- entryGetText (yl mygui)
-      yuD        <- entryGetText (yu mygui)
+      xlD'        <- entryGetText (xl mygui)
+      xuD'        <- entryGetText (xu mygui)
+      ylD'        <- entryGetText (yl mygui)
+      yuD'        <- entryGetText (yu mygui)
 
-      let xD = (,) <$> readMaybe xlD <*> readMaybe xuD :: Maybe (Double,
+      let xD = (,) <$> readMaybe xlD' <*> readMaybe xuD' :: Maybe (Double,
                                                                  Double)
-          yD = (,) <$> readMaybe ylD <*> readMaybe yuD :: Maybe (Double,
+          yD = (,) <$> readMaybe ylD' <*> readMaybe yuD' :: Maybe (Double,
                                                                  Double)
       case (xD, yD) of
         (Just xD', Just yD') -> do
           renderCairo "out.svg" (Width 600)
-            (diagFromString (def{t  = scaleVal,
-                                 dX = xD',
-                                 dY = yD'})
-                             mesh)
+            (diagS (def{t  = scaleVal,
+                             dX = xD',
+                             dY = yD'})
+                    mesh)
           return 0
         _ -> return 1
 
