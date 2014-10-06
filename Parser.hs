@@ -1,3 +1,5 @@
+{-# OPTIONS_HADDOCK ignore-exports #-}
+
 module Parser (Parser,
                runParser,
                satisfy,

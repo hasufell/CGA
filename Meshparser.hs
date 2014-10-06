@@ -1,3 +1,5 @@
+{-# OPTIONS_HADDOCK ignore-exports #-}
+
 module Meshparser (VTable, meshToArr) where
 
 import Control.Applicative

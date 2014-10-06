@@ -1,3 +1,5 @@
+{-# OPTIONS_HADDOCK ignore-exports #-}
+
 module Gtk (makeGUI) where
 
 import Control.Monad.IO.Class
