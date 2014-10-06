@@ -18,9 +18,9 @@ import Util
 -- diagrams with different algorithms but based on the same
 -- coordinates and common properties.
 data Diag = Diag {
-  mkDiag :: DiagProp         -- ^ properties of the diagrams
-         -> VTable           -- ^ coordinates from the vertice table
-         -> Diagram Cairo R2 -- ^ resulting cairo 2d diagram
+  mkDiag :: DiagProp
+         -> VTable
+         -> Diagram Cairo R2
 }
 
 
