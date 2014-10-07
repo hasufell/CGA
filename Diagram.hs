@@ -9,7 +9,7 @@ module Diagram (t,
                 diagS,
                 whiteRect) where
 
-import Defaults
+import Class.Defaults
 import Diagrams.Prelude
 import Diagrams.Backend.Cairo
 import LinearAlgebra.Vector

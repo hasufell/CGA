@@ -3,7 +3,7 @@
 module Gtk (makeGUI) where
 
 import Control.Monad.IO.Class
-import Defaults
+import Class.Defaults
 import Diagram
 import Diagrams.Prelude
 import Diagrams.Backend.Cairo

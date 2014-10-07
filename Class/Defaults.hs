@@ -1,6 +1,6 @@
 {-# OPTIONS_HADDOCK ignore-exports #-}
 
-module Defaults where
+module Class.Defaults where
 
 
 -- |Used to create a common interface for default settings of data types.
