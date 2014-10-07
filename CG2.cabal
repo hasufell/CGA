@@ -54,7 +54,7 @@ executable CG2
   main-is:             Main.hs
 
   -- Modules included in this executable, other than Main.
-  other-modules:       Diagram Gtk Class.Defaults Parser.Meshparser Parser.Core OS.FileExt LinearAlgebra.Vector
+  other-modules:       Diagram Gtk Util Class.Defaults Parser.Meshparser Parser.Core OS.FileExt LinearAlgebra.Vector
 
   -- LANGUAGE extensions used by modules in this package.
   -- other-extensions:

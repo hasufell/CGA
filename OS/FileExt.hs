@@ -2,6 +2,8 @@
 
 module OS.FileExt where
 
+import Util
+
 
 -- |Compare the extension of a file with the given String.
 cmpExt :: String -> FilePath -> Bool
@@ -22,13 +24,3 @@ getExt fp
 -- |Check if the file has an extension.
 hasExt :: FilePath -> Bool
 hasExt = (>1) . length . splitBy (== '.')
-
-
--- |Split an array into subarrays depending on a given condition.
-splitBy :: (a -> Bool) -- ^ condition
-        -> [a]         -- ^ array to split
-        -> [[a]]       -- ^ splitted array
-splitBy f s =  case dropWhile f s of
-                 [] -> []
-                 s' -> w : splitBy f s''
-                   where (w, s'') = break f s'
