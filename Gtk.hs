@@ -12,8 +12,7 @@ import Graphics.UI.Gtk
 import Graphics.UI.Gtk.Glade
 import System.Directory
 import Text.Read
-import Util
-
+import OS.FileExt
 
 -- |Monolithic object passed to various GUI functions in order
 -- to keep the API stable and not alter the parameters too much.

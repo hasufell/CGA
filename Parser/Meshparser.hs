@@ -1,9 +1,9 @@
 {-# OPTIONS_HADDOCK ignore-exports #-}
 
-module Meshparser (VTable, meshToArr) where
+module Parser.Meshparser (VTable, meshToArr) where
 
 import Control.Applicative
-import Parser
+import Parser.Core
 
 -- |The VTable is represented by a 'Double' tuple, 2-dimensional.
 type VTable = [(Double, Double)]

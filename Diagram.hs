@@ -12,8 +12,8 @@ module Diagram (t,
 import Defaults
 import Diagrams.Prelude
 import Diagrams.Backend.Cairo
-import Meshparser
-import Util
+import LinearAlgebra.Vector
+import Parser.Meshparser
 
 
 -- |Represents a Cairo Diagram. This allows us to create multiple

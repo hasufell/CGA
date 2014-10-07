@@ -1,6 +1,6 @@
 {-# OPTIONS_HADDOCK ignore-exports #-}
 
-module Parser (Parser,
+module Parser.Core (Parser,
                runParser,
                satisfy,
                char,
