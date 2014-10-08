@@ -21,7 +21,7 @@ import Parser.Meshparser
 -- coordinates and common properties.
 data Diag = Diag {
   mkDiag :: DiagProp
-         -> VTable
+         -> [PT]
          -> Diagram Cairo R2
 }
 
@@ -31,9 +31,9 @@ data DiagProp = MkProp {
   -- |The thickness of the dots.
   t :: Double,
   -- |The dimensions of the x-axis.
-  dX :: (Double, Double),
+  dX :: Coord,
   -- |The dimensions of the y-axis.
-  dY :: (Double, Double),
+  dY :: Coord,
   -- |Algorithm to use.
   alg :: Int
 }
@@ -95,13 +95,11 @@ showCoordinates :: Diag
 showCoordinates = Diag f
   where
     f p vt
-      = position (zip (map mkPoint . filter (inRange (dX p) (dY p)) $ vt)
+      = position (zip (filter (inRange (dX p) (dY p)) $ vt)
                       (repeat dot))   # moveTo (p2(xOffset p, yOffset p))
             where
               -- a dot itself is a diagram
               dot = (circle $ t p :: Diagram Cairo R2) # fc black
-              -- this is just abstraction
-              mkPoint (x,y) = p2 (x,y)
 
 
 -- |Creates a Diagram that shows an XAxis which is bound
@@ -129,7 +127,7 @@ showWhiteRectB = Diag f
 
 
 -- |Create the Diagram from the VTable.
-diag :: DiagProp -> VTable -> Diagram Cairo R2
+diag :: DiagProp -> [PT] -> Diagram Cairo R2
 diag p = case alg p of
   0 -> mkDiag
          (mconcat [showCoordinates, showXAxis, showYAxis, showWhiteRectB])
@@ -141,7 +139,7 @@ diag p = case alg p of
 -- of an obj file.
 diagS :: DiagProp -> String -> Diagram Cairo R2
 diagS p mesh
-  = diag p     .
+  = diag p      .
       meshToArr $
       mesh
 
