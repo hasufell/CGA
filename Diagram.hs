@@ -77,17 +77,6 @@ yuD :: DiagProp -> Double
 yuD = snd . dY
 
 
--- |The X offset to move coordinates to the right
--- position depending on the X dimensions.
-xOffset :: DiagProp -> Double
-xOffset p = (negate (xlD p) / 2) - (xuD p / 2)
-
-
--- |The Y offset to move coordinates to the right
--- position depending on the X dimensions.
-yOffset :: DiagProp -> Double
-yOffset p = (negate (ylD p) / 2) - (yuD p / 2)
-
 
 -- |Creates a Diagram that shows the coordinates from the VTable
 -- as dots. The VTable and thickness of the dots can be controlled
@@ -97,7 +86,7 @@ showCoordinates = Diag f
   where
     f p vt
       = position (zip (filter (inRange (dX p) (dY p)) $ vt)
-                      (repeat dot))   # moveTo (p2(xOffset p, yOffset p))
+                      (repeat dot))
             where
               -- a dot itself is a diagram
               dot = (circle $ t p :: Diagram Cairo R2) # fc black
@@ -109,7 +98,7 @@ showConvexHullPoints = Diag f
   where
     f p vt
       = position (zip (filter (inRange (dX p) (dY p)) $ vtch)
-                      (repeat dot))   # moveTo (p2(xOffset p, yOffset p))
+                      (repeat dot))
             where
               -- a dot itself is a diagram
               dot = (circle $ t p :: Diagram Cairo R2) # fc red # lc red
@@ -121,7 +110,7 @@ showConvexHullPoints = Diag f
 showXAxis :: Diag
 showXAxis = Diag f
   where
-    f p _ = hrule (xuD p - xlD p) # moveTo (p2(0, yOffset p))
+    f p _ = (strokeTrail . fromVertices $ [p2 (xlD p,0), p2 (xuD p, 0)]) # moveTo (p2 (xlD p,0))
 
 
 -- |Creates a Diagram that shows an YAxis which is bound
@@ -129,7 +118,7 @@ showXAxis = Diag f
 showYAxis :: Diag
 showYAxis = Diag f
   where
-    f p _ = vrule (yuD p - ylD p) # moveTo (p2(xOffset p, 0))
+    f p _ = strokeTrail . fromVertices $ [p2 (0, ylD p), p2 (0, yuD p)] # moveTo (p2 (0, ylD p))
 
 
 -- |Creates a Diagram that shows a white rectangle which is a little
@@ -137,7 +126,10 @@ showYAxis = Diag f
 showWhiteRectB :: Diag
 showWhiteRectB = Diag f
   where
-    f p _ = whiteRect (xuD p - xlD p + 50) (yuD p - ylD p + 50)
+    f p _ = whiteRect (w' + 50) (h' + 50) # moveTo (p2 (w' / 2, h' / 2))
+      where
+        w' = xuD p - xlD p
+        h' = yuD p - ylD p
 
 
 -- |Create the Diagram from the VTable.
@@ -157,9 +149,9 @@ diag p = case alg p of
 -- of an obj file.
 diagS :: DiagProp -> String -> Diagram Cairo R2
 diagS p mesh
-  = diag p      .
+  = (diag p      .
       meshToArr $
-      mesh
+      mesh) # bg white
 
 
 -- |Create a white rectangle with the given width and height.

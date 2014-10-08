@@ -192,9 +192,7 @@ drawDiag' fp mygui =
       ylD'       <- entryGetText (yl mygui)
       yuD'       <- entryGetText (yu mygui)
       alg'       <- comboBoxGetActive (cB mygui)
-
-      -- clear drawing area
-      clearDiag mygui
+      (daW, daH) <- widgetGetSize (da mygui)
 
       let xD = (,) <$> readMaybe xlD' <*> readMaybe xuD' :: Maybe (Double,
                                                                  Double)
@@ -203,12 +201,14 @@ drawDiag' fp mygui =
       case (xD, yD) of
         (Just xD', Just yD') -> do
           let (_, r) = renderDia Cairo
-                         (CairoOptions "" (Width 600) SVG False)
+                         (CairoOptions ""
+                           (Dims (fromIntegral daW) (fromIntegral daH))
+                           SVG False)
                          (diagS (def{t  = scaleVal,
                                           dX = xD',
                                           dY = yD',
                                           alg = alg'})
-                                 mesh)
+                           mesh)
           renderWithDrawable dw r
           return 0
         _ -> return 1
@@ -226,11 +226,12 @@ saveDiag' fp mygui =
       mesh       <- readFile fp
       adjustment <- rangeGetAdjustment (hs mygui)
       scaleVal   <- adjustmentGetValue adjustment
-      xlD'        <- entryGetText (xl mygui)
-      xuD'        <- entryGetText (xu mygui)
-      ylD'        <- entryGetText (yl mygui)
-      yuD'        <- entryGetText (yu mygui)
+      xlD'       <- entryGetText (xl mygui)
+      xuD'       <- entryGetText (xu mygui)
+      ylD'       <- entryGetText (yl mygui)
+      yuD'       <- entryGetText (yu mygui)
       alg'       <- comboBoxGetActive (cB mygui)
+      (daW, daH) <- widgetGetSize (da mygui)
 
       let xD = (,) <$> readMaybe xlD' <*> readMaybe xuD' :: Maybe (Double,
                                                                  Double)
@@ -238,25 +239,14 @@ saveDiag' fp mygui =
                                                                  Double)
       case (xD, yD) of
         (Just xD', Just yD') -> do
-          renderCairo "out.svg" (Width 600)
+          renderCairo "out.svg"
+            (Dims (fromIntegral daW) (fromIntegral daH))
             (diagS (def{t  = scaleVal,
                              dX = xD',
                              dY = yD',
                              alg = alg'})
-                    mesh)
+              mesh)
           return 0
         _ -> return 1
 
     else return 2
-
-
--- |Clears the drawing area by painting a white rectangle.
-clearDiag :: MyGUI
-          -> IO ()
-clearDiag mygui = do
-  dw <- widgetGetDrawWindow (da mygui)
-
-  let (_, r) = renderDia Cairo
-               (CairoOptions "" (Width 600) SVG False)
-               (whiteRect 600 600)
-  renderWithDrawable dw r
