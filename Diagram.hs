@@ -9,6 +9,7 @@ module Diagram (t,
                 diagS,
                 whiteRect) where
 
+import Algorithms.ConvexHull
 import Class.Defaults
 import Diagrams.Prelude
 import Diagrams.Backend.Cairo
@@ -102,6 +103,19 @@ showCoordinates = Diag f
               dot = (circle $ t p :: Diagram Cairo R2) # fc black
 
 
+-- |Create a diagram which shows the points of the convex hull.
+showConvexHullPoints :: Diag
+showConvexHullPoints = Diag f
+  where
+    f p vt
+      = position (zip (filter (inRange (dX p) (dY p)) $ vtch)
+                      (repeat dot))   # moveTo (p2(xOffset p, yOffset p))
+            where
+              -- a dot itself is a diagram
+              dot = (circle $ t p :: Diagram Cairo R2) # fc red # lc red
+              vtch = grahamGetCH vt
+
+
 -- |Creates a Diagram that shows an XAxis which is bound
 -- by the dimensions given in xD from DiagProp.
 showXAxis :: Diag
@@ -131,6 +145,10 @@ diag :: DiagProp -> [PT] -> Diagram Cairo R2
 diag p = case alg p of
   0 -> mkDiag
          (mconcat [showCoordinates, showXAxis, showYAxis, showWhiteRectB])
+         p
+  1 -> mkDiag
+         (mconcat [showConvexHullPoints, showCoordinates,
+                   showXAxis, showYAxis, showWhiteRectB])
          p
   _ -> mempty
 
