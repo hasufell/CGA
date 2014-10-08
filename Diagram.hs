@@ -77,9 +77,8 @@ yuD :: DiagProp -> Double
 yuD = snd . dY
 
 
-
--- |Creates a Diagram that shows the coordinates from the VTable
--- as dots. The VTable and thickness of the dots can be controlled
+-- |Creates a Diagram that shows the coordinates from the points
+-- as dots. The points and thickness of the dots can be controlled
 -- via DiagProp.
 showCoordinates :: Diag
 showCoordinates = Diag f
@@ -132,7 +131,7 @@ showWhiteRectB = Diag f
         h' = yuD p - ylD p
 
 
--- |Create the Diagram from the VTable.
+-- |Create the Diagram from the points.
 diag :: DiagProp -> [PT] -> Diagram Cairo R2
 diag p = case alg p of
   0 -> mkDiag
