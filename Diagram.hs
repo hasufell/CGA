@@ -45,7 +45,7 @@ instance Def DiagProp where
 
 
 instance Monoid Diag where
-  mempty = Diag (\_ _ -> rect 0 0)
+  mempty = Diag (\_ _ -> mempty)
   mappend d1 d2 = Diag g
     where
       g p vt = mkDiag d1 p vt <> mkDiag d2 p vt
