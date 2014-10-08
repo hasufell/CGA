@@ -30,6 +30,7 @@ lowestYC (a:b:vs)
 -- P0 and the x-axis.
 grahamSort :: [PT] -- ^ the points to sort
            -> [PT] -- ^ sorted points
+grahamSort [] = []
 grahamSort xs = p0 : sortBy (\a b
   -> noEqual a b                            .
        compare
@@ -59,7 +60,6 @@ grahamSort xs = p0 : sortBy (\a b
 grahamGetCH :: [PT] -> [PT]
 grahamGetCH vs = f . grahamSort $ vs
   where
-    f [] = []
     f (x:y:z:xs)
       | ccw x y z = x : f (y:z:xs)
       | otherwise = f (x:z:xs)
