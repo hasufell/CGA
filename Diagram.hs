@@ -45,10 +45,10 @@ instance Def DiagProp where
 
 
 instance Monoid Diag where
-  mempty = Diag (\_ _ -> rect 0 0 # lwG 0.00)
+  mempty = Diag (\_ _ -> rect 0 0)
   mappend d1 d2 = Diag g
     where
-      g p vt = mkDiag d1 p vt `atop` mkDiag d2 p vt
+      g p vt = mkDiag d1 p vt <> mkDiag d2 p vt
   mconcat = foldr mappend mempty
 
 
