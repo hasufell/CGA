@@ -187,10 +187,11 @@ drawDiag' fp mygui =
       dw         <- widgetGetDrawWindow (da mygui)
       adjustment <- rangeGetAdjustment (hs mygui)
       scaleVal   <- adjustmentGetValue adjustment
-      xlD'        <- entryGetText (xl mygui)
-      xuD'        <- entryGetText (xu mygui)
-      ylD'        <- entryGetText (yl mygui)
-      yuD'        <- entryGetText (yu mygui)
+      xlD'       <- entryGetText (xl mygui)
+      xuD'       <- entryGetText (xu mygui)
+      ylD'       <- entryGetText (yl mygui)
+      yuD'       <- entryGetText (yu mygui)
+      alg'       <- comboBoxGetActive (cB mygui)
 
       -- clear drawing area
       clearDiag mygui
@@ -205,7 +206,8 @@ drawDiag' fp mygui =
                          (CairoOptions "" (Width 600) SVG False)
                          (diagS (def{t  = scaleVal,
                                           dX = xD',
-                                          dY = yD'})
+                                          dY = yD',
+                                          alg = alg'})
                                  mesh)
           renderWithDrawable dw r
           return 0
@@ -228,6 +230,7 @@ saveDiag' fp mygui =
       xuD'        <- entryGetText (xu mygui)
       ylD'        <- entryGetText (yl mygui)
       yuD'        <- entryGetText (yu mygui)
+      alg'       <- comboBoxGetActive (cB mygui)
 
       let xD = (,) <$> readMaybe xlD' <*> readMaybe xuD' :: Maybe (Double,
                                                                  Double)
@@ -238,7 +241,8 @@ saveDiag' fp mygui =
           renderCairo "out.svg" (Width 600)
             (diagS (def{t  = scaleVal,
                              dX = xD',
-                             dY = yD'})
+                             dY = yD',
+                             alg = alg'})
                     mesh)
           return 0
         _ -> return 1

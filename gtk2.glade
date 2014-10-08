@@ -702,7 +702,8 @@ Malte Flender &lt;malte.flender@fh-bielefeld.de&gt;</property>
           <widget class="GtkComboBox" id="comboalgo">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="items" translatable="yes">Show points</property>
+            <property name="items" translatable="yes">Show points
+Show convex hull</property>
           </widget>
           <packing>
             <property name="expand">False</property>
