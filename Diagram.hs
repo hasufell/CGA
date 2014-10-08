@@ -104,6 +104,18 @@ showConvexHullPoints = Diag f
               vtch = grahamGetCH vt
 
 
+showConvexHullLines :: Diag
+showConvexHullLines = Diag f
+  where
+    f _ vt
+      = (strokeTrail                       .
+         fromVertices                      .
+         flip (++) [head $ grahamGetCH vt] .
+         grahamGetCH                       $
+         vt
+        ) # moveTo (head $ grahamGetCH vt) # lc red
+
+
 -- |Creates a Diagram that shows an XAxis which is bound
 -- by the dimensions given in xD from DiagProp.
 showXAxis :: Diag
@@ -138,8 +150,8 @@ diag p = case alg p of
          (mconcat [showCoordinates, showXAxis, showYAxis, showWhiteRectB])
          p
   1 -> mkDiag
-         (mconcat [showConvexHullPoints, showCoordinates,
-                   showXAxis, showYAxis, showWhiteRectB])
+         (mconcat [showConvexHullPoints, showConvexHullLines,
+                   showCoordinates, showXAxis, showYAxis, showWhiteRectB])
          p
   _ -> mempty
 
