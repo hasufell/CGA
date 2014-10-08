@@ -117,7 +117,7 @@ showXAxis = Diag f
 showYAxis :: Diag
 showYAxis = Diag f
   where
-    f p _ = strokeTrail . fromVertices $ [p2 (0, ylD p), p2 (0, yuD p)] # moveTo (p2 (0, ylD p))
+    f p _ = (strokeTrail . fromVertices $ [p2 (0, ylD p), p2 (0, yuD p)]) # moveTo (p2 (0, ylD p))
 
 
 -- |Creates a Diagram that shows a white rectangle which is a little
