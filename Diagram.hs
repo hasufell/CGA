@@ -112,6 +112,7 @@ showConvexHullPoints = Diag f
 showConvexHullLines :: Diag
 showConvexHullLines = Diag f
   where
+    f _ [] = mempty
     f _ vt
       = (strokeTrail                       .
          fromVertices                      .
