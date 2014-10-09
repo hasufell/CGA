@@ -62,7 +62,7 @@ grahamGetCH vs = f . grahamSort $ vs
   where
     f (x:y:z:xs)
       | ccw x y z = x : f (y:z:xs)
-      | otherwise = f (x:z:xs)
+      | otherwise =     f (x:z:xs)
     f xs          = xs
 
 
@@ -73,11 +73,11 @@ grahamGetCHSteps vs = reverse . g $ (length vs - 2)
   where
     vs' = grahamSort vs
     g c
-      | c >= 0 = f 0 vs' : g (c - 1)
+      | c >= 0    = f 0 vs' : g (c - 1)
       | otherwise = []
       where
         f c' (x:y:z:xs)
           | c' >= c   = [x,y]
           | ccw x y z = x : f (c' + 1) (y:z:xs)
-          | otherwise = f (c' + 1) (x:z:xs)
+          | otherwise =     f (c' + 1) (x:z:xs)
         f _ xs        = xs
