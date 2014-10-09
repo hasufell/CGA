@@ -124,6 +124,7 @@ convexHullLines = Diag f
 
 -- |Same as showConvexHullLines, except that it returns an array
 -- of diagrams with each step of the algorithm.
+-- Unfortunately this is very difficult to implement as a Diag (TODO).
 convexHullLinesInterval :: DiagProp -> [PT] -> [Diagram Cairo R2]
 convexHullLinesInterval _ xs =
   fmap g (grahamGetCHSteps xs)
