@@ -116,27 +116,31 @@ convexHullLines :: Diag
 convexHullLines = Diag f
   where
     f _ [] = mempty
-    f _ vt
+    f p vt
       = (strokeTrail                       .
          fromVertices                      .
-         flip (++) [head $ grahamGetCH vt] .
+         flip (++) [head $ grahamGetCH vtf] .
          grahamGetCH                       $
-         vt
-        ) # moveTo (head $ grahamGetCH vt) # lc red
+         vtf
+        ) # moveTo (head $ grahamGetCH vtf) # lc red
+      where
+        vtf = filter (inRange (dX p) (dY p)) vt
 
 
 -- |Same as showConvexHullLines, except that it returns an array
 -- of diagrams with each step of the algorithm.
 -- Unfortunately this is very difficult to implement as a Diag (TODO).
 convexHullLinesInterval :: DiagProp -> [PT] -> [Diagram Cairo R2]
-convexHullLinesInterval _ xs =
+convexHullLinesInterval p xs =
   fmap g (grahamGetCHSteps xs)
     where
       g vt
         = (strokeTrail        .
            fromVertices       $
-           vt
-          ) # moveTo (head vt) # lc red
+           vtf
+          ) # moveTo (head vtf) # lc red
+        where
+          vtf = filter (inRange (dX p) (dY p)) vt
 
 
 -- |Creates a Diagram that shows an XAxis which is bound
