@@ -69,11 +69,12 @@ posInt = MkParser f
 
 -- |Creates a Parser that accepts positive integers.
 posDouble :: Parser Double
-posDouble = read <$>
-             liftA3 (\x y z -> x ++ [y] ++ z)
-                    (MkParser f)
-                    (char '.')
-                    (MkParser f)
+posDouble = read <$> (
+              (\x y z -> x ++ [y] ++ z) <$>
+                    (MkParser f)        <*>
+                    (char '.')          <*>
+                    (MkParser f)        <|>
+                    (MkParser f))
   where
     f xs
       | null ns   = Nothing
