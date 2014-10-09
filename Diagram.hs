@@ -273,7 +273,8 @@ whiteRect :: Double -> Double -> Diagram Cairo R2
 whiteRect x y = rect x y # lwG 0.00 # bg white
 
 
--- |Create a grid across the whole diagram with 50*50 squares.
+-- |Create a grid across the whole diagram with squares of the
+-- given size in DiagProp.
 grid :: Diag
 grid = Diag xGrid `mappend` Diag yGrid
   where
