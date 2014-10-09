@@ -46,7 +46,9 @@ data DiagProp = MkProp {
   -- |Algorithm to use.
   alg :: Int,
   -- |If we want to show the grid.
-  gd :: Bool
+  gd :: Bool,
+  -- |Square size used to show the grid and x/y-axis.
+  sqS :: Double
 }
 
 
@@ -64,7 +66,7 @@ instance Monoid Diag where
 
 -- |The default properties of the Diagram.
 defaultProp :: DiagProp
-defaultProp = MkProp 2 (0,500) (0,500) 0 False
+defaultProp = MkProp 2 (0,500) (0,500) 0 False 50
 
 
 -- |Extract the lower bound of the x-axis dimension.
@@ -158,8 +160,9 @@ xAxis =
     hRule p _ =
       arrowAt (p2 (xlD p,0)) (r2 (xuD p, 0)) # moveTo (p2 (xlD p,0))
     segments p _ =
-      hcat' (with & sep .~ 50)
-            (take (floor . (/) (xuD p - xlD p) $ 50) . repeat $ (vrule 10)) #
+      hcat' (with & sep .~ (sqS p))
+            (take (floor . (/) (xuD p - xlD p) $ (sqS p)) .
+              repeat $ (vrule 10)) #
       moveTo (p2 (xlD p,0))
     labels p _ =
       position $
@@ -168,7 +171,8 @@ xAxis =
               text . show $ x) # scale 10) <$> xs)
       where
         xs :: [Int]
-        xs = take (floor . (/) (xuD p - xlD p) $ 50) (iterate (+50) 0)
+        xs = take (floor . (/) (xuD p - xlD p) $ (sqS p))
+                  (iterate (+(floor . sqS $ p)) 0)
         mkPoint x = p2 (fromIntegral x, -15)
 
 
@@ -183,8 +187,8 @@ yAxis =
     vRule p _ =
       arrowAt (p2 (0, ylD p)) (r2 (0, yuD p)) # moveTo (p2 (0, ylD p))
     segments p _ =
-      vcat' (with & sep .~ 50)
-            (take (floor . (/) (yuD p - ylD p) $ 50) .
+      vcat' (with & sep .~ (sqS p))
+            (take (floor . (/) (yuD p - ylD p) $ (sqS p)) .
               repeat $ (hrule 10)) #
       alignB                       #
       moveTo (p2 (0, (ylD p)))
@@ -195,7 +199,8 @@ yAxis =
               text . show $ x) # scale 10) <$> ys)
         where
           ys :: [Int]
-          ys = take (floor . (/) (yuD p - ylD p) $ 50) (iterate (+50) 0)
+          ys = take (floor . (/) (yuD p - ylD p) $ (sqS p))
+                    (iterate (+(floor . sqS $ p)) 0)
           mkPoint y = p2 (-15, fromIntegral y)
 
 
@@ -272,14 +277,14 @@ grid :: Diag
 grid = Diag f `mappend` Diag g
   where
     f p _ =
-      hcat' (with & sep .~ 50)
-            (take (floor . (/) (xuD p - xlD p) $ 50) .
+      hcat' (with & sep .~ (sqS p))
+            (take (floor . (/) (xuD p - xlD p) $ (sqS p)) .
               repeat $ (vrule $ xuD p - xlD p))   #
       moveTo (p2 (xlD p, (yuD p - ylD p) / 2))    #
       lw ultraThin
     g p _ =
-      vcat' (with & sep .~ 50)
-            (take (floor . (/) (yuD p - ylD p) $ 50) .
+      vcat' (with & sep .~ (sqS p))
+            (take (floor . (/) (yuD p - ylD p) $ (sqS p)) .
               repeat $ (hrule $ yuD p - ylD p))  #
       alignB                                     #
       moveTo (p2 ((xuD p - xlD p) / 2, ylD p))   #
