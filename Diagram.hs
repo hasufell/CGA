@@ -32,6 +32,7 @@ data Diag = Diag {
 
 
 -- |Holds the properties for a Diagram, like thickness of 2d points etc.
+-- This can also be seen as a context when merging multiple diagrams.
 data DiagProp = MkProp {
   -- |The thickness of the dots.
   t :: Double,
