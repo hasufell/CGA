@@ -20,7 +20,7 @@ inRange (xlD, xuD) (ylD, yuD) p
       (x, y) = unp2 p
 
 
--- |Get the angle between two vectors in degrees.
+-- |Get the angle between two vectors.
 getAngle :: Vec -> Vec -> Double
 getAngle a b = acos                                   .
                  flip (/) (vecLength a * vecLength b) .
