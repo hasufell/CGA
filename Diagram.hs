@@ -117,10 +117,10 @@ convexHullLines = Diag f
   where
     f _ [] = mempty
     f p vt
-      = (strokeTrail                       .
-         fromVertices                      .
+      = (strokeTrail                        .
+         fromVertices                       .
          flip (++) [head $ grahamGetCH vtf] .
-         grahamGetCH                       $
+         grahamGetCH                        $
          vtf
         ) # moveTo (head $ grahamGetCH vtf) # lc red
       where
@@ -210,7 +210,7 @@ gifDiag p xs = fmap (\x -> (x, 100))                      .
                  fmap (\x -> x <> g)                      .
                  flip (++)
                    [mkDiag (convexHullLines `mappend`
-                            convexHullPoints) p xs]   $
+                            convexHullPoints) p xs]       $
                  (convexHullLinesInterval p xs)
                    where
                      g = mconcat                      .
