@@ -67,7 +67,8 @@ posInt = MkParser f
       | otherwise = Just (read ns, rest)
         where (ns, rest) = span isDigit xs
 
--- |Creates a Parser that accepts positive integers.
+-- |Creates a Parser that accepts positive doubles.
+-- Both 131.31 and 132 are valid.
 posDouble :: Parser Double
 posDouble = (read <$>)                   $
               (\x y z -> x ++ [y] ++ z) <$>
