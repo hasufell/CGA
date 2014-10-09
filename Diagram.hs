@@ -146,27 +146,45 @@ convexHullLinesInterval p xs =
 -- |Creates a Diagram that shows an XAxis which is bound
 -- by the dimensions given in xD from DiagProp.
 xAxis :: Diag
-xAxis = (Diag f) `mappend` (Diag g)
+xAxis = (Diag hRule)    `mappend`
+        (Diag segments) `mappend`
+        (Diag labels)
   where
-    f p _ = (strokeTrail   .
-              fromVertices $
-              [p2 (xlD p,0), p2 (xuD p, 0)]) # moveTo (p2 (xlD p,0))
-    g p _ = hcat' (with & sep .~ 50)
-              (take (floor . (/) (xuD p - xlD p) $ 50) .
-              repeat $ (vrule 10)) # moveTo (p2 (xlD p,0))
+    hRule p _ = arrowAt (p2 (xlD p,0)) (r2 (xuD p, 0)) #
+                  moveTo (p2 (xlD p,0))
+    segments p _ = hcat' (with & sep .~ 50)
+                     (take (floor . (/) (xuD p - xlD p) $ 50) .
+                     repeat $ (vrule 10)) # moveTo (p2 (xlD p,0))
+    labels p _ =
+      position $ zip (mkPoint <$> xs)
+                     ((\x -> (flip (<>) (square 1 # lw none) .
+                       text . show $ x) # scale 10) <$> xs)
+        where
+          xs :: [Int]
+          xs = take (floor . (/) (xuD p - xlD p) $ 50) (iterate (+50) 0)
+          mkPoint x = p2 (fromIntegral x, -15)
 
 
 -- |Creates a Diagram that shows an YAxis which is bound
 -- by the dimensions given in yD from DiagProp.
 yAxis :: Diag
-yAxis = (Diag f) `mappend` (Diag g)
+yAxis = (Diag vRule)    `mappend`
+        (Diag segments) `mappend`
+        (Diag labels)
   where
-    f p _ = (strokeTrail   .
-              fromVertices $
-              [p2 (0, ylD p), p2 (0, yuD p)]) # moveTo (p2 (0, ylD p))
-    g p _ = vcat' (with & sep .~ 50)
-              (take (floor . (/) (yuD p - ylD p) $ 50) .
-              repeat $ (hrule 10)) # alignB # moveTo (p2 (0, (ylD p)))
+    vRule p _ = arrowAt (p2 (0, ylD p)) (r2 (0, yuD p)) #
+                  moveTo (p2 (0, ylD p))
+    segments p _ = vcat' (with & sep .~ 50)
+                    (take (floor . (/) (yuD p - ylD p) $ 50) .
+                    repeat $ (hrule 10)) # alignB # moveTo (p2 (0, (ylD p)))
+    labels p _ =
+      position $ zip (mkPoint <$> ys)
+                     ((\x -> (flip (<>) (square 1 # lw none) .
+                       text . show $ x) # scale 10) <$> ys)
+        where
+          ys :: [Int]
+          ys = take (floor . (/) (yuD p - ylD p) $ 50) (iterate (+50) 0)
+          mkPoint y = p2 (-15, fromIntegral y)
 
 
 -- |Creates a Diagram that shows a white rectangle which is a little
