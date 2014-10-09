@@ -4,6 +4,7 @@ module Diagram (t,
                 dX,
                 dY,
                 alg,
+                gd,
                 defaultProp,
                 diag,
                 diagS,
@@ -39,7 +40,9 @@ data DiagProp = MkProp {
   -- |The dimensions of the y-axis.
   dY :: Coord,
   -- |Algorithm to use.
-  alg :: Int
+  alg :: Int,
+  -- |If we want to show the grid.
+  gd :: Bool
 }
 
 
@@ -57,7 +60,7 @@ instance Monoid Diag where
 
 -- |The default properties of the Diagram.
 defaultProp :: DiagProp
-defaultProp = MkProp 2 (0,500) (0,500) 0
+defaultProp = MkProp 2 (0,500) (0,500) 0 False
 
 
 -- |Extract the lower bound of the x-axis dimension.
@@ -177,12 +180,13 @@ whiteRectB = Diag f
 diag :: DiagProp -> [PT] -> Diagram Cairo R2
 diag p = case alg p of
   0 -> mkDiag
-         (mconcat [coordPoints, xAxis, yAxis, whiteRectB])
+         (mconcat [coordPoints, xAxis, yAxis,
+                   (if gd p then grid else mempty), whiteRectB])
          p
   1 -> mkDiag
          (mconcat $
            [convexHullPoints, convexHullLines, coordPoints,
-            xAxis, yAxis, whiteRectB])
+            xAxis, yAxis, (if gd p then grid else mempty), whiteRectB])
          p
   _ -> mempty
 
@@ -223,3 +227,20 @@ gifDiagS p = gifDiag p .
 -- |Create a white rectangle with the given width and height.
 whiteRect :: Double -> Double -> Diagram Cairo R2
 whiteRect x y = rect x y # lwG 0.00 # bg white
+
+
+-- |Create a grid across the whole diagram with 50*50 squares.
+grid :: Diag
+grid = Diag f `mappend` Diag g
+  where
+    f p _ = hcat' (with & sep .~ 50)
+              (take (floor . (/) (xuD p - xlD p) $ 50) .
+                repeat $ (vrule $ xuD p - xlD p))      #
+              moveTo (p2 (xlD p, (yuD p - ylD p) / 2)) #
+              lw ultraThin
+    g p _ = vcat' (with & sep .~ 50)
+              (take (floor . (/) (yuD p - ylD p) $ 50) .
+                repeat $ (hrule $ yuD p - ylD p))      #
+              alignB                                   #
+              moveTo (p2 ((xuD p - xlD p) / 2, ylD p)) #
+              lw ultraThin

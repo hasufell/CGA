@@ -45,7 +45,9 @@ data MyGUI = MkMyGUI {
   -- |about dialog
   aD  :: AboutDialog,
   -- |combo box for choosing the algorithm
-  cB  :: ComboBox
+  cB  :: ComboBox,
+  -- |grid check button
+  gC  :: CheckButton
 }
 
 
@@ -73,8 +75,9 @@ makeMyGladeGUI = do
   yu'  <- xmlGetWidget xml castToEntry "yuD"
   aD'  <- xmlGetWidget xml castToAboutDialog "aboutdialog"
   cB'  <- xmlGetWidget xml castToComboBox "comboalgo"
+  gC'  <- xmlGetWidget xml castToCheckButton "gridcheckbutton"
 
-  return $ MkMyGUI win' dB' sB' qB' fB' da' hs' xl' xu' yl' yu' aD' cB'
+  return $ MkMyGUI win' dB' sB' qB' fB' da' hs' xl' xu' yl' yu' aD' cB' gC'
 
 
 gifCLI :: FilePath -> IO ()
@@ -201,6 +204,7 @@ drawDiag' fp mygui =
       yuD'       <- entryGetText (yu mygui)
       alg'       <- comboBoxGetActive (cB mygui)
       (daW, daH) <- widgetGetSize (da mygui)
+      gd'        <- toggleButtonGetActive (gC mygui)
 
       let xD = (,) <$> readMaybe xlD' <*> readMaybe xuD' :: Maybe (Double,
                                                                  Double)
@@ -215,7 +219,8 @@ drawDiag' fp mygui =
                          (diagS (def{t  = scaleVal,
                                           dX = xD',
                                           dY = yD',
-                                          alg = alg'})
+                                          alg = alg',
+                                          gd = gd'})
                            mesh)
           renderWithDrawable dw r
           return 0
@@ -240,6 +245,7 @@ saveDiag' fp mygui =
       yuD'       <- entryGetText (yu mygui)
       alg'       <- comboBoxGetActive (cB mygui)
       (daW, daH) <- widgetGetSize (da mygui)
+      gd'        <- toggleButtonGetActive (gC mygui)
 
       let xD = (,) <$> readMaybe xlD' <*> readMaybe xuD' :: Maybe (Double,
                                                                  Double)
@@ -252,7 +258,8 @@ saveDiag' fp mygui =
             (diagS (def{t  = scaleVal,
                              dX = xD',
                              dY = yD',
-                             alg = alg'})
+                             alg = alg',
+                             gd = gd'})
               mesh)
           return 0
         _ -> return 1
