@@ -83,8 +83,8 @@ yuD = snd . dY
 -- |Creates a Diagram that shows the coordinates from the points
 -- as dots. The points and thickness of the dots can be controlled
 -- via DiagProp.
-showCoordinates :: Diag
-showCoordinates = Diag f
+coordPoints :: Diag
+coordPoints = Diag f
   where
     f p vt
       = position (zip (filter (inRange (dX p) (dY p)) $ vt)
@@ -95,8 +95,8 @@ showCoordinates = Diag f
 
 
 -- |Create a diagram which shows the points of the convex hull.
-showConvexHullPoints :: Diag
-showConvexHullPoints = Diag f
+convexHullPoints :: Diag
+convexHullPoints = Diag f
   where
     f p vt
       = position (zip (filter (inRange (dX p) (dY p)) $ vtch)
@@ -109,8 +109,8 @@ showConvexHullPoints = Diag f
 
 -- |Create a diagram which shows the lines along the convex hull
 -- points.
-showConvexHullLines :: Diag
-showConvexHullLines = Diag f
+convexHullLines :: Diag
+convexHullLines = Diag f
   where
     f _ [] = mempty
     f _ vt
@@ -124,8 +124,8 @@ showConvexHullLines = Diag f
 
 -- |Same as showConvexHullLines, except that it returns an array
 -- of diagrams with each step of the algorithm.
-showConvexHullLinesInterval :: DiagProp -> [PT] -> [Diagram Cairo R2]
-showConvexHullLinesInterval _ xs =
+convexHullLinesInterval :: DiagProp -> [PT] -> [Diagram Cairo R2]
+convexHullLinesInterval _ xs =
   fmap g (grahamGetCHSteps xs)
     where
       g vt
@@ -137,24 +137,24 @@ showConvexHullLinesInterval _ xs =
 
 -- |Creates a Diagram that shows an XAxis which is bound
 -- by the dimensions given in xD from DiagProp.
-showXAxis :: Diag
-showXAxis = Diag f
+xAxis :: Diag
+xAxis = Diag f
   where
     f p _ = (strokeTrail . fromVertices $ [p2 (xlD p,0), p2 (xuD p, 0)]) # moveTo (p2 (xlD p,0))
 
 
 -- |Creates a Diagram that shows an YAxis which is bound
 -- by the dimensions given in yD from DiagProp.
-showYAxis :: Diag
-showYAxis = Diag f
+yAxis :: Diag
+yAxis = Diag f
   where
     f p _ = (strokeTrail . fromVertices $ [p2 (0, ylD p), p2 (0, yuD p)]) # moveTo (p2 (0, ylD p))
 
 
 -- |Creates a Diagram that shows a white rectangle which is a little
 -- bit bigger as both X and Y axis dimensions from DiagProp.
-showWhiteRectB :: Diag
-showWhiteRectB = Diag f
+whiteRectB :: Diag
+whiteRectB = Diag f
   where
     f p _ = whiteRect (w' + 50) (h' + 50) # moveTo (p2 (w' / 2, h' / 2))
       where
@@ -166,12 +166,12 @@ showWhiteRectB = Diag f
 diag :: DiagProp -> [PT] -> Diagram Cairo R2
 diag p = case alg p of
   0 -> mkDiag
-         (mconcat [showCoordinates, showXAxis, showYAxis, showWhiteRectB])
+         (mconcat [coordPoints, xAxis, yAxis, whiteRectB])
          p
   1 -> mkDiag
          (mconcat $
-           [showConvexHullPoints, showConvexHullLines, showCoordinates,
-            showXAxis, showYAxis, showWhiteRectB])
+           [convexHullPoints, convexHullLines, coordPoints,
+            xAxis, yAxis, whiteRectB])
          p
   _ -> mempty
 
@@ -190,16 +190,16 @@ gifDiag :: DiagProp -> [PT] -> [(Diagram Cairo R2, GifDelay)]
 gifDiag p xs = fmap (\x -> (x, 100))                      .
                  fmap (\x -> x <> g)                      .
                  flip (++)
-                   [mkDiag (showConvexHullLines `mappend`
-                            showConvexHullPoints) p xs]   $
-                 (showConvexHullLinesInterval p xs)
+                   [mkDiag (convexHullLines `mappend`
+                            convexHullPoints) p xs]   $
+                 (convexHullLinesInterval p xs)
                    where
                      g = mconcat                      .
                            fmap (\x -> mkDiag x p xs) $
-                           [showCoordinates,
-                            showXAxis,
-                            showYAxis,
-                            showWhiteRectB]
+                           [coordPoints,
+                            xAxis,
+                            yAxis,
+                            whiteRectB]
 
 
 -- |Same as gifDiag, except that it takes a string containing the
