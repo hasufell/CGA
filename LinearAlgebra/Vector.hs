@@ -62,7 +62,7 @@ vp2 a b = (pt2Vec b) - (pt2Vec a)
 
 
 -- |Checks if 3 points a,b,c build a counterclock wise triangle by
--- connecting a-b-c. This is done by computing thed determinant and
+-- connecting a-b-c. This is done by computing the determinant and
 -- checking the algebraic sign.
 ccw :: PT -> PT -> PT -> Bool
 ccw a b c = (bx - ax)   *

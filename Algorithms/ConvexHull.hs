@@ -66,7 +66,7 @@ grahamGetCH vs = f . grahamSort $ vs
     f xs          = xs
 
 
--- |Only compute steps of the graham scan algorithm to allow
+-- |Compute all steps of the graham scan algorithm to allow
 -- visualizing it.
 grahamGetCHSteps :: [PT] -> [[PT]]
 grahamGetCHSteps vs = reverse . g $ (length . grahamGetCH $ vs)
