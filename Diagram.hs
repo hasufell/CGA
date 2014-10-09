@@ -21,6 +21,9 @@ import LinearAlgebra.Vector
 import Parser.Meshparser
 
 
+type MeshString = String
+
+
 -- |Represents a Cairo Diagram. This allows us to create multiple
 -- diagrams with different algorithms but based on the same
 -- coordinates and common properties.
@@ -226,7 +229,7 @@ diag p = case alg p of
 
 -- |Create the Diagram from a String which is supposed to be the contents
 -- of an obj file.
-diagS :: DiagProp -> String -> Diagram Cairo R2
+diagS :: DiagProp -> MeshString -> Diagram Cairo R2
 diagS p mesh =
   (diag p       .
       meshToArr $
@@ -255,7 +258,7 @@ gifDiag p xs =
 
 -- |Same as gifDiag, except that it takes a string containing the
 -- mesh file content instead of the the points.
-gifDiagS :: DiagProp -> String -> [(Diagram Cairo R2, GifDelay)]
+gifDiagS :: DiagProp -> MeshString -> [(Diagram Cairo R2, GifDelay)]
 gifDiagS p = gifDiag p . meshToArr
 
 
