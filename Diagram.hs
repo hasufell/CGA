@@ -139,17 +139,27 @@ convexHullLinesInterval _ xs =
 -- |Creates a Diagram that shows an XAxis which is bound
 -- by the dimensions given in xD from DiagProp.
 xAxis :: Diag
-xAxis = Diag f
+xAxis = (Diag f) `mappend` (Diag g)
   where
-    f p _ = (strokeTrail . fromVertices $ [p2 (xlD p,0), p2 (xuD p, 0)]) # moveTo (p2 (xlD p,0))
+    f p _ = (strokeTrail   .
+              fromVertices $
+              [p2 (xlD p,0), p2 (xuD p, 0)]) # moveTo (p2 (xlD p,0))
+    g p _ = hcat' (with & sep .~ 50)
+              (take (floor . (/) (xuD p - xlD p) $ 50) .
+              repeat $ (vrule 10)) # moveTo (p2 (xlD p,0))
 
 
 -- |Creates a Diagram that shows an YAxis which is bound
 -- by the dimensions given in yD from DiagProp.
 yAxis :: Diag
-yAxis = Diag f
+yAxis = (Diag f) `mappend` (Diag g)
   where
-    f p _ = (strokeTrail . fromVertices $ [p2 (0, ylD p), p2 (0, yuD p)]) # moveTo (p2 (0, ylD p))
+    f p _ = (strokeTrail   .
+              fromVertices $
+              [p2 (0, ylD p), p2 (0, yuD p)]) # moveTo (p2 (0, ylD p))
+    g p _ = vcat' (with & sep .~ 50)
+              (take (floor . (/) (yuD p - ylD p) $ 50) .
+              repeat $ (hrule 10)) # alignB # moveTo (p2 (0, (ylD p)))
 
 
 -- |Creates a Diagram that shows a white rectangle which is a little
