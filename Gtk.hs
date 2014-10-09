@@ -146,6 +146,7 @@ onClickedDrawButton mygui = do
     Just x -> do
       cId <- onExpose (da mygui) (\_ -> drawDiag' x mygui >>=
                                         (\_ -> return True))
+      -- TODO: does not work properly
       _   <- on fcb fileActivated (signalDisconnect cId)
       ret <- drawDiag' x mygui
       case ret of
