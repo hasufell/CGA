@@ -48,7 +48,7 @@ data DiagProp = MkProp {
 
 
 instance Def DiagProp where
-    def = defaultProp
+  def = defaultProp
 
 
 instance Monoid Diag where
@@ -90,25 +90,23 @@ yuD = snd . dY
 coordPoints :: Diag
 coordPoints = Diag f
   where
-    f p vt
-      = position (zip (filter (inRange (dX p) (dY p)) $ vt)
-                      (repeat dot))
-            where
-              -- a dot itself is a diagram
-              dot = (circle $ t p :: Diagram Cairo R2) # fc black
+    f p vt =
+      position (zip (filter (inRange (dX p) (dY p)) $ vt)
+        (repeat dot))
+      where
+        dot = (circle $ t p :: Diagram Cairo R2) # fc black
 
 
 -- |Create a diagram which shows the points of the convex hull.
 convexHullPoints :: Diag
 convexHullPoints = Diag f
   where
-    f p vt
-      = position (zip (filter (inRange (dX p) (dY p)) $ vtch)
-                      (repeat dot))
-            where
-              -- a dot itself is a diagram
-              dot = (circle $ t p :: Diagram Cairo R2) # fc red # lc red
-              vtch = grahamGetCH vt
+    f p vt =
+      position (zip (filter (inRange (dX p) (dY p)) $ vtch)
+        (repeat dot))
+      where
+        dot = (circle $ t p :: Diagram Cairo R2) # fc red # lc red
+        vtch = grahamGetCH vt
 
 
 -- |Create a diagram which shows the lines along the convex hull
@@ -117,13 +115,14 @@ convexHullLines :: Diag
 convexHullLines = Diag f
   where
     f _ [] = mempty
-    f p vt
-      = (strokeTrail                        .
-         fromVertices                       .
-         flip (++) [head $ grahamGetCH vtf] .
-         grahamGetCH                        $
-         vtf
-        ) # moveTo (head $ grahamGetCH vtf) # lc red
+    f p vt =
+      (strokeTrail                           .
+          fromVertices                       .
+          flip (++) [head $ grahamGetCH vtf] .
+          grahamGetCH                        $
+          vtf)                          #
+        moveTo (head $ grahamGetCH vtf) #
+        lc red
       where
         vtf = filter (inRange (dX p) (dY p)) vt
 
@@ -134,54 +133,63 @@ convexHullLines = Diag f
 convexHullLinesInterval :: DiagProp -> [PT] -> [Diagram Cairo R2]
 convexHullLinesInterval p xs =
   fmap g (grahamGetCHSteps xs)
-    where
-      g vt
-        = (strokeTrail        .
-           fromVertices       $
-           vtf
-          ) # moveTo (head vtf) # lc red
-        where
-          vtf = filter (inRange (dX p) (dY p)) vt
+  where
+    g vt =
+      (strokeTrail         .
+          fromVertices     $
+          vtf)            #
+        moveTo (head vtf) #
+        lc red
+      where
+        vtf = filter (inRange (dX p) (dY p)) vt
 
 
 -- |Creates a Diagram that shows an XAxis which is bound
 -- by the dimensions given in xD from DiagProp.
 xAxis :: Diag
-xAxis = (Diag hRule)    `mappend`
-        (Diag segments) `mappend`
-        (Diag labels)
+xAxis =
+  (Diag hRule)      `mappend`
+    (Diag segments) `mappend`
+    (Diag labels)
   where
-    hRule p _ = arrowAt (p2 (xlD p,0)) (r2 (xuD p, 0)) #
-                  moveTo (p2 (xlD p,0))
-    segments p _ = hcat' (with & sep .~ 50)
-                     (take (floor . (/) (xuD p - xlD p) $ 50) .
-                     repeat $ (vrule 10)) # moveTo (p2 (xlD p,0))
+    hRule p _ =
+      arrowAt (p2 (xlD p,0)) (r2 (xuD p, 0)) # moveTo (p2 (xlD p,0))
+    segments p _ =
+      hcat' (with & sep .~ 50)
+            (take (floor . (/) (xuD p - xlD p) $ 50) . repeat $ (vrule 10)) #
+      moveTo (p2 (xlD p,0))
     labels p _ =
-      position $ zip (mkPoint <$> xs)
-                     ((\x -> (flip (<>) (square 1 # lw none) .
-                       text . show $ x) # scale 10) <$> xs)
-        where
-          xs :: [Int]
-          xs = take (floor . (/) (xuD p - xlD p) $ 50) (iterate (+50) 0)
-          mkPoint x = p2 (fromIntegral x, -15)
+      position $
+        zip (mkPoint <$> xs)
+            ((\x -> (flip (<>) (square 1 # lw none) .
+              text . show $ x) # scale 10) <$> xs)
+      where
+        xs :: [Int]
+        xs = take (floor . (/) (xuD p - xlD p) $ 50) (iterate (+50) 0)
+        mkPoint x = p2 (fromIntegral x, -15)
 
 
 -- |Creates a Diagram that shows an YAxis which is bound
 -- by the dimensions given in yD from DiagProp.
 yAxis :: Diag
-yAxis = (Diag vRule)    `mappend`
-        (Diag segments) `mappend`
-        (Diag labels)
+yAxis =
+  (Diag vRule)      `mappend`
+    (Diag segments) `mappend`
+    (Diag labels)
   where
-    vRule p _ = arrowAt (p2 (0, ylD p)) (r2 (0, yuD p)) #
-                  moveTo (p2 (0, ylD p))
-    segments p _ = vcat' (with & sep .~ 50)
-                    (take (floor . (/) (yuD p - ylD p) $ 50) .
-                    repeat $ (hrule 10)) # alignB # moveTo (p2 (0, (ylD p)))
+    vRule p _ =
+      arrowAt (p2 (0, ylD p)) (r2 (0, yuD p)) # moveTo (p2 (0, ylD p))
+    segments p _ =
+      vcat' (with & sep .~ 50)
+            (take (floor . (/) (yuD p - ylD p) $ 50) .
+              repeat $ (hrule 10)) #
+      alignB                       #
+      moveTo (p2 (0, (ylD p)))
     labels p _ =
-      position $ zip (mkPoint <$> ys)
-                     ((\x -> (flip (<>) (square 1 # lw none) .
-                       text . show $ x) # scale 10) <$> ys)
+      position $
+        zip (mkPoint <$> ys)
+            ((\x -> (flip (<>) (square 1 # lw none) .
+              text . show $ x) # scale 10) <$> ys)
         where
           ys :: [Int]
           ys = take (floor . (/) (yuD p - ylD p) $ 50) (iterate (+50) 0)
@@ -202,49 +210,53 @@ whiteRectB = Diag f
 -- |Create the Diagram from the points.
 diag :: DiagProp -> [PT] -> Diagram Cairo R2
 diag p = case alg p of
-  0 -> mkDiag
-         (mconcat [coordPoints, xAxis, yAxis,
-                   (if gd p then grid else mempty), whiteRectB])
-         p
-  1 -> mkDiag
-         (mconcat $
-           [convexHullPoints, convexHullLines, coordPoints,
-            xAxis, yAxis, (if gd p then grid else mempty), whiteRectB])
-         p
+  0 ->
+    mkDiag
+      (mconcat [coordPoints, xAxis, yAxis,
+        (if gd p then grid else mempty), whiteRectB])
+      p
+  1 ->
+    mkDiag
+      (mconcat
+        [convexHullPoints, convexHullLines, coordPoints,
+        xAxis, yAxis, (if gd p then grid else mempty), whiteRectB])
+      p
   _ -> mempty
 
 
 -- |Create the Diagram from a String which is supposed to be the contents
 -- of an obj file.
 diagS :: DiagProp -> String -> Diagram Cairo R2
-diagS p mesh
-  = (diag p      .
+diagS p mesh =
+  (diag p       .
       meshToArr $
-      mesh) # bg white
+      mesh) #
+    bg white
 
 
 -- |Return a list of tuples used by 'gifMain' to generate an animated gif.
 gifDiag :: DiagProp -> [PT] -> [(Diagram Cairo R2, GifDelay)]
-gifDiag p xs = fmap (\x -> (x, 100))                      .
-                 fmap (\x -> x <> g)                      .
-                 flip (++)
-                   [mkDiag (convexHullLines `mappend`
-                            convexHullPoints) p xs]       $
-                 (convexHullLinesInterval p xs)
-                   where
-                     g = mconcat                      .
-                           fmap (\x -> mkDiag x p xs) $
-                           [coordPoints,
-                            xAxis,
-                            yAxis,
-                            whiteRectB]
+gifDiag p xs =
+  fmap (\x -> (x, 100))                      .
+    fmap (\x -> x <> g)                      .
+    flip (++)
+      [mkDiag (convexHullLines `mappend`
+      convexHullPoints) p xs]                $
+    (convexHullLinesInterval p xs)
+  where
+    g =
+      mconcat                      .
+        fmap (\x -> mkDiag x p xs) $
+        [coordPoints,
+        xAxis,
+        yAxis,
+        whiteRectB]
 
 
 -- |Same as gifDiag, except that it takes a string containing the
 -- mesh file content instead of the the points.
 gifDiagS :: DiagProp -> String -> [(Diagram Cairo R2, GifDelay)]
-gifDiagS p = gifDiag p .
-               meshToArr
+gifDiagS p = gifDiag p . meshToArr
 
 
 -- |Create a white rectangle with the given width and height.
@@ -256,14 +268,16 @@ whiteRect x y = rect x y # lwG 0.00 # bg white
 grid :: Diag
 grid = Diag f `mappend` Diag g
   where
-    f p _ = hcat' (with & sep .~ 50)
-              (take (floor . (/) (xuD p - xlD p) $ 50) .
-                repeat $ (vrule $ xuD p - xlD p))      #
-              moveTo (p2 (xlD p, (yuD p - ylD p) / 2)) #
-              lw ultraThin
-    g p _ = vcat' (with & sep .~ 50)
-              (take (floor . (/) (yuD p - ylD p) $ 50) .
-                repeat $ (hrule $ yuD p - ylD p))      #
-              alignB                                   #
-              moveTo (p2 ((xuD p - xlD p) / 2, ylD p)) #
-              lw ultraThin
+    f p _ =
+      hcat' (with & sep .~ 50)
+            (take (floor . (/) (xuD p - xlD p) $ 50) .
+              repeat $ (vrule $ xuD p - xlD p))   #
+      moveTo (p2 (xlD p, (yuD p - ylD p) / 2))    #
+      lw ultraThin
+    g p _ =
+      vcat' (with & sep .~ 50)
+            (take (floor . (/) (yuD p - ylD p) $ 50) .
+              repeat $ (hrule $ yuD p - ylD p))  #
+      alignB                                     #
+      moveTo (p2 ((xuD p - xlD p) / 2, ylD p))   #
+      lw ultraThin

@@ -77,12 +77,13 @@ makeMyGladeGUI = do
   cB'  <- xmlGetWidget xml castToComboBox "comboalgo"
   gC'  <- xmlGetWidget xml castToCheckButton "gridcheckbutton"
 
-  return $ MkMyGUI win' dB' sB' qB' fB' da' hs' xl' xu' yl' yu' aD' cB' gC'
+  return $ MkMyGUI win' dB' sB' qB' fB' da' hs'
+                   xl' xu' yl' yu' aD' cB' gC'
 
 
 gifCLI :: FilePath -> IO ()
 gifCLI startFile = do
-  mesh       <- readFile "UB1_sonderfaelle.obj"
+  mesh <- readFile "UB1_sonderfaelle.obj"
   gifMain (gifDiagS def mesh)
 
 
@@ -118,21 +119,21 @@ makeGUI startFile = do
 
   -- hotkeys
   _ <- win mygui `on` keyPressEvent $ tryEvent $ do
-         [Control] <- eventModifier
-         "q"       <- eventKeyName
-         liftIO mainQuit
+    [Control] <- eventModifier
+    "q"       <- eventKeyName
+    liftIO mainQuit
   _ <- win mygui `on` keyPressEvent $ tryEvent $ do
-         [Control] <- eventModifier
-         "s"       <- eventKeyName
-         liftIO $ onClickedSaveButton mygui
+    [Control] <- eventModifier
+    "s"       <- eventKeyName
+    liftIO $ onClickedSaveButton mygui
   _ <- win mygui `on` keyPressEvent $ tryEvent $ do
-         [Control] <- eventModifier
-         "d"       <- eventKeyName
-         liftIO $ onClickedDrawButton mygui
+    [Control] <- eventModifier
+    "d"       <- eventKeyName
+    liftIO $ onClickedDrawButton mygui
   _ <- win mygui `on` keyPressEvent $ tryEvent $ do
-         [Control] <- eventModifier
-         "a"       <- eventKeyName
-         liftIO $ widgetShowAll (aD mygui)
+    [Control] <- eventModifier
+    "a"       <- eventKeyName
+    liftIO $ widgetShowAll (aD mygui)
 
   -- draw widgets and start main loop
   widgetShowAll (win mygui)
@@ -206,22 +207,27 @@ drawDiag' fp mygui =
       (daW, daH) <- widgetGetSize (da mygui)
       gd'        <- toggleButtonGetActive (gC mygui)
 
-      let xD = (,) <$> readMaybe xlD' <*> readMaybe xuD' :: Maybe (Double,
-                                                                 Double)
-          yD = (,) <$> readMaybe ylD' <*> readMaybe yuD' :: Maybe (Double,
-                                                                 Double)
+      let
+        xD = (,)         <$>
+          readMaybe xlD' <*>
+          readMaybe xuD' :: Maybe (Double, Double)
+        yD = (,)         <$>
+          readMaybe ylD' <*>
+          readMaybe yuD' :: Maybe (Double, Double)
+
       case (xD, yD) of
         (Just xD', Just yD') -> do
           let (_, r) = renderDia Cairo
-                         (CairoOptions ""
-                           (Dims (fromIntegral daW) (fromIntegral daH))
-                           SVG False)
-                         (diagS (def{t  = scaleVal,
-                                          dX = xD',
-                                          dY = yD',
-                                          alg = alg',
-                                          gd = gd'})
-                           mesh)
+                (CairoOptions ""
+                   (Dims (fromIntegral daW) (fromIntegral daH))
+                   SVG False)
+                (diagS (def{
+                    t   = scaleVal,
+                    dX  = xD',
+                    dY  = yD',
+                    alg = alg',
+                    gd  = gd'})
+                  mesh)
           renderWithDrawable dw r
           return 0
         _ -> return 1
@@ -247,19 +253,23 @@ saveDiag' fp mygui =
       (daW, daH) <- widgetGetSize (da mygui)
       gd'        <- toggleButtonGetActive (gC mygui)
 
-      let xD = (,) <$> readMaybe xlD' <*> readMaybe xuD' :: Maybe (Double,
-                                                                 Double)
-          yD = (,) <$> readMaybe ylD' <*> readMaybe yuD' :: Maybe (Double,
-                                                                 Double)
+      let
+        xD = (,)         <$>
+          readMaybe xlD' <*>
+          readMaybe xuD' :: Maybe (Double, Double)
+        yD = (,)         <$>
+          readMaybe ylD' <*>
+          readMaybe yuD' :: Maybe (Double, Double)
       case (xD, yD) of
         (Just xD', Just yD') -> do
           renderCairo "out.svg"
             (Dims (fromIntegral daW) (fromIntegral daH))
-            (diagS (def{t  = scaleVal,
-                             dX = xD',
-                             dY = yD',
-                             alg = alg',
-                             gd = gd'})
+            (diagS (def{
+                t   = scaleVal,
+                dX  = xD',
+                dY  = yD',
+                alg = alg',
+                gd  = gd'})
               mesh)
           return 0
         _ -> return 1

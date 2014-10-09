@@ -13,11 +13,11 @@ cmpExt checkExt = (==) checkExt . getExt
 -- |Get the extension of a file.
 getExt :: FilePath -> String
 getExt fp
-  | hasExt fp = last   .
-      splitBy (== '.') .
-      last             .
-      splitBy (== '/') $
-      fp
+  | hasExt fp = last .
+    splitBy (== '.') .
+    last             .
+    splitBy (== '/') $
+    fp
   | otherwise = ""
 
 

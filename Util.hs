@@ -7,10 +7,11 @@ module Util where
 splitBy :: (a -> Bool) -- ^ condition
         -> [a]         -- ^ array to split
         -> [[a]]       -- ^ splitted array
-splitBy f s =  case dropWhile f s of
-                 [] -> []
-                 s' -> w : splitBy f s''
-                   where (w, s'') = break f s'
+splitBy f s =
+  case dropWhile f s of
+    [] -> []
+    s' -> w : splitBy f s''
+      where (w, s'') = break f s'
 
 
 -- |Remove a given item from a list.

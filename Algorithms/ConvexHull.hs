@@ -21,9 +21,9 @@ lowestYC (a:b:vs)
   | ay == by &&
     ax >  bx     = lowestYC (b:vs)
   | otherwise    = lowestYC (a:vs)
-    where
-      (ax, ay) = unp2 a
-      (bx, by) = unp2 b
+  where
+    (ax, ay) = unp2 a
+    (bx, by) = unp2 b
 
 
 -- |Sort the points in increasing order of their degree between
@@ -31,34 +31,33 @@ lowestYC (a:b:vs)
 grahamSort :: [PT] -- ^ the points to sort
            -> [PT] -- ^ sorted points
 grahamSort [] = []
-grahamSort xs = p0 : sortBy (\a b
-  -> noEqual a b                            .
-       compare
-       (getAngle (pt2Vec a - pt2Vec p0) xv) $
-       (getAngle (pt2Vec b - pt2Vec p0) xv))
-  (removeItem p0 xs)
-    where
-      xv = unitX
-      p0 = lowestYC xs
-      -- Have to account for corner cases when points are in
-      -- a straight line or have the same y coordinates. Eq is
-      -- not an option anyhow.
-      noEqual :: PT -> PT -> Ordering -> Ordering
-      noEqual a b EQ
-        | ay == by &&
-          ax < bx      = LT
-        | otherwise    = GT
-          where
-            (ax, ay) = unp2 a
-            (bx, by) = unp2 b
-      noEqual _ _ LT     = LT
-      noEqual _ _ GT     = GT
+grahamSort xs =
+  p0 : sortBy (\a b -> noEqual a b     .
+    compare (getAngle xv . (-) (pt2Vec a) $ pt2Vec p0) $
+            (getAngle xv . (-) (pt2Vec b) $ pt2Vec p0))
+    (removeItem p0 xs)
+  where
+    xv = unitX
+    p0 = lowestYC xs
+    -- Have to account for corner cases when points are in
+    -- a straight line or have the same y coordinates. Eq is
+    -- not an option anyhow.
+    noEqual :: PT -> PT -> Ordering -> Ordering
+    noEqual a b EQ
+      | ay == by &&
+        ax < bx      = LT
+      | otherwise    = GT
+      where
+        (ax, ay) = unp2 a
+        (bx, by) = unp2 b
+    noEqual _ _ x     = x
 
 
 -- |Get all points on a convex hull by using the graham scan
 -- algorithm.
 grahamGetCH :: [PT] -> [PT]
-grahamGetCH vs = f . grahamSort $ vs
+grahamGetCH vs =
+  f . grahamSort $ vs
   where
     f (x:y:z:xs)
       | ccw x y z = x : f (y:z:xs)
@@ -69,7 +68,8 @@ grahamGetCH vs = f . grahamSort $ vs
 -- |Compute all steps of the graham scan algorithm to allow
 -- visualizing it.
 grahamGetCHSteps :: [PT] -> [[PT]]
-grahamGetCHSteps vs = reverse . g $ (length vs - 2)
+grahamGetCHSteps vs =
+  reverse . g $ (length vs - 2)
   where
     vs' = grahamSort vs
     g c

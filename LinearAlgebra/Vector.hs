@@ -14,18 +14,18 @@ inRange :: Coord -- ^ X dimension
         -> Coord -- ^ Y dimension
         -> PT    -- ^ Coordinates
         -> Bool  -- ^ result
-inRange (xlD, xuD) (ylD, yuD) p
-  = x <= xuD && x >= xlD && y <= yuD && y >= ylD
-    where
-      (x, y) = unp2 p
+inRange (xlD, xuD) (ylD, yuD) p = x <= xuD && x >= xlD && y <= yuD && y >= ylD
+  where
+    (x, y) = unp2 p
 
 
 -- |Get the angle between two vectors.
 getAngle :: Vec -> Vec -> Double
-getAngle a b = acos                                   .
-                 flip (/) (vecLength a * vecLength b) .
-                 scalarProd a                         $
-                 b
+getAngle a b =
+  acos                                   .
+    flip (/) (vecLength a * vecLength b) .
+    scalarProd a                         $
+    b
 
 
 -- |Get the length of a vector.
@@ -65,10 +65,11 @@ vp2 a b = (pt2Vec b) - (pt2Vec a)
 -- connecting a-b-c. This is done by computing the determinant and
 -- checking the algebraic sign.
 ccw :: PT -> PT -> PT -> Bool
-ccw a b c = (bx - ax)   *
-              (cy - ay) -
-              (by - ay) *
-              (cx - ax) >= 0
+ccw a b c =
+  (bx - ax)   *
+    (cy - ay) -
+    (by - ay) *
+    (cx - ax) >= 0
   where
     (ax, ay) = unp2 a
     (bx, by) = unp2 b
