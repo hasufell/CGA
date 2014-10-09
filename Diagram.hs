@@ -7,12 +7,15 @@ module Diagram (t,
                 defaultProp,
                 diag,
                 diagS,
+                gifDiag,
+                gifDiagS,
                 whiteRect) where
 
 import Algorithms.ConvexHull
+import Codec.Picture.Gif
 import Class.Defaults
-import Diagrams.Prelude
 import Diagrams.Backend.Cairo
+import Diagrams.Prelude
 import LinearAlgebra.Vector
 import Parser.Meshparser
 
@@ -104,6 +107,8 @@ showConvexHullPoints = Diag f
               vtch = grahamGetCH vt
 
 
+-- |Create a diagram which shows the lines along the convex hull
+-- points.
 showConvexHullLines :: Diag
 showConvexHullLines = Diag f
   where
@@ -114,6 +119,19 @@ showConvexHullLines = Diag f
          grahamGetCH                       $
          vt
         ) # moveTo (head $ grahamGetCH vt) # lc red
+
+
+-- |Same as showConvexHullLines, except that it returns an array
+-- of diagrams with each step of the algorithm.
+showConvexHullLinesInterval :: DiagProp -> [PT] -> [Diagram Cairo R2]
+showConvexHullLinesInterval _ xs =
+  fmap g (grahamGetCHSteps xs)
+    where
+      g vt
+        = (strokeTrail        .
+           fromVertices       $
+           vt
+          ) # moveTo (head vt) # lc red
 
 
 -- |Creates a Diagram that shows an XAxis which is bound
@@ -150,8 +168,9 @@ diag p = case alg p of
          (mconcat [showCoordinates, showXAxis, showYAxis, showWhiteRectB])
          p
   1 -> mkDiag
-         (mconcat [showConvexHullPoints, showConvexHullLines,
-                   showCoordinates, showXAxis, showYAxis, showWhiteRectB])
+         (mconcat $
+           [showConvexHullPoints, showConvexHullLines, showCoordinates,
+            showXAxis, showYAxis, showWhiteRectB])
          p
   _ -> mempty
 
@@ -163,6 +182,30 @@ diagS p mesh
   = (diag p      .
       meshToArr $
       mesh) # bg white
+
+
+-- |Return a list of tuples used by 'gifMain' to generate an animated gif.
+gifDiag :: DiagProp -> [PT] -> [(Diagram Cairo R2, GifDelay)]
+gifDiag p xs = fmap (\x -> (x, 100))                      .
+                 fmap (\x -> x <> g)                      .
+                 flip (++)
+                   [mkDiag (showConvexHullLines `mappend`
+                            showConvexHullPoints) p xs]   $
+                 (showConvexHullLinesInterval p xs)
+                   where
+                     g = mconcat                      .
+                           fmap (\x -> mkDiag x p xs) $
+                           [showCoordinates,
+                            showXAxis,
+                            showYAxis,
+                            showWhiteRectB]
+
+
+-- |Same as gifDiag, except that it takes a string containing the
+-- mesh file content instead of the the points.
+gifDiagS :: DiagProp -> String -> [(Diagram Cairo R2, GifDelay)]
+gifDiagS p = gifDiag p .
+               meshToArr
 
 
 -- |Create a white rectangle with the given width and height.

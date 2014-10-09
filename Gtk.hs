@@ -1,12 +1,13 @@
 {-# OPTIONS_HADDOCK ignore-exports #-}
 
-module Gtk (makeGUI) where
+module Gtk (makeGUI, gifCLI) where
 
 import Control.Monad.IO.Class
 import Class.Defaults
 import Diagram
 import Diagrams.Prelude
 import Diagrams.Backend.Cairo
+import Diagrams.Backend.Cairo.CmdLine
 import Diagrams.Backend.Cairo.Internal
 import Graphics.UI.Gtk
 import Graphics.UI.Gtk.Glade
@@ -74,6 +75,12 @@ makeMyGladeGUI = do
   cB'  <- xmlGetWidget xml castToComboBox "comboalgo"
 
   return $ MkMyGUI win' dB' sB' qB' fB' da' hs' xl' xu' yl' yu' aD' cB'
+
+
+gifCLI :: FilePath -> IO ()
+gifCLI startFile = do
+  mesh       <- readFile "UB1_sonderfaelle.obj"
+  gifMain (gifDiagS def mesh)
 
 
 -- |Main entry point for the GTK GUI routines.

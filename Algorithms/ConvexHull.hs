@@ -64,3 +64,20 @@ grahamGetCH vs = f . grahamSort $ vs
       | ccw x y z = x : f (y:z:xs)
       | otherwise = f (x:z:xs)
     f xs          = xs
+
+
+-- |Only compute steps of the graham scan algorithm to allow
+-- visualizing it.
+grahamGetCHSteps :: [PT] -> [[PT]]
+grahamGetCHSteps vs = reverse . g $ (length . grahamGetCH $ vs)
+  where
+    vs' = grahamSort vs
+    g c
+      | c >= 0 = f 0 vs' : g (c - 1)
+      | otherwise = []
+      where
+        f c' (x:y:z:xs)
+          | c' >= c   = [x,y]
+          | ccw x y z = x : f (c' + 1) (y:z:xs)
+          | otherwise = f (c' + 1) (x:z:xs)
+        f _ xs        = xs
