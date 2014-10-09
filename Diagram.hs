@@ -93,9 +93,9 @@ yuD = snd . dY
 -- as dots. The points and thickness of the dots can be controlled
 -- via DiagProp.
 coordPoints :: Diag
-coordPoints = Diag f
+coordPoints = Diag cp
   where
-    f p vt =
+    cp p vt =
       position (zip (filter (inRange (dX p) (dY p)) $ vt)
         (repeat dot))
       where
@@ -104,9 +104,9 @@ coordPoints = Diag f
 
 -- |Create a diagram which shows the points of the convex hull.
 convexHullPoints :: Diag
-convexHullPoints = Diag f
+convexHullPoints = Diag chp
   where
-    f p vt =
+    chp p vt =
       position (zip (filter (inRange (dX p) (dY p)) $ vtch)
         (repeat dot))
       where
@@ -117,10 +117,10 @@ convexHullPoints = Diag f
 -- |Create a diagram which shows the lines along the convex hull
 -- points.
 convexHullLines :: Diag
-convexHullLines = Diag f
+convexHullLines = Diag chl
   where
-    f _ [] = mempty
-    f p vt =
+    chl _ [] = mempty
+    chl p vt =
       (strokeTrail                           .
           fromVertices                       .
           flip (++) [head $ grahamGetCH vtf] .
@@ -137,9 +137,9 @@ convexHullLines = Diag f
 -- Unfortunately this is very difficult to implement as a Diag (TODO).
 convexHullLinesInterval :: DiagProp -> [PT] -> [Diagram Cairo R2]
 convexHullLinesInterval p xs =
-  fmap g (grahamGetCHSteps xs)
+  fmap mkChDiag (grahamGetCHSteps xs)
   where
-    g vt =
+    mkChDiag vt =
       (strokeTrail         .
           fromVertices     $
           vtf)            #
@@ -207,9 +207,9 @@ yAxis =
 -- |Creates a Diagram that shows a white rectangle which is a little
 -- bit bigger as both X and Y axis dimensions from DiagProp.
 whiteRectB :: Diag
-whiteRectB = Diag f
+whiteRectB = Diag rect'
   where
-    f p _ = whiteRect (w' + 50) (h' + 50) # moveTo (p2 (w' / 2, h' / 2))
+    rect' p _ = whiteRect (w' + 50) (h' + 50) # moveTo (p2 (w' / 2, h' / 2))
       where
         w' = xuD p - xlD p
         h' = yuD p - ylD p
@@ -246,13 +246,14 @@ diagS p mesh =
 gifDiag :: DiagProp -> [PT] -> [(Diagram Cairo R2, GifDelay)]
 gifDiag p xs =
   fmap (\x -> (x, 100))                      .
-    fmap (\x -> x <> g)                      .
+    fmap (\x -> x <> nonChDiag)              .
     flip (++)
       [mkDiag (convexHullLines `mappend`
       convexHullPoints) p xs]                $
     (convexHullLinesInterval p xs)
   where
-    g =
+    -- add the x-axis and the other default stuff
+    nonChDiag =
       mconcat                      .
         fmap (\x -> mkDiag x p xs) $
         [coordPoints,
@@ -274,15 +275,15 @@ whiteRect x y = rect x y # lwG 0.00 # bg white
 
 -- |Create a grid across the whole diagram with 50*50 squares.
 grid :: Diag
-grid = Diag f `mappend` Diag g
+grid = Diag xGrid `mappend` Diag yGrid
   where
-    f p _ =
+    yGrid p _ =
       hcat' (with & sep .~ (sqS p))
             (take (floor . (/) (xuD p - xlD p) $ (sqS p)) .
               repeat $ (vrule $ xuD p - xlD p))   #
       moveTo (p2 (xlD p, (yuD p - ylD p) / 2))    #
       lw ultraThin
-    g p _ =
+    xGrid p _ =
       vcat' (with & sep .~ (sqS p))
             (take (floor . (/) (yuD p - ylD p) $ (sqS p)) .
               repeat $ (hrule $ yuD p - ylD p))  #
