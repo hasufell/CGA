@@ -261,6 +261,7 @@ saveDiag' fp mygui =
         yD = (,)         <$>
           readMaybe ylD' <*>
           readMaybe yuD' :: Maybe (Double, Double)
+
       case (xD, yD) of
         (Just xD', Just yD') -> do
           renderCairo "out.svg"

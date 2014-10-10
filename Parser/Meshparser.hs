@@ -13,7 +13,7 @@ import Parser.Core
 meshToArr :: String   -- ^ the string to convert
           -> [PT]     -- ^ the resulting vertice table
 meshToArr xs =
-  fmap (p2)                       .
+  fmap p2                         .
     fmap (\(Just (x, _)) -> x)    .
     filter (/= Nothing)           .
     fmap (runParser parseVertice) .
