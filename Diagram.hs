@@ -114,6 +114,7 @@ pointToTextCoord pt =
     (x, y) = unp2 pt
 
 
+-- |Show coordinates as text above all points.
 coordPointsText :: Diag
 coordPointsText = Diag cpt
   where
@@ -134,7 +135,7 @@ convexHullPoints = Diag chp
         vtch = grahamGetCH vt
 
 
--- |Create a diagram which shows the points of the convex hull.
+-- |Show coordinates as text above the convex hull points.
 convexHullPointsText :: Diag
 convexHullPointsText = Diag chpt
   where
