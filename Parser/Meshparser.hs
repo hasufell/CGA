@@ -12,13 +12,12 @@ import Parser.Core
 -- an array of float tuples.
 meshToArr :: String   -- ^ the string to convert
           -> [PT]     -- ^ the resulting vertice table
-meshToArr xs =
+meshToArr =
   fmap p2                         .
     fmap (\(Just (x, _)) -> x)    .
     filter (/= Nothing)           .
     fmap (runParser parseVertice) .
-    lines                         $
-    xs
+    lines
 
 
 -- | Creates a Parser that accepts a single vertice, such as 'v 1.0 2.0'.
