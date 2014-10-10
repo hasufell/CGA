@@ -114,6 +114,9 @@ makeGUI startFile = do
   _ <- onResponse (aD mygui) (\x -> case x of
                                 ResponseCancel -> widgetHideAll (aD mygui)
                                 _ -> return ())
+  -- have to redraw for window overlapping and resizing on expose
+  _ <- onExpose (da mygui) (\_ -> onClickedDrawButton mygui >>=
+                             (\_ -> return True))
 
   -- hotkeys
   _ <- win mygui `on` keyPressEvent $ tryEvent $ do
@@ -146,10 +149,6 @@ onClickedDrawButton mygui = do
   filename <- fileChooserGetFilename fcb
   case filename of
     Just x -> do
-      cId <- onExpose (da mygui) (\_ -> drawDiag' x mygui >>=
-                                        (\_ -> return True))
-      -- TODO: does not work properly
-      _   <- on fcb fileActivated (signalDisconnect cId)
       ret <- drawDiag' x mygui
       case ret of
         1 -> showErrorDialog "No valid x/y dimensions!"
