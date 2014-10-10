@@ -118,8 +118,7 @@ xAxis =
     labels p _ =
       position $
         zip (mkPoint <$> xs)
-            ((\x -> (flip (<>) (square 1 # lw none) .
-              text . show $ x) # scale 10) <$> xs)
+            ((\x -> (text . show $ x) # scale 10) <$> xs)
       where
         xs :: [Int]
         xs = take (floor . (/) (xuD p - xlD p) $ (sqS p))
@@ -146,8 +145,7 @@ yAxis =
     labels p _ =
       position $
         zip (mkPoint <$> ys)
-            ((\x -> (flip (<>) (square 1 # lw none) .
-              text . show $ x) # scale 10) <$> ys)
+            ((\x -> (text . show $ x) # scale 10) <$> ys)
         where
           ys :: [Int]
           ys = take (floor . (/) (yuD p - ylD p) $ (sqS p))
