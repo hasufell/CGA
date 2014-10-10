@@ -692,8 +692,7 @@ Malte Flender &lt;malte.flender@fh-bielefeld.de&gt;</property>
               </packing>
             </child>
             <child>
-              <widget class="GtkVBox" id="vbox7">
-                <property name="width_request">100</property>
+              <widget class="GtkVBox" id="vbox8">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <child>
@@ -709,23 +708,48 @@ Malte Flender &lt;malte.flender@fh-bielefeld.de&gt;</property>
                   </packing>
                 </child>
                 <child>
-                  <widget class="GtkCheckButton" id="gridcheckbutton">
-                    <property name="label" translatable="yes">grid</property>
+                  <widget class="GtkHBox" id="hbox6">
                     <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="receives_default">False</property>
-                    <property name="draw_indicator">True</property>
+                    <property name="can_focus">False</property>
+                    <child>
+                      <widget class="GtkCheckButton" id="gridcheckbutton">
+                        <property name="label" translatable="yes">grid</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">False</property>
+                        <property name="draw_indicator">True</property>
+                      </widget>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">False</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkCheckButton" id="coordcheckbutton">
+                        <property name="label" translatable="yes">coord</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">False</property>
+                        <property name="draw_indicator">True</property>
+                      </widget>
+                      <packing>
+                        <property name="expand">True</property>
+                        <property name="fill">True</property>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
                   </widget>
                   <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">False</property>
+                    <property name="expand">True</property>
+                    <property name="fill">True</property>
                     <property name="position">1</property>
                   </packing>
                 </child>
               </widget>
               <packing>
                 <property name="expand">False</property>
-                <property name="fill">True</property>
+                <property name="fill">False</property>
                 <property name="position">3</property>
               </packing>
             </child>

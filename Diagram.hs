@@ -5,6 +5,7 @@ module Diagram (t,
                 dY,
                 alg,
                 gd,
+                ct,
                 defaultProp,
                 diag,
                 diagS,
@@ -47,6 +48,8 @@ data DiagProp = MkProp {
   alg :: Int,
   -- |If we want to show the grid.
   gd :: Bool,
+  -- |If we want to show the coordinates as text.
+  ct :: Bool,
   -- |Square size used to show the grid and x/y-axis.
   sqS :: Double
 }
@@ -66,7 +69,7 @@ instance Monoid Diag where
 
 -- |The default properties of the Diagram.
 defaultProp :: DiagProp
-defaultProp = MkProp 2 (0,500) (0,500) 0 False 50
+defaultProp = MkProp 2 (0,500) (0,500) 0 False False 50
 
 
 -- |Extract the lower bound of the x-axis dimension.
@@ -102,6 +105,19 @@ coordPoints = Diag cp
         dot = (circle $ t p :: Diagram Cairo R2) # fc black
 
 
+coordPointsText :: Diag
+coordPointsText = Diag cpt
+  where
+    cpt _ vt =
+      position $
+        zip vt
+            ((\(x, y) -> (flip (<>) (square 1 # lw none) .
+              text $ ("(" ++ show x ++ ", " ++ show y ++ ")")) #
+              scale 10 # translate (r2 (0, 10))) <$>
+              unp2 <$>
+              vt)
+
+
 -- |Create a diagram which shows the points of the convex hull.
 convexHullPoints :: Diag
 convexHullPoints = Diag chp
@@ -111,6 +127,22 @@ convexHullPoints = Diag chp
         (repeat dot))
       where
         dot = (circle $ t p :: Diagram Cairo R2) # fc red # lc red
+        vtch = grahamGetCH vt
+
+
+-- |Create a diagram which shows the points of the convex hull.
+convexHullPointsText :: Diag
+convexHullPointsText = Diag chpt
+  where
+    chpt _ vt =
+      position $
+        zip vtch
+            ((\(x, y) -> (flip (<>) (square 1 # lw none) .
+              text $ ("(" ++ show x ++ ", " ++ show y ++ ")")) #
+              scale 10 # translate (r2 (0, 10))) <$>
+              unp2 <$>
+              vtch)
+      where
         vtch = grahamGetCH vt
 
 
@@ -220,14 +252,17 @@ diag :: DiagProp -> [PT] -> Diagram Cairo R2
 diag p = case alg p of
   0 ->
     mkDiag
-      (mconcat [coordPoints, xAxis, yAxis,
-        (if gd p then grid else mempty), whiteRectB])
+      (mconcat [if ct p then coordPointsText else mempty,
+        coordPoints, xAxis, yAxis,
+        (if gd p then grid else mempty),whiteRectB])
       p
   1 ->
     mkDiag
       (mconcat
-        [convexHullPoints, convexHullLines, coordPoints,
-        xAxis, yAxis, (if gd p then grid else mempty), whiteRectB])
+        [if ct p then convexHullPointsText else mempty,
+        convexHullPoints, convexHullLines,
+        coordPoints, xAxis, yAxis,
+        (if gd p then grid else mempty), whiteRectB])
       p
   _ -> mempty
 

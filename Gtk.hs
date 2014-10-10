@@ -15,6 +15,7 @@ import System.Directory
 import Text.Read
 import OS.FileExt
 
+
 -- |Monolithic object passed to various GUI functions in order
 -- to keep the API stable and not alter the parameters too much.
 -- This only holds GUI widgets that are needed to be read during
@@ -47,7 +48,9 @@ data MyGUI = MkMyGUI {
   -- |combo box for choosing the algorithm
   cB  :: ComboBox,
   -- |grid check button
-  gC  :: CheckButton
+  gC  :: CheckButton,
+    -- |coord check button
+  cC  :: CheckButton
 }
 
 
@@ -76,13 +79,14 @@ makeMyGladeGUI = do
   aD'  <- xmlGetWidget xml castToAboutDialog "aboutdialog"
   cB'  <- xmlGetWidget xml castToComboBox "comboalgo"
   gC'  <- xmlGetWidget xml castToCheckButton "gridcheckbutton"
+  cC'  <- xmlGetWidget xml castToCheckButton "coordcheckbutton"
 
   return $ MkMyGUI win' dB' sB' qB' fB' da' hs'
-                   xl' xu' yl' yu' aD' cB' gC'
+                   xl' xu' yl' yu' aD' cB' gC' cC'
 
 
 gifCLI :: FilePath -> IO ()
-gifCLI startFile = do
+gifCLI _ = do
   mesh <- readFile "UB1_sonderfaelle.obj"
   gifMain (gifDiagS def mesh)
 
@@ -206,6 +210,7 @@ drawDiag' fp mygui =
       alg'       <- comboBoxGetActive (cB mygui)
       (daW, daH) <- widgetGetSize (da mygui)
       gd'        <- toggleButtonGetActive (gC mygui)
+      ct'        <- toggleButtonGetActive (cC mygui)
 
       let
         xD = (,)         <$>
@@ -226,7 +231,8 @@ drawDiag' fp mygui =
                     dX  = xD',
                     dY  = yD',
                     alg = alg',
-                    gd  = gd'})
+                    gd  = gd',
+                    ct  = ct'})
                   mesh)
           renderWithDrawable dw r
           return 0
@@ -252,6 +258,7 @@ saveDiag' fp mygui =
       alg'       <- comboBoxGetActive (cB mygui)
       (daW, daH) <- widgetGetSize (da mygui)
       gd'        <- toggleButtonGetActive (gC mygui)
+      ct'        <- toggleButtonGetActive (cC mygui)
 
       let
         xD = (,)         <$>
@@ -269,7 +276,8 @@ saveDiag' fp mygui =
                 dX  = xD',
                 dY  = yD',
                 alg = alg',
-                gd  = gd'})
+                gd  = gd',
+                ct  = ct'})
               mesh)
           return 0
         _ -> return 1
