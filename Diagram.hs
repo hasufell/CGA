@@ -105,17 +105,21 @@ coordPoints = Diag cp
         dot = (circle $ t p :: Diagram Cairo R2) # fc black
 
 
+-- |Creates a Diagram from a point that shows the coordinates
+-- in text format, such as "(1.0, 2.0)".
+pointToTextCoord :: PT -> Diagram Cairo R2
+pointToTextCoord pt =
+  text ("(" ++ show x ++ ", " ++ show y ++ ")") # scale 10
+  where
+    (x, y) = unp2 pt
+
+
 coordPointsText :: Diag
 coordPointsText = Diag cpt
   where
     cpt _ vt =
       position $
-        zip vt
-            ((\(x, y) -> (flip (<>) (square 1 # lw none) .
-              text $ ("(" ++ show x ++ ", " ++ show y ++ ")")) #
-              scale 10 # translate (r2 (0, 10))) <$>
-              unp2 <$>
-              vt)
+        zip vt (pointToTextCoord <$> vt) # translate (r2 (0, 10))
 
 
 -- |Create a diagram which shows the points of the convex hull.
@@ -137,11 +141,7 @@ convexHullPointsText = Diag chpt
     chpt _ vt =
       position $
         zip vtch
-            ((\(x, y) -> (flip (<>) (square 1 # lw none) .
-              text $ ("(" ++ show x ++ ", " ++ show y ++ ")")) #
-              scale 10 # translate (r2 (0, 10))) <$>
-              unp2 <$>
-              vtch)
+            (pointToTextCoord <$> vtch) # translate (r2 (0, 10))
       where
         vtch = grahamGetCH vt
 
