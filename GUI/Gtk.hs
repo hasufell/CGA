@@ -193,7 +193,23 @@ showErrorDialog str = do
 drawDiag' :: FilePath
           -> MyGUI
           -> IO Int
-drawDiag' fp mygui =
+drawDiag' fp mygui = saveAndDrawDiag fp "" mygui
+
+
+-- |Saves a Diagram which is built from a given file as an SVG.
+saveDiag' :: FilePath
+          -> MyGUI
+          -> IO Int
+saveDiag' fp mygui = saveAndDrawDiag fp "out.svg" mygui
+
+
+-- |Draws and saves a Diagram which is built from a given file.
+-- If the file to save is left empty, then nothing is saved.
+saveAndDrawDiag :: FilePath -- ^ obj file to parse
+                -> FilePath -- ^ if/where to save the result
+                -> MyGUI
+                -> IO Int
+saveAndDrawDiag fp fps mygui =
   if cmpExt "obj" fp
     then do
       mesh       <- readFile fp
@@ -219,8 +235,8 @@ drawDiag' fp mygui =
 
       case (xD, yD) of
         (Just xD', Just yD') -> do
-          let (_, r) = renderDia Cairo
-                (CairoOptions ""
+          let (s, r) = renderDia Cairo
+                (CairoOptions fps
                    (Dims (fromIntegral daW) (fromIntegral daH))
                    SVG False)
                 (diagS (def{
@@ -232,51 +248,9 @@ drawDiag' fp mygui =
                     ct  = ct'})
                   mesh)
           renderWithDrawable dw r
-          return 0
-        _ -> return 1
-
-    else return 2
-
-
--- |Saves a Diagram which is built from a given file as an SVG.
-saveDiag' :: FilePath
-          -> MyGUI
-          -> IO Int
-saveDiag' fp mygui =
-  if cmpExt "obj" fp
-    then do
-      mesh       <- readFile fp
-      adjustment <- rangeGetAdjustment (hs mygui)
-      scaleVal   <- adjustmentGetValue adjustment
-      xlD'       <- entryGetText (xl mygui)
-      xuD'       <- entryGetText (xu mygui)
-      ylD'       <- entryGetText (yl mygui)
-      yuD'       <- entryGetText (yu mygui)
-      alg'       <- comboBoxGetActive (cB mygui)
-      (daW, daH) <- widgetGetSize (da mygui)
-      gd'        <- toggleButtonGetActive (gC mygui)
-      ct'        <- toggleButtonGetActive (cC mygui)
-
-      let
-        xD = (,)         <$>
-          readMaybe xlD' <*>
-          readMaybe xuD' :: Maybe (Double, Double)
-        yD = (,)         <$>
-          readMaybe ylD' <*>
-          readMaybe yuD' :: Maybe (Double, Double)
-
-      case (xD, yD) of
-        (Just xD', Just yD') -> do
-          renderCairo "out.svg"
-            (Dims (fromIntegral daW) (fromIntegral daH))
-            (diagS (def{
-                t   = scaleVal,
-                dX  = xD',
-                dY  = yD',
-                alg = alg',
-                gd  = gd',
-                ct  = ct'})
-              mesh)
+          if null fps
+            then return ()
+            else s
           return 0
         _ -> return 1
 
