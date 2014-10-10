@@ -117,6 +117,10 @@ makeGUI startFile = do
   -- have to redraw for window overlapping and resizing on expose
   _ <- onExpose (da mygui) (\_ -> onClickedDrawButton mygui >>=
                              (\_ -> return True))
+  _ <- on (cB mygui) changed (onClickedDrawButton mygui)
+  _ <- on (gC mygui) toggled (onClickedDrawButton mygui)
+  _ <- on (cC mygui) toggled (onClickedDrawButton mygui)
+  _ <- on (hs mygui) valueChanged (onClickedDrawButton mygui)
 
   -- hotkeys
   _ <- win mygui `on` keyPressEvent $ tryEvent $ do
