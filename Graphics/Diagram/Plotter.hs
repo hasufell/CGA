@@ -36,9 +36,11 @@ pointToTextCoord pt =
 coordPointsText :: Diag
 coordPointsText = Diag cpt
   where
-    cpt _ vt =
+    cpt p vt =
       position $
-        zip vt (pointToTextCoord <$> vt) # translate (r2 (0, 10))
+        zip vtf (pointToTextCoord <$> vtf) # translate (r2 (0, 10))
+      where
+        vtf = filter (inRange (dX p) (dY p)) vt
 
 
 -- |Create a diagram which shows the points of the convex hull.
@@ -57,12 +59,12 @@ convexHullPoints = Diag chp
 convexHullPointsText :: Diag
 convexHullPointsText = Diag chpt
   where
-    chpt _ vt =
+    chpt p vt =
       position $
-        zip vtch
-            (pointToTextCoord <$> vtch) # translate (r2 (0, 10))
+        zip vtchf
+            (pointToTextCoord <$> vtchf) # translate (r2 (0, 10))
       where
-        vtch = grahamGetCH vt
+        vtchf = grahamGetCH . filter (inRange (dX p) (dY p)) $ vt
 
 
 -- |Create a diagram which shows the lines along the convex hull
