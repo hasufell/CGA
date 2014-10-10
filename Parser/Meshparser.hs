@@ -2,9 +2,9 @@
 
 module Parser.Meshparser (meshToArr) where
 
+import Algebra.VectorTypes
 import Control.Applicative
 import Diagrams.TwoD.Types
-import LinearAlgebra.Vector
 import Parser.Core
 
 

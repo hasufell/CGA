@@ -1,8 +1,8 @@
 {-# OPTIONS_HADDOCK ignore-exports #-}
 
-module OS.FileExt where
+module System.FileSystem.FileExt where
 
-import Util
+import MyPrelude
 
 
 -- |Compare the extension of a file with the given String.

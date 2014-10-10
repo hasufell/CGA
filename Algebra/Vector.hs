@@ -1,12 +1,9 @@
 {-# OPTIONS_HADDOCK ignore-exports #-}
 
-module LinearAlgebra.Vector where
+module Algebra.Vector where
 
+import Algebra.VectorTypes
 import Diagrams.TwoD.Types
-
-type Vec = R2
-type PT  = P2
-type Coord  = (Double, Double)
 
 
 -- |Checks whether the Point is in a given dimension.

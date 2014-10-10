@@ -1,19 +1,19 @@
 {-# OPTIONS_HADDOCK ignore-exports #-}
 
-module Gtk (makeGUI, gifCLI) where
+module GUI.Gtk (makeGUI) where
 
 import Control.Monad.IO.Class
-import Class.Defaults
-import Diagram
 import Diagrams.Prelude
 import Diagrams.Backend.Cairo
-import Diagrams.Backend.Cairo.CmdLine
 import Diagrams.Backend.Cairo.Internal
+import Graphics.Diagram.Gtk
+import Graphics.Diagram.Types
 import Graphics.UI.Gtk
 import Graphics.UI.Gtk.Glade
+import MyPrelude
 import System.Directory
+import System.FileSystem.FileExt
 import Text.Read
-import OS.FileExt
 
 
 -- |Monolithic object passed to various GUI functions in order
@@ -56,7 +56,7 @@ data MyGUI = MkMyGUI {
 
 -- |The glade file to load the UI from.
 gladeFile :: FilePath
-gladeFile = "gtk2.glade"
+gladeFile = "GUI/gtk2.glade"
 
 
 -- |Loads the glade file and creates the MyGUI object.
@@ -83,12 +83,6 @@ makeMyGladeGUI = do
 
   return $ MkMyGUI win' dB' sB' qB' fB' da' hs'
                    xl' xu' yl' yu' aD' cB' gC' cC'
-
-
-gifCLI :: FilePath -> IO ()
-gifCLI _ = do
-  mesh <- readFile "UB1_sonderfaelle.obj"
-  gifMain (gifDiagS def mesh)
 
 
 -- |Main entry point for the GTK GUI routines.

@@ -1,6 +1,6 @@
 {-# OPTIONS_HADDOCK ignore-exports #-}
 
-import Gtk
+import GUI.Gtk
 import System.Environment
 
 

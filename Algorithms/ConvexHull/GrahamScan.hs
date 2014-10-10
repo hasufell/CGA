@@ -1,12 +1,13 @@
 {-# OPTIONS_HADDOCK ignore-exports #-}
 
-module Algorithms.ConvexHull where
+module Algorithms.ConvexHull.GrahamScan where
 
+import Algebra.Vector
+import Algebra.VectorTypes
 import Data.List
 import Diagrams.TwoD.Types
 import Diagrams.TwoD.Vector
-import Util
-import LinearAlgebra.Vector
+import MyPrelude
 
 
 -- |Find the point with the lowest Y coordinate.

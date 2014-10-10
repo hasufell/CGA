@@ -1,6 +1,11 @@
 {-# OPTIONS_HADDOCK ignore-exports #-}
 
-module Util where
+module MyPrelude where
+
+
+-- |Used to create a common interface for default settings of data types.
+class Def a where
+  def :: a
 
 
 -- |Split an array into subarrays depending on a given condition.
