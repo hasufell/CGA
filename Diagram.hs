@@ -92,6 +92,15 @@ yuD :: DiagProp -> Double
 yuD = snd . dY
 
 
+-- |Returns the specified diagram if True is passed,
+-- otherwise returns the empty diagram. This is just for convenience
+-- to avoid if else constructs.
+maybeDiag :: Bool -> Diag -> Diag
+maybeDiag b d
+  | b         = d
+  | otherwise = mempty
+
+
 -- |Creates a Diagram that shows the coordinates from the points
 -- as dots. The points and thickness of the dots can be controlled
 -- via DiagProp.
@@ -253,17 +262,17 @@ diag :: DiagProp -> [PT] -> Diagram Cairo R2
 diag p = case alg p of
   0 ->
     mkDiag
-      (mconcat [if ct p then coordPointsText else mempty,
+      (mconcat [maybeDiag (ct p) coordPointsText,
         coordPoints, xAxis, yAxis,
-        (if gd p then grid else mempty),whiteRectB])
+        maybeDiag (gd p) grid, whiteRectB])
       p
   1 ->
     mkDiag
       (mconcat
-        [if ct p then convexHullPointsText else mempty,
+        [maybeDiag (ct p) convexHullPointsText,
         convexHullPoints, convexHullLines,
         coordPoints, xAxis, yAxis,
-        (if gd p then grid else mempty), whiteRectB])
+        maybeDiag (gd p) grid, whiteRectB])
       p
   _ -> mempty
 
