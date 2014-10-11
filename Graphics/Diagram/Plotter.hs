@@ -111,13 +111,13 @@ xAxis =
     Diag labels
   where
     hRule p _ =
-      arrowAt (p2 (xmin p,0))
+      arrowAt (p2 (xmin p, if ymin p <= 0 then 0 else ymin p))
               (r2 (w' p, 0))
     segments p _ =
       hcat' (with & sep .~ sqS p)
             (replicate (floor . (/) (w' p) $ sqS p)
                        (vrule 10)) #
-      moveTo (p2 (xmin p,0))
+      moveTo (p2 (xmin p, if ymin p <= 0 then 0 else ymin p))
     labels p _ =
       position $
         zip (mkPoint <$> xs)
@@ -126,7 +126,8 @@ xAxis =
         xs :: [Int]
         xs = take (floor . (/) (w' p) $ sqS p)
                   (iterate (+(floor . sqS $ p)) (floor . xmin $ p))
-        mkPoint x = p2 (fromIntegral x, -15)
+        mkPoint x = p2 (fromIntegral x,
+                        -15 + (if ymin p <= 0 then 0 else ymin p))
 
 
 -- |Creates a Diagram that shows an YAxis which is bound
@@ -138,14 +139,14 @@ yAxis =
     Diag labels
   where
     vRule p _ =
-      arrowAt (p2 (0, ymin p))
+      arrowAt (p2 (if xmin p <= 0 then 0 else xmin p, ymin p))
               (r2 (0, h' p))
     segments p _ =
       vcat' (with & sep .~ sqS p)
             (replicate (floor . (/) (h' p) $ sqS p)
                        (hrule 10)) #
       alignB                       #
-      moveTo (p2 (0, ymin p))
+      moveTo (p2 (if xmin p <= 0 then 0 else xmin p, ymin p))
     labels p _ =
       position $
         zip (mkPoint <$> ys)
@@ -154,7 +155,8 @@ yAxis =
           ys :: [Int]
           ys = take (floor . (/) (h' p) $ sqS p)
                     (iterate (+(floor . sqS $ p)) (floor . ymin $ p))
-          mkPoint y = p2 (-15, fromIntegral y)
+          mkPoint y = p2 (-15 + (if xmin p <= 0 then 0 else xmin p),
+                          fromIntegral y)
 
 
 -- |Creates a Diagram that shows a white rectangle which is a little
@@ -166,7 +168,6 @@ whiteRectB = Diag rect'
       whiteRect (w' p + 50) (h' p + 50) #
         moveTo (p2 (wOff p, hOff p))
       where
-
 
 
 -- |Create a white rectangle with the given width and height.
