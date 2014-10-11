@@ -24,5 +24,5 @@ meshToArr =
 parseVertice :: Parser (Double, Double)
 parseVertice =
   (,)                                 <$>
-    (char 'v' *> spaces *> posDouble) <*>
-    (spaces *> posDouble)
+    (char 'v' *> spaces *> allDouble) <*>
+    (spaces *> allDouble)

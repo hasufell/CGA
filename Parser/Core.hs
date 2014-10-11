@@ -6,6 +6,8 @@ module Parser.Core (Parser,
                char,
                posInt,
                posDouble,
+               negDouble,
+               allDouble,
                oneOrMore,
                zeroOrMore,
                spaces) where
@@ -92,6 +94,29 @@ posDouble =
       | null ns   = Nothing
       | otherwise = Just (ns, rest)
         where (ns, rest) = span isDigit xs
+
+
+-- |Creates a Parser that accepts negative doubles.
+-- Both -131.31 and -132 are valid.
+negDouble :: Parser Double
+negDouble =
+    (negate <$>)                 $
+      (read <$>)                 $
+      (\x y z -> x ++ [y] ++ z) <$>
+      (char '-' *> MkParser f)  <*>
+      char '.'                  <*>
+      MkParser f                <|>
+      (char '-' *> MkParser f)
+  where
+    f xs
+      | null ns   = Nothing
+      | otherwise = Just (ns, rest)
+        where (ns, rest) = span isDigit xs
+
+
+-- |Creates a Parser that accepts both positive and negative doubles.
+allDouble :: Parser Double
+allDouble = negDouble <|> posDouble
 
 
 -- |Convert a given Parser to a Parser that accepts zero or more occurences.
