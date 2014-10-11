@@ -2,6 +2,8 @@
 
 module MyPrelude where
 
+import Data.List
+
 
 -- |Used to create a common interface for default settings of data types.
 class Def a where
@@ -22,3 +24,19 @@ splitBy f s =
 -- |Remove a given item from a list.
 removeItem :: (Eq a) => a -> [a] -> [a]
 removeItem x = foldr (\x' y -> if x' == x then y else x':y) []
+
+
+-- |Sort a liste of tuples lexicographically.
+sortLex :: (Ord a) => [(a, a)] -> [(a, a)]
+sortLex =
+  sortBy (\(x1, y1) (x2, y2) -> case compare x1 x2 of
+           EQ -> compare y1 y2
+           x  -> x)
+
+
+-- |Get a list with it's head and last element cut. If there are less
+-- than 2 elements in the list, return an empty list.
+tailInit :: [a] -> [a]
+tailInit xs
+  | length xs > 2 = tail . init $ xs
+  | otherwise     = []

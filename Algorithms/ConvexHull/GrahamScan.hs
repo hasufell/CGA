@@ -4,81 +4,69 @@ module Algorithms.ConvexHull.GrahamScan where
 
 import Algebra.Vector
 import Algebra.VectorTypes
-import Data.List
 import Diagrams.TwoD.Types
-import Diagrams.TwoD.Vector
 import MyPrelude
-
-
--- |Find the point with the lowest Y coordinate.
--- If the lowest y-coordinate exists in more than one point in the set,
--- the point with the lowest x-coordinate out of the candidates is
--- chosen.
-lowestYC :: [PT] -> PT
-lowestYC []          = error "lowestYC: empty list"
-lowestYC [a]         = a
-lowestYC (a:b:vs)
-  | ay >  by     = lowestYC (b:vs)
-  | ay == by &&
-    ax >  bx     = lowestYC (b:vs)
-  | otherwise    = lowestYC (a:vs)
-  where
-    (ax, ay) = unp2 a
-    (bx, by) = unp2 b
-
-
--- |Sort the points in increasing order of their degree between
--- P0 and the x-axis.
-grahamSort :: [PT] -- ^ the points to sort
-           -> [PT] -- ^ sorted points
-grahamSort [] = []
-grahamSort xs =
-  p0 : sortBy (\a b -> noEqual a b     .
-    compare (getAngle xv . (-) (pt2Vec a) $ pt2Vec p0) $
-            (getAngle xv . (-) (pt2Vec b) $ pt2Vec p0))
-    (removeItem p0 xs)
-  where
-    xv = unitX
-    p0 = lowestYC xs
-    -- Have to account for corner cases when points are in
-    -- a straight line or have the same y coordinates. Eq is
-    -- not an option anyhow.
-    noEqual :: PT -> PT -> Ordering -> Ordering
-    noEqual a b EQ
-      | ay == by &&
-        ax < bx      = LT
-      | otherwise    = GT
-      where
-        (ax, ay) = unp2 a
-        (bx, by) = unp2 b
-    noEqual _ _ x     = x
 
 
 -- |Get all points on a convex hull by using the graham scan
 -- algorithm.
 grahamGetCH :: [PT] -> [PT]
 grahamGetCH vs =
-  f . grahamSort $ vs
+        -- merge upper hull with lower hull while discarding
+        -- the duplicated points from the lower hull
+        f (reverse uH) uHRest ++ tailInit (f (reverse lH) lHRest)
   where
-    f (x:y:z:xs)
-      | ccw x y z = x : f (y:z:xs)
-      | otherwise =     f (x:z:xs)
-    f xs          = xs
+    -- sort lexicographically by x values (ties are resolved by y values)
+    sortedVs = fmap p2 . sortLex . fmap unp2 $ vs
+    -- lists for lower hull
+    (lH, lHRest) = splitAt 2 sortedVs
+    -- lists for upper hull
+    (uH, uHRest) = splitAt 2 . reverse $ sortedVs
+    -- This is the actual algorithm.
+    -- If we have a list say:
+    -- [(100, 100), (200, 450), (250, 250), (300, 400), (400, 200)]
+    --
+    -- then this will start with:
+    -- [(200, 450), (100, 100)] and [(250, 250), (300, 400), (400, 200)]
+    --
+    -- The first list is reversed since we only care about the last
+    -- 3 elements and want to stay efficient.
+    f (y:z:xs) (x:ys)
+      -- last 3 elements are ccw, but there are elements left to check
+      |	ccw z y x   = f (x:y:z:xs) ys
+      -- not ccw, pop one out
+      | otherwise   = f (x:z:xs) ys
+    f (x:y:z:xs) []
+      -- nothing left and last 3 elements are ccw, so return
+      |	ccw z y x   = x:y:z:xs
+      -- not ccw, pop one out
+      | otherwise   = f (x:z:xs) []
+    f xs _ = xs
 
 
 -- |Compute all steps of the graham scan algorithm to allow
 -- visualizing it.
 grahamGetCHSteps :: [PT] -> [[PT]]
 grahamGetCHSteps vs =
-  reverse . g $ (length vs - 2)
+  (++)  (reverse . g (length vs) (reverse lH) $ lHRest) .
+    fmap (\x -> (last . reverse . g (length vs) (reverse lH) $ lHRest)
+          ++ x) $
+    (init . reverse . g (length vs) (reverse uH) $ uHRest)
   where
-    vs' = grahamSort vs
-    g c
-      | c >= 0    = f 0 vs' : g (c - 1)
+    sortedVs = fmap p2 . sortLex . fmap unp2 $ vs
+    (lH, lHRest) = splitAt 2 sortedVs
+    (uH, uHRest) = splitAt 2 . reverse $ sortedVs
+    g c xs' ys'
+      | c >= 0    = f 0 xs' ys' : g (c - 1) xs' ys'
       | otherwise = []
       where
-        f c' (x:y:z:xs)
-          | c' >= c   = [x,y]
-          | ccw x y z = x : f (c' + 1) (y:z:xs)
-          | otherwise =     f (c' + 1) (x:z:xs)
-        f _ xs        = xs
+        f c' (y:z:xs) (x:ys)
+          | c' >= c     = reverse (y:z:xs)
+          |	ccw z y x   = f (c' + 1) (x:y:z:xs) ys
+          | otherwise   = f (c' + 1) (x:z:xs) ys
+        f _ [x,y] []    = [y,x]
+        f c' (x:y:z:xs) []
+          | c' >= c     = reverse (x:y:z:xs)
+          |	ccw z y x   = x:y:z:xs
+          | otherwise   = f (c' + 1) (x:z:xs) []
+        f _ xs _        = reverse xs
