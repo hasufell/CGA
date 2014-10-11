@@ -14,6 +14,7 @@ module Parser.Core (Parser,
 
 import Control.Applicative
 import Data.Char
+import MyPrelude
 
 
 -- |The parser type. It allows us to create specific parsers,
@@ -47,10 +48,6 @@ inParser :: ((String -> Maybe (a1, String))
          -> Parser a1
          -> Parser a
 inParser f p = MkParser . f . runParser $ p
-
-
-first :: (a -> b) -> (a,c) -> (b,c)
-first f (x,y) = (f x, y)
 
 
 -- |Creates a Parser that parses a Char depending on a given condition.

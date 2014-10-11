@@ -40,3 +40,8 @@ tailInit :: [a] -> [a]
 tailInit xs
   | length xs > 2 = tail . init $ xs
   | otherwise     = []
+
+
+-- |Apply a function to the first element of a tuple.
+first :: (a -> b) -> (a,c) -> (b,c)
+first f (x,y) = (f x, y)
