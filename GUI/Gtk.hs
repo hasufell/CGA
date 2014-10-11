@@ -108,19 +108,19 @@ makeGUI startFile = do
 
   -- callbacks
   _ <- onDestroy  (win mygui) mainQuit
-  _ <- onClicked  (dB mygui) $ onClickedDrawButton mygui
-  _ <- onClicked  (sB mygui) $ onClickedSaveButton mygui
+  _ <- onClicked  (dB mygui) $ drawDiag mygui
+  _ <- onClicked  (sB mygui) $ saveDiag mygui
   _ <- onClicked  (qB mygui) mainQuit
   _ <- onResponse (aD mygui) (\x -> case x of
                                 ResponseCancel -> widgetHideAll (aD mygui)
                                 _ -> return ())
   -- have to redraw for window overlapping and resizing on expose
-  _ <- onExpose (da mygui) (\_ -> onClickedDrawButton mygui >>=
+  _ <- onExpose (da mygui) (\_ -> drawDiag mygui >>=
                              (\_ -> return True))
-  _ <- on (cB mygui) changed (onClickedDrawButton mygui)
-  _ <- on (gC mygui) toggled (onClickedDrawButton mygui)
-  _ <- on (cC mygui) toggled (onClickedDrawButton mygui)
-  _ <- on (hs mygui) valueChanged (onClickedDrawButton mygui)
+  _ <- on (cB mygui) changed (drawDiag mygui)
+  _ <- on (gC mygui) toggled (drawDiag mygui)
+  _ <- on (cC mygui) toggled (drawDiag mygui)
+  _ <- on (hs mygui) valueChanged (drawDiag mygui)
 
   -- hotkeys
   _ <- win mygui `on` keyPressEvent $ tryEvent $ do
@@ -130,11 +130,11 @@ makeGUI startFile = do
   _ <- win mygui `on` keyPressEvent $ tryEvent $ do
     [Control] <- eventModifier
     "s"       <- eventKeyName
-    liftIO $ onClickedSaveButton mygui
+    liftIO $ saveDiag mygui
   _ <- win mygui `on` keyPressEvent $ tryEvent $ do
     [Control] <- eventModifier
     "d"       <- eventKeyName
-    liftIO $ onClickedDrawButton mygui
+    liftIO $ drawDiag mygui
   _ <- win mygui `on` keyPressEvent $ tryEvent $ do
     [Control] <- eventModifier
     "a"       <- eventKeyName
@@ -143,37 +143,6 @@ makeGUI startFile = do
   -- draw widgets and start main loop
   widgetShowAll (win mygui)
   mainGUI
-
-
--- |Callback when the "Draw" Button is clicked.
-onClickedDrawButton :: MyGUI
-                    -> IO ()
-onClickedDrawButton mygui = do
-  let fcb = fB mygui
-  filename <- fileChooserGetFilename fcb
-  case filename of
-    Just x -> do
-      ret <- drawDiag' x mygui
-      case ret of
-        1 -> showErrorDialog "No valid x/y dimensions!"
-        2 -> showErrorDialog "No valid Mesh file!"
-        _ -> return ()
-    Nothing -> showErrorDialog "No valid Mesh file!"
-
-
--- |Callback when the "Save" Button is clicked.
-onClickedSaveButton :: MyGUI
-                    -> IO ()
-onClickedSaveButton mygui = do
-  filename <- fileChooserGetFilename (fB mygui)
-  case filename of
-    Just x -> do
-      ret <- saveDiag' x mygui
-      case ret of
-        1 -> showErrorDialog "No valid x/y dimensions!"
-        2 -> showErrorDialog "No valid Mesh file!"
-        _ -> return ()
-    Nothing -> showErrorDialog "No valid Mesh file!"
 
 
 -- |Pops up an error Dialog with the given String.
@@ -190,17 +159,33 @@ showErrorDialog str = do
 
 -- |Draws a Diagram which is built from a given file to
 -- the gtk DrawingArea.
-drawDiag' :: FilePath
-          -> MyGUI
-          -> IO Int
-drawDiag' fp mygui = saveAndDrawDiag fp "" mygui
+drawDiag :: MyGUI
+          -> IO ()
+drawDiag mygui = do
+  fp <- fileChooserGetFilename (fB mygui)
+  case fp of
+    Just x -> do
+      ret <- saveAndDrawDiag x "" mygui
+      case ret of
+        1 -> showErrorDialog "No valid x/y dimensions!"
+        2 -> showErrorDialog "No valid Mesh file!"
+        _ -> return ()
+    Nothing -> showErrorDialog "No valid Mesh file!"
 
 
 -- |Saves a Diagram which is built from a given file as an SVG.
-saveDiag' :: FilePath
-          -> MyGUI
-          -> IO Int
-saveDiag' fp mygui = saveAndDrawDiag fp "out.svg" mygui
+saveDiag :: MyGUI
+          -> IO ()
+saveDiag mygui = do
+  fp <- fileChooserGetFilename (fB mygui)
+  case fp of
+    Just x -> do
+      ret <- saveAndDrawDiag x "out.svg" mygui
+      case ret of
+        1 -> showErrorDialog "No valid x/y dimensions!"
+        2 -> showErrorDialog "No valid Mesh file!"
+        _ -> return ()
+    Nothing -> showErrorDialog "No valid Mesh file!"
 
 
 -- |Draws and saves a Diagram which is built from a given file.
