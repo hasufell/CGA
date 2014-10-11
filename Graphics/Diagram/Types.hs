@@ -59,23 +59,45 @@ defaultProp = MkProp 2 (0,500) (0,500) 0 False False 50
 
 
 -- |Extract the lower bound of the x-axis dimension.
-xlD :: DiagProp -> Double
-xlD = fst . dX
+xmin :: DiagProp -> Double
+xmin = fst . dX
 
 
 -- |Extract the upper bound of the x-axis dimension.
-xuD :: DiagProp -> Double
-xuD = snd . dX
+xmax :: DiagProp -> Double
+xmax = snd . dX
 
 
 -- |Extract the lower bound of the y-axis dimension.
-ylD :: DiagProp -> Double
-ylD = fst . dY
+ymin :: DiagProp -> Double
+ymin = fst . dY
 
 
 -- |Extract the upper bound of the y-axis dimension.
-yuD :: DiagProp -> Double
-yuD = snd . dY
+ymax :: DiagProp -> Double
+ymax = snd . dY
+
+
+-- |The full width of the x dimension.
+w' :: DiagProp -> Double
+w' p = xmax p - xmin p
+
+
+-- |The full height of the y dimension.
+h' :: DiagProp -> Double
+h' p = ymax p - ymin p
+
+
+-- |The offset on the x-axis to move the grid and the white rectangle
+-- to the right place.
+wOff :: DiagProp -> Double
+wOff p = xmin p + (w' p / 2)
+
+
+-- |The offset on the y-axis to move the grid and the white rectangle
+-- to the right place.
+hOff :: DiagProp -> Double
+hOff p = ymin p + (h' p / 2)
 
 
 -- |Returns the specified diagram if True is passed,

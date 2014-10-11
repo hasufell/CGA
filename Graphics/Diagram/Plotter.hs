@@ -17,7 +17,7 @@ coordPoints :: Diag
 coordPoints = Diag cp
   where
     cp p vt =
-      position (zip (filter (inRange (dX p) (dY p)) $ vt)
+      position (zip (filter (inRange (dX p) (dY p)) vt)
         (repeat dot))
       where
         dot = (circle $ t p :: Diagram Cairo R2) # fc black
@@ -48,7 +48,7 @@ convexHullPoints :: Diag
 convexHullPoints = Diag chp
   where
     chp p vt =
-      position (zip (filter (inRange (dX p) (dY p)) $ vtch)
+      position (zip (filter (inRange (dX p) (dY p)) vtch)
         (repeat dot))
       where
         dot = (circle $ t p :: Diagram Cairo R2) # fc red # lc red
@@ -106,26 +106,26 @@ convexHullLinesInterval p xs =
 -- by the dimensions given in xD from DiagProp.
 xAxis :: Diag
 xAxis =
-  (Diag hRule)      `mappend`
-    (Diag segments) `mappend`
-    (Diag labels)
+  Diag hRule      `mappend`
+    Diag segments `mappend`
+    Diag labels
   where
     hRule p _ =
-      arrowAt (p2 (xlD p,0))
-              (r2 (xuD p - xlD p, 0))
+      arrowAt (p2 (xmin p,0))
+              (r2 (w' p, 0))
     segments p _ =
-      hcat' (with & sep .~ (sqS p))
-            (take (floor . (/) (xuD p - xlD p) $ (sqS p)) .
-              repeat $ (vrule 10)) #
-      moveTo (p2 (xlD p,0))
+      hcat' (with & sep .~ sqS p)
+            (replicate (floor . (/) (w' p) $ sqS p)
+                       (vrule 10)) #
+      moveTo (p2 (xmin p,0))
     labels p _ =
       position $
         zip (mkPoint <$> xs)
             ((\x -> (text . show $ x) # scale 10) <$> xs)
       where
         xs :: [Int]
-        xs = take (floor . (/) (xuD p - xlD p) $ (sqS p))
-                  (iterate (+(floor . sqS $ p)) (floor . xlD $ p))
+        xs = take (floor . (/) (w' p) $ sqS p)
+                  (iterate (+(floor . sqS $ p)) (floor . xmin $ p))
         mkPoint x = p2 (fromIntegral x, -15)
 
 
@@ -133,27 +133,27 @@ xAxis =
 -- by the dimensions given in yD from DiagProp.
 yAxis :: Diag
 yAxis =
-  (Diag vRule)      `mappend`
-    (Diag segments) `mappend`
-    (Diag labels)
+  Diag vRule      `mappend`
+    Diag segments `mappend`
+    Diag labels
   where
     vRule p _ =
-      arrowAt (p2 (0, ylD p))
-              (r2 (0, yuD p - ylD p))
+      arrowAt (p2 (0, ymin p))
+              (r2 (0, h' p))
     segments p _ =
-      vcat' (with & sep .~ (sqS p))
-            (take (floor . (/) (yuD p - ylD p) $ (sqS p)) .
-              repeat $ (hrule 10)) #
+      vcat' (with & sep .~ sqS p)
+            (replicate (floor . (/) (h' p) $ sqS p)
+                       (hrule 10)) #
       alignB                       #
-      moveTo (p2 (0, (ylD p)))
+      moveTo (p2 (0, ymin p))
     labels p _ =
       position $
         zip (mkPoint <$> ys)
             ((\x -> (text . show $ x) # scale 10) <$> ys)
         where
           ys :: [Int]
-          ys = take (floor . (/) (yuD p - ylD p) $ (sqS p))
-                    (iterate (+(floor . sqS $ p)) (floor . ylD $ p))
+          ys = take (floor . (/) (h' p) $ sqS p)
+                    (iterate (+(floor . sqS $ p)) (floor . ymin $ p))
           mkPoint y = p2 (-15, fromIntegral y)
 
 
@@ -162,10 +162,11 @@ yAxis =
 whiteRectB :: Diag
 whiteRectB = Diag rect'
   where
-    rect' p _ = whiteRect (w' + 50) (h' + 50) # moveTo (p2 (w' / 2, h' / 2))
+    rect' p _ =
+      whiteRect (w' p + 50) (h' p + 50) #
+        moveTo (p2 (wOff p, hOff p))
       where
-        w' = xuD p - xlD p
-        h' = yuD p - ylD p
+
 
 
 -- |Create a white rectangle with the given width and height.
@@ -180,14 +181,15 @@ grid = Diag xGrid `mappend` Diag yGrid
   where
     yGrid p _ =
       hcat' (with & sep .~ sqS p)
-            (replicate (floor . (/) (xuD p - xlD p) $ sqS p)
-                       (vrule $ yuD p - ylD p))          #
-      moveTo (p2 (xlD p, ylD p + ((yuD p - ylD p) / 2))) #
+            (replicate (floor . (/) (w' p) $ sqS p)
+                       (vrule $ h' p))  #
+      moveTo (p2 (xmin p, hOff p))      #
       lw ultraThin
     xGrid p _ =
       vcat' (with & sep .~ sqS p)
-            (replicate (floor . (/) (yuD p - ylD p) $ sqS p)
-                       (hrule $ xuD p - xlD p))   #
-      alignB                                      #
-      moveTo (p2 (xlD p + ((xuD p - xlD p) / 2), ylD p)) #
+            (replicate (floor . (/) (h' p) $ sqS p)
+                       (hrule $ w' p))  #
+      alignB                            #
+      moveTo (p2 (wOff p, ymin p))      #
       lw ultraThin
+      where
