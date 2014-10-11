@@ -111,7 +111,8 @@ xAxis =
     (Diag labels)
   where
     hRule p _ =
-      arrowAt (p2 (xlD p,0)) (r2 (xuD p, 0)) # moveTo (p2 (xlD p,0))
+      arrowAt (p2 (xlD p,0))
+              (r2 (xuD p - xlD p, 0))
     segments p _ =
       hcat' (with & sep .~ (sqS p))
             (take (floor . (/) (xuD p - xlD p) $ (sqS p)) .
@@ -124,7 +125,7 @@ xAxis =
       where
         xs :: [Int]
         xs = take (floor . (/) (xuD p - xlD p) $ (sqS p))
-                  (iterate (+(floor . sqS $ p)) 0)
+                  (iterate (+(floor . sqS $ p)) (floor . xlD $ p))
         mkPoint x = p2 (fromIntegral x, -15)
 
 
@@ -137,7 +138,8 @@ yAxis =
     (Diag labels)
   where
     vRule p _ =
-      arrowAt (p2 (0, ylD p)) (r2 (0, yuD p)) # moveTo (p2 (0, ylD p))
+      arrowAt (p2 (0, ylD p))
+              (r2 (0, yuD p - ylD p))
     segments p _ =
       vcat' (with & sep .~ (sqS p))
             (take (floor . (/) (yuD p - ylD p) $ (sqS p)) .
@@ -151,7 +153,7 @@ yAxis =
         where
           ys :: [Int]
           ys = take (floor . (/) (yuD p - ylD p) $ (sqS p))
-                    (iterate (+(floor . sqS $ p)) 0)
+                    (iterate (+(floor . sqS $ p)) (floor . ylD $ p))
           mkPoint y = p2 (-15, fromIntegral y)
 
 
@@ -177,15 +179,15 @@ grid :: Diag
 grid = Diag xGrid `mappend` Diag yGrid
   where
     yGrid p _ =
-      hcat' (with & sep .~ (sqS p))
-            (take (floor . (/) (xuD p - xlD p) $ (sqS p)) .
-              repeat $ (vrule $ xuD p - xlD p))   #
-      moveTo (p2 (xlD p, (yuD p - ylD p) / 2))    #
+      hcat' (with & sep .~ sqS p)
+            (replicate (floor . (/) (xuD p - xlD p) $ sqS p)
+                       (vrule $ yuD p - ylD p))          #
+      moveTo (p2 (xlD p, ylD p + ((yuD p - ylD p) / 2))) #
       lw ultraThin
     xGrid p _ =
-      vcat' (with & sep .~ (sqS p))
-            (take (floor . (/) (yuD p - ylD p) $ (sqS p)) .
-              repeat $ (hrule $ yuD p - ylD p))  #
-      alignB                                     #
-      moveTo (p2 ((xuD p - xlD p) / 2, ylD p))   #
+      vcat' (with & sep .~ sqS p)
+            (replicate (floor . (/) (yuD p - ylD p) $ sqS p)
+                       (hrule $ xuD p - xlD p))   #
+      alignB                                      #
+      moveTo (p2 (xlD p + ((xuD p - xlD p) / 2), ylD p)) #
       lw ultraThin
