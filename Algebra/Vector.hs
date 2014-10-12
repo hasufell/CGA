@@ -58,16 +58,34 @@ vp2 :: PT  -- ^ vector origin
 vp2 a b = (pt2Vec b) - (pt2Vec a)
 
 
--- |Checks if 3 points a,b,c build a counterclock wise triangle by
--- connecting a-b-c. This is done by computing the determinant and
--- checking the algebraic sign.
-ccw :: PT -> PT -> PT -> Bool
-ccw a b c =
-  (bx - ax)   *
+-- |Computes the determinant of 3 points.
+det :: PT -> PT -> PT -> Double
+det a b c =
+  (bx - ax) *
     (cy - ay) -
     (by - ay) *
-    (cx - ax) >= 0
+    (cx - ax)
   where
     (ax, ay) = unp2 a
     (bx, by) = unp2 b
     (cx, cy) = unp2 c
+
+
+-- |Get the orientation of 3 points which can either be
+-- * clock-wise
+-- * counter-clock-wise
+-- * collinear
+getOrient :: PT -> PT -> PT -> Alignment
+getOrient a b c = case compare (det a b c) 0 of
+  GT -> CW
+  LT -> CCW
+  EQ -> CL
+
+
+--- |Checks if 3 points a,b,c do not build a clockwise triangle by
+--- connecting a-b-c. This is done by computing the determinant and
+--- checking the algebraic sign.
+notcw :: PT -> PT -> PT -> Bool
+notcw a b c = case getOrient a b c of
+  CW -> False
+  _  -> True

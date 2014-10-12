@@ -25,14 +25,14 @@ return (scanHalf upperHull restu) ++
 
 === begin scanHalf function ===
 scanHalf (min 3 elem => lowerHull) (min 1 elem => rest)
-  | isCounterClockWise (last3Elements lowerHull) == True
+  | isNotClockWise (last3Elements lowerHull) == True
     = scanHalf (lowerHull + head rest) (tail rest)
   | otherwise
     = scanHalf (deleteSndToLastElem lowerHull + head rest)
            (rest)
 
 scanHalf (min 3 elem => lowerHull ) []
-  | isCounterClockWise (last3Elements lowerHull) == True
+  | isNotClockWise (last3Elements lowerHull) == True
     = return lowerHull
   | otherwise
     = scanHalf (deleteSndToLastElem lowerHull) []
@@ -49,26 +49,26 @@ scanHalf lowerHull _ = lowerHull
 xs = [(100, 100), (200, 450), (250, 250)]
 ys = [(300, 400), (400, 200)]
 
-ccw (100, 100) (200, 450) (250, 250) => false, pop snd2last of xs
+notcw (100, 100) (200, 450) (250, 250) => false, pop snd2last of xs
 ===
 move first of ys to end of xs
 
 xs = [(100, 100), (250, 250), (300, 400)]
 ys = [(400, 200)]
 
-ccw (100, 100), (250, 250) (300, 400) => true
+notcw (100, 100), (250, 250) (300, 400) => true
 ===
 move first of ys to end of xs
 
 xs = [(100, 100), (250, 250), (300, 400), (400, 200)]
 ys = []
 
-ccw (250, 250) (300, 400) (400, 200) => false, pop snd2last of xs
+notcw (250, 250) (300, 400) (400, 200) => false, pop snd2last of xs
 ===
 xs = [(100, 100), (250, 250), (400, 200)]
 ys = []
 
-ccw (100, 100) (250, 250) (400, 200) => false, pop snd2last of xs
+notcw (100, 100) (250, 250) (400, 200) => false, pop snd2last of xs
 ===
 xs = [(100, 100), (400, 200)]
 ys = []
@@ -91,13 +91,13 @@ grahamGetCH vs =
           -> [PT] -- ^ the rest of the points
           -> [PT] -- ^ all convex hull points for the half
     scanH hs@(x:y:z:xs) (r':rs')
-      |	ccw z y x     = scanH (r':hs) rs'
-      | otherwise     = scanH (x:z:xs) (r':rs')
+      |	notcw z y x     = scanH (r':hs) rs'
+      | otherwise       = scanH (x:z:xs) (r':rs')
     scanH hs@(x:y:z:xs) []
-      |	ccw z y x     = hs
-      | otherwise     = scanH (x:z:xs) []
-    scanH hs (r':rs') = scanH (r':hs) rs'
-    scanH hs _        = hs
+      |	notcw z y x     = hs
+      | otherwise       = scanH (x:z:xs) []
+    scanH hs (r':rs')   = scanH (r':hs) rs'
+    scanH hs _          = hs
 
 
 -- |Compute all steps of the graham scan algorithm to allow
@@ -116,12 +116,12 @@ grahamGetCHSteps vs =
       where
         scanH c' hs@(x:y:z:xs) (r':rs')
           | c' >= c      = hs
-          |	ccw z y x    = scanH (c' + 1) (r':hs) rs'
+          |	notcw z y x  = scanH (c' + 1) (r':hs) rs'
           | otherwise    = scanH (c' + 1) (x:z:xs) (r':rs')
         scanH _ [x,y] [] = [y,x]
         scanH c' hs@(x:y:z:xs) []
           | c' >= c      = hs
-          |	ccw z y x    = hs
+          |	notcw z y x  = hs
           | otherwise    = scanH (c' + 1) (x:z:xs) []
         scanH c' hs (r':rs')
           | c' >= c      = hs

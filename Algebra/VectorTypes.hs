@@ -8,3 +8,8 @@ import Diagrams.TwoD.Types
 type Vec = R2
 type PT  = P2
 type Coord  = (Double, Double)
+
+
+data Alignment = CW
+               | CCW
+               | CL
