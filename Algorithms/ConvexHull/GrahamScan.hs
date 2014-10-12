@@ -29,13 +29,17 @@ scanHalf (min 3 elem => lowerHull) (min 1 elem => rest)
     = scanHalf (lowerHull + head rest) (tail rest)
   | otherwise
     = scanHalf (deleteSndToLastElem lowerHull + head rest)
-           (tail rest)
+           (rest)
 
 scanHalf (min 3 elem => lowerHull ) []
   | isCounterClockWise (last3Elements lowerHull) == True
     = return lowerHull
   | otherwise
     = scanHalf (deleteSndToLastElem lowerHull) []
+
+scanHalf lowerHull (min 1 elem => rest) = scanHalf (lowerHull + head rest)
+                                                   (tail rest)
+
 
 scanHalf lowerHull _ = lowerHull
 === end scanHalf function ===
@@ -87,12 +91,13 @@ grahamGetCH vs =
           -> [PT] -- ^ the rest of the points
           -> [PT] -- ^ all convex hull points for the half
     scanH hs@(x:y:z:xs) (r':rs')
-      |	ccw z y x   = scanH (r':hs) rs'
-      | otherwise   = scanH (r':x:z:xs) rs'
+      |	ccw z y x     = scanH (r':hs) rs'
+      | otherwise     = scanH (x:z:xs) (r':rs')
     scanH hs@(x:y:z:xs) []
-      |	ccw z y x   = hs
-      | otherwise   = scanH (x:z:xs) []
-    scanH xs _      = xs
+      |	ccw z y x     = hs
+      | otherwise     = scanH (x:z:xs) []
+    scanH hs (r':rs') = scanH (r':hs) rs'
+    scanH hs _        = hs
 
 
 -- |Compute all steps of the graham scan algorithm to allow
@@ -110,12 +115,15 @@ grahamGetCHSteps vs =
       | otherwise = []
       where
         scanH c' hs@(x:y:z:xs) (r':rs')
-          | c' >= c     = hs
-          |	ccw z y x   = scanH (c' + 1) (r':hs) rs'
-          | otherwise   = scanH (c' + 1) (r':x:z:xs) rs'
-        scanH _ [x,y] []    = [y,x]
+          | c' >= c      = hs
+          |	ccw z y x    = scanH (c' + 1) (r':hs) rs'
+          | otherwise    = scanH (c' + 1) (x:z:xs) (r':rs')
+        scanH _ [x,y] [] = [y,x]
         scanH c' hs@(x:y:z:xs) []
-          | c' >= c     = hs
-          |	ccw z y x   = hs
-          | otherwise   = scanH (c' + 1) (x:z:xs) []
+          | c' >= c      = hs
+          |	ccw z y x    = hs
+          | otherwise    = scanH (c' + 1) (x:z:xs) []
+        scanH c' hs (r':rs')
+          | c' >= c      = hs
+          | otherwise    = scanH (c' + 1) (r':hs) rs'
         scanH _ xs _     = xs

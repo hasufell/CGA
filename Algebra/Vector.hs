@@ -66,7 +66,7 @@ ccw a b c =
   (bx - ax)   *
     (cy - ay) -
     (by - ay) *
-    (cx - ax) > 0
+    (cx - ax) >= 0
   where
     (ax, ay) = unp2 a
     (bx, by) = unp2 b
