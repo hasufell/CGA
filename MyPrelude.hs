@@ -65,7 +65,7 @@ first f (x,y) = (f x, y)
 -- |Sequentialize a list, such as:
 -- [1, 2, 3, 4, 5] -> [[1],[1,2],[1,2,3],[1,2,3,4],[1,2,3,4,5]]
 seqList :: [a] -> [[a]]
-seqList = reverse . takeWhile (not . null) . iterate init
+seqList = tail. inits
 
 
 -- |Duplicate the last element of a list and append it.
