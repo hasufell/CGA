@@ -104,8 +104,8 @@ grahamGetCH vs =
 -- visualizing it.
 grahamGetCHSteps :: [PT] -> [[PT]]
 grahamGetCHSteps vs =
-  (++) (rmdups . reverse . g (length vs) lH $ lHRest)
-       (rmdups . init . reverse . g (length vs) uH $ uHRest)
+  (++) (rmdups . reverse . g ((* 2) . length $ vs) lH $ lHRest)
+       (rmdups . init . reverse . g ((* 2) . length $ vs) uH $ uHRest)
   where
     sortedXY = fmap p2 . sortLex . fmap unp2 $ vs
     (lH, lHRest) = first reverse . splitAt 3 $ sortedXY
