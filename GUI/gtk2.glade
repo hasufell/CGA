@@ -7,7 +7,7 @@
     <property name="border_width">5</property>
     <property name="type_hint">dialog</property>
     <property name="program_name">CG2</property>
-    <property name="version">0.0.0.1</property>
+    <property name="version">0.0.0.9</property>
     <property name="copyright" translatable="yes">Copyright (C) hasufell</property>
     <property name="comments" translatable="yes">Drawing random crap.</property>
     <property name="website">https://hasufell.de/CG2/</property>
