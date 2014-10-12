@@ -34,6 +34,13 @@ sortLex =
            x  -> x)
 
 
+-- |Get the last x elements of a list.
+getLastX :: Int -> [a] -> [a]
+getLastX a xs
+  | length xs < a = []
+  | otherwise     = snd . splitAt (length xs - a) $ xs
+
+
 -- |Get a list with it's head and last element cut. If there are less
 -- than 2 elements in the list, return an empty list.
 tailInit :: [a] -> [a]
