@@ -51,10 +51,8 @@ grahamGetCH vs =
 -- visualizing it.
 grahamGetCHSteps :: [PT] -> [[PT]]
 grahamGetCHSteps vs =
-  (++)  (reverse . g (length vs) lH $ lHRest) .
-    fmap (\x -> (last . reverse . g (length vs) lH $ lHRest)
-          ++ x) $
-    (init . reverse . g (length vs) uH $ uHRest)
+  (++) (rmdups . reverse . g (length vs) lH $ lHRest)
+       (rmdups . init . reverse . g (length vs) uH $ uHRest)
   where
     sortedXY = fmap p2 . sortLex . fmap unp2 $ vs
     (lH, lHRest) = first reverse . splitAt 2 $ sortedXY
@@ -64,12 +62,12 @@ grahamGetCHSteps vs =
       | otherwise = []
       where
         scan c' (y:z:xs) (x:ys)
-          | c' >= c     = reverse (y:z:xs)
+          | c' >= c     = y:z:xs
           |	ccw z y x   = scan (c' + 1) (x:y:z:xs) ys
           | otherwise   = scan (c' + 1) (x:z:xs) ys
         scan _ [x,y] []    = [y,x]
         scan c' (x:y:z:xs) []
-          | c' >= c     = reverse (x:y:z:xs)
+          | c' >= c     = x:y:z:xs
           |	ccw z y x   = x:y:z:xs
           | otherwise   = scan (c' + 1) (x:z:xs) []
-        scan _ xs _        = reverse xs
+        scan _ xs _     = xs

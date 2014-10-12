@@ -42,6 +42,14 @@ tailInit xs
   | otherwise     = []
 
 
+-- |Remove duplicates from a list.
+rmdups :: (Ord a) => [a] -> [a]
+rmdups =
+  foldl (\seen x -> if x `elem` seen
+    then seen
+    else seen ++ [x]) []
+
+
 -- |Apply a function to the first element of a tuple.
 first :: (a -> b) -> (a,c) -> (b,c)
 first f (x,y) = (f x, y)
