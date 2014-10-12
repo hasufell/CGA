@@ -120,7 +120,6 @@ makeGUI startFile = do
   _ <- on (cB mygui) changed (drawDiag mygui)
   _ <- on (gC mygui) toggled (drawDiag mygui)
   _ <- on (cC mygui) toggled (drawDiag mygui)
-  _ <- on (hs mygui) valueChanged (drawDiag mygui)
 
   -- hotkeys
   _ <- win mygui `on` keyPressEvent $ tryEvent $ do
