@@ -169,7 +169,7 @@ drawDiag mygui = do
         1 -> showErrorDialog "No valid x/y dimensions!"
         2 -> showErrorDialog "No valid Mesh file!"
         _ -> return ()
-    Nothing -> showErrorDialog "No valid Mesh file!"
+    Nothing -> return ()
 
 
 -- |Saves a Diagram which is built from a given file as an SVG.
@@ -184,7 +184,7 @@ saveDiag mygui = do
         1 -> showErrorDialog "No valid x/y dimensions!"
         2 -> showErrorDialog "No valid Mesh file!"
         _ -> return ()
-    Nothing -> showErrorDialog "No valid Mesh file!"
+    Nothing -> return ()
 
 
 -- |Draws and saves a Diagram which is built from a given file.
