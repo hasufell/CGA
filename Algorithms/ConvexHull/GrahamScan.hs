@@ -12,9 +12,9 @@ import MyPrelude
 -- algorithm.
 grahamGetCH :: [PT] -> [PT]
 grahamGetCH vs =
-        -- merge upper hull with lower hull while discarding
-        -- the duplicated points from the lower hull
-        scan uH uHRest ++ tailInit (scan lH lHRest)
+  -- merge upper hull with lower hull while discarding
+  -- the duplicated points from the lower hull
+  scan uH uHRest ++ tailInit (scan lH lHRest)
   where
     -- sort lexicographically by x values (ties are resolved by y values)
     sortedXY     = fmap p2 . sortLex . fmap unp2 $ vs
