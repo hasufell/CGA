@@ -55,7 +55,7 @@ vec2Pt = p2 . unr2
 vp2 :: PT  -- ^ vector origin
     -> PT  -- ^ vector points here
     -> Vec
-vp2 a b = (pt2Vec b) - (pt2Vec a)
+vp2 a b = pt2Vec b - pt2Vec a
 
 
 -- |Computes the determinant of 3 points.
