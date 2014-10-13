@@ -52,7 +52,7 @@ convexHullPoints = Diag chp
         (repeat dot))
       where
         dot = (circle $ t p :: Diagram Cairo R2) # fc red # lc red
-        vtch = grahamGetCH vt
+        vtch = grahamCH vt
 
 
 -- |Show coordinates as text above the convex hull points.
@@ -64,7 +64,7 @@ convexHullPointsText = Diag chpt
         zip vtchf
             (pointToTextCoord <$> vtchf) # translate (r2 (0, 10))
       where
-        vtchf = grahamGetCH . filter (inRange (dX p) (dY p)) $ vt
+        vtchf = grahamCH . filter (inRange (dX p) (dY p)) $ vt
 
 
 -- |Create a diagram which shows the lines along the convex hull
@@ -76,10 +76,10 @@ convexHullLines = Diag chl
     chl p vt =
       (strokeTrail                           .
           fromVertices                       .
-          flip (++) [head $ grahamGetCH vtf] .
-          grahamGetCH                        $
-          vtf)                          #
-        moveTo (head $ grahamGetCH vtf) #
+          flip (++) [head $ grahamCH vtf]    .
+          grahamCH                           $
+          vtf)                       #
+        moveTo (head $ grahamCH vtf) #
         lc red
       where
         vtf = filter (inRange (dX p) (dY p)) vt

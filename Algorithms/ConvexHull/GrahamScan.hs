@@ -76,28 +76,41 @@ ys = []
 return [(100, 100), (400, 200)]
 =========================================================
 --}
-grahamGetCH :: [PT] -> [PT]
-grahamGetCH vs =
-  scanH uH uHRest ++ tailInit (scanH lH lHRest)
+grahamCH :: [PT] -> [PT]
+grahamCH vs = grahamUCH vs ++ (tailInit . grahamLCH $ vs)
+
+
+-- |Get the lower part of the convex hull.
+grahamLCH :: [PT] -> [PT]
+grahamLCH vs = scanH lH lHRest
   where
     sortedXY     = fmap p2 . sortLex . fmap unp2 $ vs
     (lH, lHRest) = first reverse . splitAt 3 $ sortedXY
+
+
+-- |Get the upper part of the convex hull.
+grahamUCH :: [PT] -> [PT]
+grahamUCH vs = scanH uH uHRest
+  where
+    sortedXY     = fmap p2 . sortLex . fmap unp2 $ vs
     (uH, uHRest) = first reverse . splitAt 3 . reverse $ sortedXY
-    -- This scans only a half of the convex hull. If it's the upper
-    -- or lower half depends on the input.
-    -- Also, the first list is reversed since we only care about the last
-    -- 3 elements and want to stay efficient.
-    scanH :: [PT] -- ^ the first 3 starting points in reversed order
-          -> [PT] -- ^ the rest of the points
-          -> [PT] -- ^ all convex hull points for the half
-    scanH hs@(x:y:z:xs) (r':rs')
-      |	notcw z y x     = scanH (r':hs) rs'
-      | otherwise       = scanH (x:z:xs) (r':rs')
-    scanH hs@(x:y:z:xs) []
-      |	notcw z y x     = hs
-      | otherwise       = scanH (x:z:xs) []
-    scanH hs (r':rs')   = scanH (r':hs) rs'
-    scanH hs _          = hs
+
+
+-- |This scans only a half of the convex hull. If it's the upper
+-- or lower half depends on the input.
+-- Also, the first list is reversed since we only care about the last
+-- 3 elements and want to stay efficient.
+scanH :: [PT] -- ^ the first 3 starting points in reversed order
+      -> [PT] -- ^ the rest of the points
+      -> [PT] -- ^ all convex hull points for the half
+scanH hs@(x:y:z:xs) (r':rs')
+  |	notcw z y x     = scanH (r':hs) rs'
+  | otherwise       = scanH (x:z:xs) (r':rs')
+scanH hs@(x:y:z:xs) []
+  |	notcw z y x     = hs
+  | otherwise       = scanH (x:z:xs) []
+scanH hs (r':rs')   = scanH (r':hs) rs'
+scanH hs _          = hs
 
 
 -- |Compute all steps of the graham scan algorithm to allow
