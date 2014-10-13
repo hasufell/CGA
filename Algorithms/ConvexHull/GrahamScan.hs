@@ -122,21 +122,28 @@ grahamGetCHSteps c xs' ys'
     scanH _ xs _     = xs
 
 
+-- |Get all iterations of the upper hull of the graham scan algorithm.
 grahamGetUpperHullSteps :: [PT] -> [[PT]]
 grahamGetUpperHullSteps vs =
-  (++) [getLastX 2 sortedXY] . rmdups . init . reverse . grahamGetCHSteps ((* 2) . length $ vs) uH $
+  (++) [getLastX 2 sortedXY]                  .
+    rmdups                                    .
+    init                                      .
+    reverse                                   .
+    grahamGetCHSteps ((* 2) . length $ vs) uH $
     uHRest
   where
     sortedXY     = fmap p2 . sortLex . fmap unp2 $ vs
     (uH, uHRest) = first reverse . splitAt 3 . reverse $ sortedXY
 
 
+-- |Get all iterations of the lower hull of the graham scan algorithm.
 grahamGetLowerHullSteps :: [PT] -> [[PT]]
 grahamGetLowerHullSteps vs =
-  (++) [take 2 sortedXY] . rmdups . reverse . grahamGetCHSteps ((* 2) . length $ vs) lH $ lHRest
+  (++) [take 2 sortedXY]                      .
+    rmdups                                    .
+    reverse                                   .
+    grahamGetCHSteps ((* 2) . length $ vs) lH $
+    lHRest
   where
     sortedXY     = fmap p2 . sortLex . fmap unp2 $ vs
     (lH, lHRest) = first reverse . splitAt 3 $ sortedXY
-
-{- -  (++) (rmdups . reverse . g ((* 2) . length $ vs) lH $ lHRest) -}
-{- -       (rmdups . init . reverse . g ((* 2) . length $ vs) uH $ uHRest) -}

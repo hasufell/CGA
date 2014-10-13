@@ -14,15 +14,13 @@ import Parser.Meshparser
 -- |Return a list of tuples used by 'gifMain' to generate an animated gif.
 gifDiag :: DiagProp -> [PT] -> [(Diagram Cairo R2, GifDelay)]
 gifDiag p xs =
-  fmap (\x -> (x, 100))                      .
-    fmap (\x -> x <> nonChDiag)              .
+  fmap (\x -> (x, 100))                         .
+    fmap (\x -> x <> nonChDiag)                 .
     flip (++)
       [mkDiag (convexHullPointsText `mappend`
-                convexHullPoints)
-              p xs <> lastUpperHull <> lastLowerHull] $
-    (lowerHullList ++
-      ((<> lastLowerHull) <$>
-      upperHullList))
+        convexHullPoints)
+        p xs <> lastUpperHull <> lastLowerHull] $
+    (lowerHullList ++ ((<> lastLowerHull) <$> upperHullList))
   where
     upperHullList = convexHullLinesIntervalUpper p xs
     lastUpperHull = last upperHullList
