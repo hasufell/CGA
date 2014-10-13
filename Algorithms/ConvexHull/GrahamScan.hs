@@ -100,12 +100,12 @@ scanH :: [PT]   -- ^ the first 3 starting points in reversed order
       -> [PT]   -- ^ the rest of the points
       -> [[PT]] -- ^ all convex hull points iterations for the half
 scanH hs@(x:y:z:xs) (r':rs')
-  |	notcw z y x       = [hs] ++ scanH (r':hs) rs'
-  | otherwise         = [hs] ++ scanH (x:z:xs) (r':rs')
+  |	notcw z y x       = hs : scanH (r':hs) rs'
+  | otherwise         = hs : scanH (x:z:xs) (r':rs')
 scanH hs@(x:y:z:xs) []
   |	notcw z y x       = [hs]
-  | otherwise         = [hs] ++ scanH (x:z:xs) []
-scanH hs (r':rs')     = [hs] ++ scanH (r':hs) rs'
+  | otherwise         = hs : scanH (x:z:xs) []
+scanH hs (r':rs')     = hs : scanH (r':hs) rs'
 scanH hs _            = [hs]
 
 
