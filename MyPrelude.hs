@@ -72,3 +72,9 @@ seqList = tail. inits
 dupLast :: [a] -> [a]
 dupLast [] = []
 dupLast xs = xs ++ [last xs]
+
+
+-- |Simpler version of if-then-else.
+if' :: Bool -> a -> a -> a
+if' True  x _ = x
+if' False _ y = y
