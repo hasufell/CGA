@@ -44,8 +44,8 @@ coordPointsText = Diag cpt
 
 
 -- |Create a diagram which shows the points of the convex hull.
-convexHullPoints :: Diag
-convexHullPoints = Diag chp
+convexHP :: Diag
+convexHP = Diag chp
   where
     chp p vt =
       position (zip (filter (inRange (dX p) (dY p)) vtch)
@@ -56,8 +56,8 @@ convexHullPoints = Diag chp
 
 
 -- |Show coordinates as text above the convex hull points.
-convexHullPointsText :: Diag
-convexHullPointsText = Diag chpt
+convexHPText :: Diag
+convexHPText = Diag chpt
   where
     chpt p vt =
       position $
@@ -69,8 +69,8 @@ convexHullPointsText = Diag chpt
 
 -- |Create a diagram which shows the lines along the convex hull
 -- points.
-convexHullLines :: Diag
-convexHullLines = Diag chl
+convexHLs :: Diag
+convexHLs = Diag chl
   where
     chl _ [] = mempty
     chl p vt =
@@ -85,32 +85,37 @@ convexHullLines = Diag chl
         vtf = filter (inRange (dX p) (dY p)) vt
 
 
-convexHullLinesIntervalLower :: DiagProp -> [PT] -> [Diagram Cairo R2]
-convexHullLinesIntervalLower p xs =
-  fmap mkChDiag (grahamLHSteps xs)
+-- |Create list of diagrama which describe the lines along points of a half
+-- convex hull, for each iteration of the algorithm. Which half is chosen
+-- depends on the input.
+convexHStepsLs :: Colour Double
+               -> ([PT] -> [[PT]])
+               -> DiagProp
+               -> [PT]
+               -> [Diagram Cairo R2]
+convexHStepsLs col f p xs =
+  fmap mkChDiag (f xs)
   where
     mkChDiag vt =
       (strokeTrail         .
           fromVertices     $
           vtf)            #
         moveTo (head vtf) #
-        lc orange
+        lc col
       where
         vtf = filter (inRange (dX p) (dY p)) vt
 
 
-convexHullLinesIntervalUpper :: DiagProp -> [PT] -> [Diagram Cairo R2]
-convexHullLinesIntervalUpper p xs =
-  fmap mkChDiag (grahamUHSteps xs)
-  where
-    mkChDiag vt =
-      (strokeTrail         .
-          fromVertices     $
-          vtf)            #
-        moveTo (head vtf) #
-        lc purple
-      where
-        vtf = filter (inRange (dX p) (dY p)) vt
+-- |Create list of diagrama which describe the lines along the lower
+-- convex hull points, for each iteration of the algorithm.
+convexLHStepsLs :: DiagProp -> [PT] -> [Diagram Cairo R2]
+convexLHStepsLs = convexHStepsLs orange grahamLHSteps
+
+
+-- |Create list of diagrama which describe the lines along the upper
+-- convex hull points, for each iteration of the algorithm.
+convexUHStepsLs :: DiagProp -> [PT] -> [Diagram Cairo R2]
+convexUHStepsLs = convexHStepsLs purple grahamUHSteps
 
 
 -- |Creates a Diagram that shows an XAxis which is bound

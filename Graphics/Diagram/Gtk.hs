@@ -22,8 +22,8 @@ diag p = case alg p of
   1 ->
     mkDiag
       (mconcat
-        [maybeDiag (ct p) convexHullPointsText,
-        convexHullPoints, convexHullLines,
+        [maybeDiag (ct p) convexHPText,
+        convexHP, convexHLs,
         coordPoints, xAxis, yAxis,
         maybeDiag (gd p) grid, whiteRectB])
       p

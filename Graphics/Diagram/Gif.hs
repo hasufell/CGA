@@ -16,14 +16,14 @@ gifDiag :: DiagProp -> [PT] -> [(Diagram Cairo R2, GifDelay)]
 gifDiag p xs =
   fmap ((\x -> (x, 100)) . (<> nonChDiag))      .
     flip (++)
-      [mkDiag (convexHullPointsText `mappend`
-        convexHullPoints)
+      [mkDiag (convexHPText `mappend`
+        convexHP)
         p xs <> lastUpperHull <> lastLowerHull] $
     (lowerHullList ++ ((<> lastLowerHull) <$> upperHullList))
   where
-    upperHullList = convexHullLinesIntervalUpper p xs
+    upperHullList = convexUHStepsLs p xs
     lastUpperHull = last upperHullList
-    lowerHullList = convexHullLinesIntervalLower p xs
+    lowerHullList = convexLHStepsLs p xs
     lastLowerHull = last lowerHullList
     -- add the x-axis and the other default stuff
     nonChDiag =
