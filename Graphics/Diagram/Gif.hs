@@ -18,11 +18,16 @@ gifDiag p xs =
     fmap (\x -> x <> nonChDiag)              .
     flip (++)
       [mkDiag (convexHullPointsText `mappend`
-                convexHullLines     `mappend`
                 convexHullPoints)
-              p xs]                $
-    (convexHullLinesInterval p xs)
+              p xs <> lastUpperHull <> lastLowerHull] $
+    (lowerHullList ++
+      ((<> lastLowerHull) <$>
+      upperHullList))
   where
+    upperHullList = convexHullLinesIntervalUpper p xs
+    lastUpperHull = last upperHullList
+    lowerHullList = convexHullLinesIntervalLower p xs
+    lastLowerHull = last lowerHullList
     -- add the x-axis and the other default stuff
     nonChDiag =
       mconcat                      .

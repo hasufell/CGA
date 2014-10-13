@@ -102,28 +102,41 @@ grahamGetCH vs =
 
 -- |Compute all steps of the graham scan algorithm to allow
 -- visualizing it.
-grahamGetCHSteps :: [PT] -> [[PT]]
-grahamGetCHSteps vs =
-  (++) (rmdups . reverse . g ((* 2) . length $ vs) lH $ lHRest)
-       (rmdups . init . reverse . g ((* 2) . length $ vs) uH $ uHRest)
+-- Whether the upper or lower hull is computed depends on the input.
+grahamGetCHSteps :: Int -> [PT] -> [PT] -> [[PT]]
+grahamGetCHSteps c xs' ys'
+  | c >= 0    = scanH 0 xs' ys' : grahamGetCHSteps (c - 1) xs' ys'
+  | otherwise = []
   where
-    sortedXY = fmap p2 . sortLex . fmap unp2 $ vs
-    (lH, lHRest) = first reverse . splitAt 3 $ sortedXY
+    scanH c' hs@(x:y:z:xs) (r':rs')
+      | c' >= c      = hs
+      |	notcw z y x  = scanH (c' + 1) (r':hs) rs'
+      | otherwise    = scanH (c' + 1) (x:z:xs) (r':rs')
+    scanH c' hs@(x:y:z:xs) []
+      | c' >= c      = hs
+      |	notcw z y x  = hs
+      | otherwise    = scanH (c' + 1) (x:z:xs) []
+    scanH c' hs (r':rs')
+      | c' >= c      = hs
+      | otherwise    = scanH (c' + 1) (r':hs) rs'
+    scanH _ xs _     = xs
+
+
+grahamGetUpperHullSteps :: [PT] -> [[PT]]
+grahamGetUpperHullSteps vs =
+  (++) [getLastX 2 sortedXY] . rmdups . init . reverse . grahamGetCHSteps ((* 2) . length $ vs) uH $
+    uHRest
+  where
+    sortedXY     = fmap p2 . sortLex . fmap unp2 $ vs
     (uH, uHRest) = first reverse . splitAt 3 . reverse $ sortedXY
-    g c xs' ys'
-      | c >= 0    = scanH 0 xs' ys' : g (c - 1) xs' ys'
-      | otherwise = []
-      where
-        scanH c' hs@(x:y:z:xs) (r':rs')
-          | c' >= c      = hs
-          |	notcw z y x  = scanH (c' + 1) (r':hs) rs'
-          | otherwise    = scanH (c' + 1) (x:z:xs) (r':rs')
-        scanH _ [x,y] [] = [y,x]
-        scanH c' hs@(x:y:z:xs) []
-          | c' >= c      = hs
-          |	notcw z y x  = hs
-          | otherwise    = scanH (c' + 1) (x:z:xs) []
-        scanH c' hs (r':rs')
-          | c' >= c      = hs
-          | otherwise    = scanH (c' + 1) (r':hs) rs'
-        scanH _ xs _     = xs
+
+
+grahamGetLowerHullSteps :: [PT] -> [[PT]]
+grahamGetLowerHullSteps vs =
+  (++) [take 2 sortedXY] . rmdups . reverse . grahamGetCHSteps ((* 2) . length $ vs) lH $ lHRest
+  where
+    sortedXY     = fmap p2 . sortLex . fmap unp2 $ vs
+    (lH, lHRest) = first reverse . splitAt 3 $ sortedXY
+
+{- -  (++) (rmdups . reverse . g ((* 2) . length $ vs) lH $ lHRest) -}
+{- -       (rmdups . init . reverse . g ((* 2) . length $ vs) uH $ uHRest) -}

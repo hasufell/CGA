@@ -85,19 +85,30 @@ convexHullLines = Diag chl
         vtf = filter (inRange (dX p) (dY p)) vt
 
 
--- |Same as showConvexHullLines, except that it returns an array
--- of diagrams with each step of the algorithm.
--- Unfortunately this is very difficult to implement as a Diag (TODO).
-convexHullLinesInterval :: DiagProp -> [PT] -> [Diagram Cairo R2]
-convexHullLinesInterval p xs =
-  fmap mkChDiag (grahamGetCHSteps xs)
+convexHullLinesIntervalLower :: DiagProp -> [PT] -> [Diagram Cairo R2]
+convexHullLinesIntervalLower p xs =
+  fmap mkChDiag (grahamGetLowerHullSteps xs)
   where
     mkChDiag vt =
       (strokeTrail         .
           fromVertices     $
           vtf)            #
         moveTo (head vtf) #
-        lc red
+        lc orange
+      where
+        vtf = filter (inRange (dX p) (dY p)) vt
+
+
+convexHullLinesIntervalUpper :: DiagProp -> [PT] -> [Diagram Cairo R2]
+convexHullLinesIntervalUpper p xs =
+  fmap mkChDiag (grahamGetUpperHullSteps xs)
+  where
+    mkChDiag vt =
+      (strokeTrail         .
+          fromVertices     $
+          vtf)            #
+        moveTo (head vtf) #
+        lc purple
       where
         vtf = filter (inRange (dX p) (dY p)) vt
 
