@@ -87,7 +87,7 @@ convexHullLines = Diag chl
 
 convexHullLinesIntervalLower :: DiagProp -> [PT] -> [Diagram Cairo R2]
 convexHullLinesIntervalLower p xs =
-  fmap mkChDiag (grahamGetLowerHullSteps xs)
+  fmap mkChDiag (grahamLHSteps xs)
   where
     mkChDiag vt =
       (strokeTrail         .
@@ -101,7 +101,7 @@ convexHullLinesIntervalLower p xs =
 
 convexHullLinesIntervalUpper :: DiagProp -> [PT] -> [Diagram Cairo R2]
 convexHullLinesIntervalUpper p xs =
-  fmap mkChDiag (grahamGetUpperHullSteps xs)
+  fmap mkChDiag (grahamUHSteps xs)
   where
     mkChDiag vt =
       (strokeTrail         .

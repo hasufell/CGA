@@ -116,9 +116,9 @@ scanH hs _          = hs
 -- |Compute all steps of the graham scan algorithm to allow
 -- visualizing it.
 -- Whether the upper or lower hull is computed depends on the input.
-grahamGetCHSteps :: Int -> [PT] -> [PT] -> [[PT]]
-grahamGetCHSteps c xs' ys'
-  | c >= 0    = scanH 0 xs' ys' : grahamGetCHSteps (c - 1) xs' ys'
+grahamCHSteps :: Int -> [PT] -> [PT] -> [[PT]]
+grahamCHSteps c xs' ys'
+  | c >= 0    = scanH 0 xs' ys' : grahamCHSteps (c - 1) xs' ys'
   | otherwise = []
   where
     scanH c' hs@(x:y:z:xs) (r':rs')
@@ -136,13 +136,13 @@ grahamGetCHSteps c xs' ys'
 
 
 -- |Get all iterations of the upper hull of the graham scan algorithm.
-grahamGetUpperHullSteps :: [PT] -> [[PT]]
-grahamGetUpperHullSteps vs =
+grahamUHSteps :: [PT] -> [[PT]]
+grahamUHSteps vs =
   (++) [getLastX 2 sortedXY]                  .
     rmdups                                    .
     init                                      .
     reverse                                   .
-    grahamGetCHSteps ((* 2) . length $ vs) uH $
+    grahamCHSteps ((* 2) . length $ vs) uH $
     uHRest
   where
     sortedXY     = fmap p2 . sortLex . fmap unp2 $ vs
@@ -150,12 +150,12 @@ grahamGetUpperHullSteps vs =
 
 
 -- |Get all iterations of the lower hull of the graham scan algorithm.
-grahamGetLowerHullSteps :: [PT] -> [[PT]]
-grahamGetLowerHullSteps vs =
+grahamLHSteps :: [PT] -> [[PT]]
+grahamLHSteps vs =
   (++) [take 2 sortedXY]                      .
     rmdups                                    .
     reverse                                   .
-    grahamGetCHSteps ((* 2) . length $ vs) lH $
+    grahamCHSteps ((* 2) . length $ vs) lH $
     lHRest
   where
     sortedXY     = fmap p2 . sortLex . fmap unp2 $ vs
