@@ -77,8 +77,8 @@ det a b c =
 -- * collinear
 getOrient :: PT -> PT -> PT -> Alignment
 getOrient a b c = case compare (det a b c) 0 of
-  GT -> CW
-  LT -> CCW
+  LT -> CW
+  GT -> CCW
   EQ -> CL
 
 
