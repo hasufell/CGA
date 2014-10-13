@@ -27,7 +27,7 @@ getAngle a b =
 
 -- |Get the length of a vector.
 vecLength :: Vec -> Double
-vecLength v = sqrt (x^2 + y^2)
+vecLength v = sqrt (x^(2 :: Int) + y^(2 :: Int))
   where
     (x, y) = unr2 v
 
