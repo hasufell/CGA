@@ -176,7 +176,7 @@ whiteRectB :: Diag
 whiteRectB = Diag rect'
   where
     rect' p _ =
-      whiteRect (w' p + 50) (h' p + 50) #
+      whiteRect (w' p + (w' p / 10)) (h' p + (h' p / 10)) #
         moveTo (p2 (wOff p, hOff p))
       where
 
