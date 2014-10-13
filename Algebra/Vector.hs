@@ -4,6 +4,7 @@ module Algebra.Vector where
 
 import Algebra.VectorTypes
 import Diagrams.TwoD.Types
+import MyPrelude
 
 
 -- |Checks whether the Point is in a given dimension.
@@ -89,3 +90,8 @@ notcw :: PT -> PT -> PT -> Bool
 notcw a b c = case getOrient a b c of
   CW -> False
   _  -> True
+
+
+-- |Sort X and Y coordinates lexicographically.
+sortedXY :: [PT] -> [PT]
+sortedXY = fmap p2 . sortLex . fmap unp2

@@ -4,7 +4,6 @@ module Algorithms.ConvexHull.GrahamScan where
 
 import Algebra.Vector
 import Algebra.VectorTypes
-import Diagrams.TwoD.Types
 import MyPrelude
 
 
@@ -82,81 +81,58 @@ grahamCH vs = grahamUCH vs ++ (tailInit . grahamLCH $ vs)
 
 -- |Get the lower part of the convex hull.
 grahamLCH :: [PT] -> [PT]
-grahamLCH vs = scanH lH lHRest
-  where
-    sortedXY     = fmap p2 . sortLex . fmap unp2 $ vs
-    (lH, lHRest) = first reverse . splitAt 3 $ sortedXY
+grahamLCH vs = uncurry (\x y -> last . scanH x $ y)
+                 (first reverse . splitAt 3 . sortedXY $ vs)
 
 
 -- |Get the upper part of the convex hull.
 grahamUCH :: [PT] -> [PT]
-grahamUCH vs = scanH uH uHRest
-  where
-    sortedXY     = fmap p2 . sortLex . fmap unp2 $ vs
-    (uH, uHRest) = first reverse . splitAt 3 . reverse $ sortedXY
+grahamUCH vs = uncurry (\x y -> last . scanH x $ y)
+                 (first reverse . splitAt 3 . reverse . sortedXY $ vs)
 
 
--- |This scans only a half of the convex hull. If it's the upper
--- or lower half depends on the input.
+-- |This scans only a half of the convex hull, but all steps (the last
+-- is the end result).
+-- If it's the upper or lower half depends on the input.
 -- Also, the first list is reversed since we only care about the last
 -- 3 elements and want to stay efficient.
-scanH :: [PT] -- ^ the first 3 starting points in reversed order
-      -> [PT] -- ^ the rest of the points
-      -> [PT] -- ^ all convex hull points for the half
+scanH :: [PT]   -- ^ the first 3 starting points in reversed order
+      -> [PT]   -- ^ the rest of the points
+      -> [[PT]] -- ^ all convex hull points iterations for the half
 scanH hs@(x:y:z:xs) (r':rs')
-  |	notcw z y x     = scanH (r':hs) rs'
-  | otherwise       = scanH (x:z:xs) (r':rs')
+  |	notcw z y x       = [hs] ++ scanH (r':hs) rs'
+  | otherwise         = [hs] ++ scanH (x:z:xs) (r':rs')
 scanH hs@(x:y:z:xs) []
-  |	notcw z y x     = hs
-  | otherwise       = scanH (x:z:xs) []
-scanH hs (r':rs')   = scanH (r':hs) rs'
-scanH hs _          = hs
+  |	notcw z y x       = [hs]
+  | otherwise         = [hs] ++ scanH (x:z:xs) []
+scanH hs (r':rs')     = [hs] ++ scanH (r':hs) rs'
+scanH hs _            = [hs]
 
 
 -- |Compute all steps of the graham scan algorithm to allow
 -- visualizing it.
 -- Whether the upper or lower hull is computed depends on the input.
 grahamCHSteps :: Int -> [PT] -> [PT] -> [[PT]]
-grahamCHSteps c xs' ys'
-  | c >= 0    = scanH 0 xs' ys' : grahamCHSteps (c - 1) xs' ys'
-  | otherwise = []
-  where
-    scanH c' hs@(x:y:z:xs) (r':rs')
-      | c' >= c      = hs
-      |	notcw z y x  = scanH (c' + 1) (r':hs) rs'
-      | otherwise    = scanH (c' + 1) (x:z:xs) (r':rs')
-    scanH c' hs@(x:y:z:xs) []
-      | c' >= c      = hs
-      |	notcw z y x  = hs
-      | otherwise    = scanH (c' + 1) (x:z:xs) []
-    scanH c' hs (r':rs')
-      | c' >= c      = hs
-      | otherwise    = scanH (c' + 1) (r':hs) rs'
-    scanH _ xs _     = xs
+grahamCHSteps c xs' ys' = take c . scanH xs' $ ys'
 
 
 -- |Get all iterations of the upper hull of the graham scan algorithm.
 grahamUHSteps :: [PT] -> [[PT]]
 grahamUHSteps vs =
-  (++) [getLastX 2 sortedXY]                  .
+  (++) [getLastX 2 . sortedXY $ vs]           .
     rmdups                                    .
-    init                                      .
-    reverse                                   .
-    grahamCHSteps ((* 2) . length $ vs) uH $
+    grahamCHSteps ((* 2) . length $ vs) uH    $
     uHRest
   where
-    sortedXY     = fmap p2 . sortLex . fmap unp2 $ vs
-    (uH, uHRest) = first reverse . splitAt 3 . reverse $ sortedXY
+    (uH, uHRest) = first reverse . splitAt 3 . reverse . sortedXY $ vs
 
 
 -- |Get all iterations of the lower hull of the graham scan algorithm.
 grahamLHSteps :: [PT] -> [[PT]]
 grahamLHSteps vs =
-  (++) [take 2 sortedXY]                      .
+  (++) [take 2 . sortedXY $ vs]               .
     rmdups                                    .
-    reverse                                   .
-    grahamCHSteps ((* 2) . length $ vs) lH $
+    grahamCHSteps ((* 2) . length $ vs) lH    $
     lHRest
   where
-    sortedXY     = fmap p2 . sortLex . fmap unp2 $ vs
-    (lH, lHRest) = first reverse . splitAt 3 $ sortedXY
+    (lH, lHRest) = first reverse . splitAt 3 . sortedXY $ vs
