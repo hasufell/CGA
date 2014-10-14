@@ -4,8 +4,9 @@ module Graphics.Diagram.Gif where
 
 import Algebra.VectorTypes
 import Codec.Picture.Gif
+import Data.Monoid
 import Diagrams.Backend.Cairo
-import Diagrams.Prelude
+import Diagrams.Prelude hiding ((<>))
 import Graphics.Diagram.Plotter
 import Graphics.Diagram.Types
 import Parser.Meshparser
@@ -16,7 +17,7 @@ gifDiag :: DiagProp -> [PT] -> [(Diagram Cairo R2, GifDelay)]
 gifDiag p xs =
   fmap ((\x -> (x, 100)) . (<> nonChDiag))      .
     flip (++)
-      [mkDiag (convexHPText `mappend`
+      [mkDiag (convexHPText <>
         convexHP)
         p xs <> lastUpperHull <> lastLowerHull] $
     (lowerHullList ++ ((<> lastLowerHull) <$> upperHullList))

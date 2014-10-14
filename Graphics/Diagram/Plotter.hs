@@ -5,8 +5,9 @@ module Graphics.Diagram.Plotter where
 import Algebra.Vector
 import Algebra.VectorTypes
 import Algorithms.ConvexHull.GrahamScan
+import Data.Monoid
 import Diagrams.Backend.Cairo
-import Diagrams.Prelude
+import Diagrams.Prelude hiding ((<>))
 import Graphics.Diagram.Types
 
 
@@ -121,8 +122,8 @@ convexUHStepsLs = convexHStepsLs purple grahamUHSteps
 -- by the dimensions given in xD from DiagProp.
 xAxis :: Diag
 xAxis =
-  Diag hRule      `mappend`
-    Diag segments `mappend`
+  Diag hRule      <>
+    Diag segments <>
     Diag labels
   where
     hRule p _ =
@@ -149,8 +150,8 @@ xAxis =
 -- by the dimensions given in yD from DiagProp.
 yAxis :: Diag
 yAxis =
-  Diag vRule      `mappend`
-    Diag segments `mappend`
+  Diag vRule      <>
+    Diag segments <>
     Diag labels
   where
     vRule p _ =
@@ -193,7 +194,7 @@ whiteRect x y = rect x y # lwG 0.00 # bg white
 -- |Create a grid across the whole diagram with squares of the
 -- given size in DiagProp.
 grid :: Diag
-grid = Diag xGrid `mappend` Diag yGrid
+grid = Diag xGrid <> Diag yGrid
   where
     yGrid p _ =
       hcat' (with & sep .~ sqS p)
