@@ -48,11 +48,11 @@ convexHP :: Diag
 convexHP = Diag chp
   where
     chp p vt =
-      position (zip (filter (inRange (dX p) (dY p)) vtch)
+      position (zip vtch
         (repeat dot))
       where
         dot = (circle $ t p :: Diagram Cairo R2) # fc red # lc red
-        vtch = grahamCH vt
+        vtch = grahamCH $ filter (inRange (dX p) (dY p)) vt
 
 
 -- |Show coordinates as text above the convex hull points.
@@ -94,16 +94,15 @@ convexHStepsLs :: Colour Double
                -> [PT]
                -> [Diagram Cairo R2]
 convexHStepsLs col f p xs =
-  fmap mkChDiag (f xs)
+  fmap mkChDiag (f xs')
   where
+    xs' = filter (inRange (dX p) (dY p)) xs
     mkChDiag vt =
       (strokeTrail         .
           fromVertices     $
-          vtf)            #
-        moveTo (head vtf) #
+          vt)            #
+        moveTo (head vt) #
         lc col
-      where
-        vtf = filter (inRange (dX p) (dY p)) vt
 
 
 -- |Create list of diagrama which describe the lines along the lower
