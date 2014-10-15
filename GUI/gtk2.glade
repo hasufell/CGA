@@ -6,11 +6,11 @@
     <property name="can_focus">False</property>
     <property name="border_width">5</property>
     <property name="type_hint">dialog</property>
-    <property name="program_name">CG2</property>
+    <property name="program_name">CGA</property>
     <property name="version">0.0.0.9</property>
-    <property name="copyright" translatable="yes">Copyright (C) hasufell</property>
+    <property name="copyright" translatable="yes">Copyright (C) Julian Ospald</property>
     <property name="comments" translatable="yes">Drawing random crap.</property>
-    <property name="website">https://hasufell.de/CG2/</property>
+    <property name="website">https://github.com/hasufell/CGA</property>
     <property name="license" translatable="yes">             GNU GENERAL PUBLIC LICENSE
                 Version 2, June 1991
 
@@ -351,8 +351,7 @@ consider it more useful to permit linking proprietary applications with the
 library.  If this is what you want to do, use the GNU Lesser General
 Public License instead of this License.
 </property>
-    <property name="authors">Julian Ospald &lt;hasufell@hasufell.de&gt;
-Malte Flender &lt;malte.flender@fh-bielefeld.de&gt;</property>
+    <property name="authors">Julian Ospald &lt;hasufell@hasufell.de&gt;</property>
     <child internal-child="vbox">
       <widget class="GtkVBox" id="dialog-vbox1">
         <property name="visible">True</property>
