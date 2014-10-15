@@ -94,8 +94,8 @@ grahamUCH vs = uncurry (\x y -> last . scanH x $ y)
 -- |This scans only a half of the convex hull, but all steps (the last
 -- is the end result).
 -- If it's the upper or lower half depends on the input.
--- Also, the first list is reversed since we only care about the last
--- 3 elements and want to stay efficient.
+-- Also, the first list is expected to be reversed since we only care
+-- about the last 3 elements and want to stay efficient.
 scanH :: [PT]   -- ^ the first 3 starting points in reversed order
       -> [PT]   -- ^ the rest of the points
       -> [[PT]] -- ^ all convex hull points iterations for the half
