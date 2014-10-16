@@ -2,6 +2,7 @@
 
 module GUI.Gtk (makeGUI) where
 
+import Control.Monad
 import Control.Monad.IO.Class
 import Diagrams.Prelude
 import Diagrams.Backend.Cairo
@@ -64,25 +65,24 @@ makeMyGladeGUI :: IO MyGUI
 makeMyGladeGUI = do
   -- load glade file
   Just xml   <- xmlNew gladeFile
-  win' <- xmlGetWidget xml castToWindow "window1"
-  dB'  <- xmlGetWidget xml castToButton "drawButton"
-  sB'  <- xmlGetWidget xml castToButton "saveButton"
-  qB'  <- xmlGetWidget xml castToButton "quitButton"
-  fB'  <- xmlGetWidget xml castToFileChooserButton
-                  "filechooserButton"
-  da'  <- xmlGetWidget xml castToDrawingArea "drawingarea"
-  hs'  <- xmlGetWidget xml castToHScale "hscale"
-  xl'  <- xmlGetWidget xml castToEntry "xlD"
-  xu'  <- xmlGetWidget xml castToEntry "xuD"
-  yl'  <- xmlGetWidget xml castToEntry "ylD"
-  yu'  <- xmlGetWidget xml castToEntry "yuD"
-  aD'  <- xmlGetWidget xml castToAboutDialog "aboutdialog"
-  cB'  <- xmlGetWidget xml castToComboBox "comboalgo"
-  gC'  <- xmlGetWidget xml castToCheckButton "gridcheckbutton"
-  cC'  <- xmlGetWidget xml castToCheckButton "coordcheckbutton"
 
-  return $ MkMyGUI win' dB' sB' qB' fB' da' hs'
-                   xl' xu' yl' yu' aD' cB' gC' cC'
+  return MkMyGUI `ap`
+    xmlGetWidget xml castToWindow "window1" `ap`
+    xmlGetWidget xml castToButton "drawButton" `ap`
+    xmlGetWidget xml castToButton "saveButton" `ap`
+    xmlGetWidget xml castToButton "quitButton" `ap`
+    xmlGetWidget xml castToFileChooserButton
+            "filechooserButton" `ap`
+    xmlGetWidget xml castToDrawingArea "drawingarea" `ap`
+    xmlGetWidget xml castToHScale "hscale" `ap`
+    xmlGetWidget xml castToEntry "xlD" `ap`
+    xmlGetWidget xml castToEntry "xuD" `ap`
+    xmlGetWidget xml castToEntry "ylD" `ap`
+    xmlGetWidget xml castToEntry "yuD" `ap`
+    xmlGetWidget xml castToAboutDialog "aboutdialog" `ap`
+    xmlGetWidget xml castToComboBox "comboalgo" `ap`
+    xmlGetWidget xml castToCheckButton "gridcheckbutton" `ap`
+    xmlGetWidget xml castToCheckButton "coordcheckbutton"
 
 
 -- |Main entry point for the GTK GUI routines.
