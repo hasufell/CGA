@@ -2,7 +2,7 @@
 
 ## Building
 
-cabal build (you need cabal)
+```cabal build``` (you need cabal)
 
 ## Running
 
