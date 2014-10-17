@@ -10,5 +10,6 @@ cabal build (you need cabal)
 or
 ```cabal run Gif -- -w 600 -h 600 -o out.gif```
 
-### Build Status
-[![Build Status](https://travis-ci.org/hasufell/CG2.png)](https://travis-ci.org/hasufell/CG2)
+## Build Status
+
+[![Build Status](https://travis-ci.org/hasufell/CGA.png)](https://travis-ci.org/hasufell/CGA)
