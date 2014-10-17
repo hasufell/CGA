@@ -2,6 +2,7 @@
 
 module GUI.Gtk (makeGUI) where
 
+import Control.Applicative
 import Control.Monad
 import Control.Monad.IO.Class
 import Diagrams.Prelude
@@ -66,23 +67,23 @@ makeMyGladeGUI = do
   -- load glade file
   Just xml   <- xmlNew gladeFile
 
-  return MkMyGUI `ap`
-    xmlGetWidget xml castToWindow "window1" `ap`
-    xmlGetWidget xml castToButton "drawButton" `ap`
-    xmlGetWidget xml castToButton "saveButton" `ap`
-    xmlGetWidget xml castToButton "quitButton" `ap`
-    xmlGetWidget xml castToFileChooserButton
-            "filechooserButton" `ap`
-    xmlGetWidget xml castToDrawingArea "drawingarea" `ap`
-    xmlGetWidget xml castToHScale "hscale" `ap`
-    xmlGetWidget xml castToEntry "xlD" `ap`
-    xmlGetWidget xml castToEntry "xuD" `ap`
-    xmlGetWidget xml castToEntry "ylD" `ap`
-    xmlGetWidget xml castToEntry "yuD" `ap`
-    xmlGetWidget xml castToAboutDialog "aboutdialog" `ap`
-    xmlGetWidget xml castToComboBox "comboalgo" `ap`
-    xmlGetWidget xml castToCheckButton "gridcheckbutton" `ap`
-    xmlGetWidget xml castToCheckButton "coordcheckbutton"
+  MkMyGUI
+    <$> xmlGetWidget xml castToWindow "window1"
+    <*> xmlGetWidget xml castToButton "drawButton"
+    <*> xmlGetWidget xml castToButton "saveButton"
+    <*> xmlGetWidget xml castToButton "quitButton"
+    <*> xmlGetWidget xml castToFileChooserButton
+          "filechooserButton"
+    <*> xmlGetWidget xml castToDrawingArea "drawingarea"
+    <*> xmlGetWidget xml castToHScale "hscale"
+    <*> xmlGetWidget xml castToEntry "xlD"
+    <*> xmlGetWidget xml castToEntry "xuD"
+    <*> xmlGetWidget xml castToEntry "ylD"
+    <*> xmlGetWidget xml castToEntry "yuD"
+    <*> xmlGetWidget xml castToAboutDialog "aboutdialog"
+    <*> xmlGetWidget xml castToComboBox "comboalgo"
+    <*> xmlGetWidget xml castToCheckButton "gridcheckbutton"
+    <*> xmlGetWidget xml castToCheckButton "coordcheckbutton"
 
 
 -- |Main entry point for the GTK GUI routines.
