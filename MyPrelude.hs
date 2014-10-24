@@ -78,3 +78,10 @@ dupLast xs = xs ++ [last xs]
 if' :: Bool -> a -> a -> a
 if' True  x _ = x
 if' False _ y = y
+
+
+-- |Shift a list k places.
+shiftM :: Int -> [a] -> [a]
+shiftM _ [] = []
+shiftM 0 xs = xs
+shiftM n xs = drop n xs ++ take n xs
