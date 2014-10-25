@@ -14,25 +14,25 @@ diag :: DiagProp -> Object -> Diagram Cairo R2
 diag p obj@(Object _)
   | alg p == 0 =
       mkDiag
-        (mconcat [maybeDiag (ct p) coordPointsText,
+        (mconcat [coordPointsText,
           coordPoints, plotterBG])
         p obj
   | alg p == 1 =
       mkDiag
         (mconcat
-          [maybeDiag (ct p) convexHPText,
+          [convexHPText,
           convexHP, convexHLs,
           coordPoints, plotterBG])
         p obj
   | otherwise = mempty
 diag p objs@(Objects _)
   | alg p == 2 =
-      mkDiag (mconcat [polyLines, maybeDiag (ct p) coordPointsText, coordPoints,
+      mkDiag (mconcat [polyLines, coordPointsText, coordPoints,
                       plotterBG])
         p objs
   | alg p == 3 =
-      mkDiag (mconcat [maybeDiag (ct p) polyIntersectionText,
-                      polyIntersection, maybeDiag (ct p) coordPointsText,
+      mkDiag (mconcat [polyIntersectionText,
+                      polyIntersection, coordPointsText,
                       coordPoints, polyLines,
                       plotterBG])
         p objs
