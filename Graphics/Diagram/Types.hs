@@ -16,9 +16,13 @@ type MeshString = String
 -- coordinates and common properties.
 data Diag = Diag {
   mkDiag :: DiagProp
-         -> [PT]
+         -> Object
          -> Diagram Cairo R2
 }
+
+
+data Object = Object [PT]
+            | Objects [[PT]]
 
 
 -- |Holds the properties for a Diagram, like thickness of 2d points etc.

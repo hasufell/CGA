@@ -18,7 +18,10 @@ import Graphics.Diagram.Types
 coordPoints :: Diag
 coordPoints = Diag cp
   where
-    cp p vt =
+    cp p (Object vt) = drawP vt p
+    cp p (Objects vts) = drawP (concat vts) p
+    drawP [] _ = mempty
+    drawP vt p =
       position (zip (filter (inRange (dX p) (dY p)) vt)
         (repeat dot))
       where
@@ -38,9 +41,14 @@ pointToTextCoord pt =
 coordPointsText :: Diag
 coordPointsText = Diag cpt
   where
-    cpt p vt =
-      position $
-        zip vtf (pointToTextCoord <$> vtf) # translate (r2 (0, 10))
+    cpt p (Object vt)   = drawT vt p
+    cpt p (Objects vts) = drawT (concat vts) p
+    drawT [] _ = mempty
+    drawT vt p
+      | ct p =
+          position $
+            zip vtf (pointToTextCoord <$> vtf) # translate (r2 (0, 10))
+      | otherwise = mempty
       where
         vtf = filter (inRange (dX p) (dY p)) vt
 
@@ -49,72 +57,80 @@ coordPointsText = Diag cpt
 polyLines :: Diag
 polyLines = Diag pp
   where
-    pp _ []  = mempty
-    pp p vt =
-        (strokeTrail        .
-          fromVertices      $
-          vtf ++ [head vtf])   #
-        moveTo (head vt)       #
-        lc black
+    pp _ (Objects []) = mempty
+    pp p (Objects (x:y:_)) =
+      strokePoly x <> strokePoly y
       where
-        vtf = filter (inRange (dX p) (dY p)) vt
+        strokePoly x' =
+          (strokeTrail        .
+            fromVertices      $
+            vtf x' ++ [head . vtf $ x'])   #
+          moveTo (head x')                 #
+          lc black
+        vtf = filter (inRange (dX p) (dY p))
+    pp _ _  = mempty
 
 
 -- |Show the intersection points of two polygons as red dots.
-polyIntersection :: [PT]
-                 -> [PT]
-                 -> DiagProp
-                 -> Diagram Cairo R2
-polyIntersection pA pB p =
-  position (zip vtpi (repeat dot))
+polyIntersection :: Diag
+polyIntersection = Diag pi'
   where
-    paF  = filter (inRange (dX p) (dY p)) pA
-    pbF  = filter (inRange (dX p) (dY p)) pB
-    dot  = (circle $ t p :: Diagram Cairo R2) # fc red # lc red
-    vtpi = intersectionPoints
-            . sortLexPolys
-            $ (sortLexPoly paF, sortLexPoly pbF)
+    pi' p (Objects (x:y:_)) = position (zip vtpi (repeat dot))
+      where
+        paF  = filter (inRange (dX p) (dY p)) x
+        pbF  = filter (inRange (dX p) (dY p)) y
+        dot  = (circle $ t p :: Diagram Cairo R2) # fc red # lc red
+        vtpi = intersectionPoints
+                . sortLexPolys
+                $ (sortLexPoly paF, sortLexPoly pbF)
+    pi' _ _ = mempty
 
 
 -- |Show the intersection points of two polygons as red dots.
-polyIntersectionText :: [PT]
-                     -> [PT]
-                     -> DiagProp
-                     -> Diagram Cairo R2
-polyIntersectionText pA pB p =
-  position $
-    zip vtpi
-        (pointToTextCoord # fc red <$> vtpi) # translate (r2 (0, 10))
+polyIntersectionText :: Diag
+polyIntersectionText = Diag pit'
   where
-    paF  = filter (inRange (dX p) (dY p)) pA
-    pbF  = filter (inRange (dX p) (dY p)) pB
-    vtpi = intersectionPoints
-            . sortLexPolys
-            $ (sortLexPoly paF, sortLexPoly pbF)
+    pit' p (Objects (x:y:_))
+      | ct p =
+          position $
+            zip vtpi
+                (pointToTextCoord # fc red <$> vtpi) # translate (r2 (0, 10))
+      | otherwise = mempty
+      where
+        paF  = filter (inRange (dX p) (dY p)) x
+        pbF  = filter (inRange (dX p) (dY p)) y
+        vtpi = intersectionPoints
+                . sortLexPolys
+                $ (sortLexPoly paF, sortLexPoly pbF)
+    pit' _ _ = mempty
 
 
 -- |Create a diagram which shows the points of the convex hull.
 convexHP :: Diag
 convexHP = Diag chp
   where
-    chp p vt =
+    chp p (Object vt) =
       position (zip vtch
         (repeat dot))
       where
         dot = (circle $ t p :: Diagram Cairo R2) # fc red # lc red
         vtch = grahamCH $ filter (inRange (dX p) (dY p)) vt
+    chp _ _ = mempty
 
 
 -- |Show coordinates as text above the convex hull points.
 convexHPText :: Diag
 convexHPText = Diag chpt
   where
-    chpt p vt =
-      position $
-        zip vtchf
-            (pointToTextCoord <$> vtchf) # translate (r2 (0, 10))
+    chpt p (Object vt)
+      | ct p =
+          position $
+            zip vtchf
+                (pointToTextCoord <$> vtchf) # translate (r2 (0, 10))
+      | otherwise = mempty
       where
         vtchf = grahamCH . filter (inRange (dX p) (dY p)) $ vt
+    chpt _ _ = mempty
 
 
 -- |Create a diagram which shows the lines along the convex hull
@@ -122,8 +138,8 @@ convexHPText = Diag chpt
 convexHLs :: Diag
 convexHLs = Diag chl
   where
-    chl _ [] = mempty
-    chl p vt =
+    chl _ (Object []) = mempty
+    chl p (Object vt) =
       (strokeTrail                           .
           fromVertices                       .
           flip (++) [head $ grahamCH vtf]    .
@@ -133,6 +149,7 @@ convexHLs = Diag chl
         lc red
       where
         vtf = filter (inRange (dX p) (dY p)) vt
+    chl _ _ = mempty
 
 
 -- |Create list of diagrama which describe the lines along points of a half
@@ -245,17 +262,24 @@ whiteRect x y = rect x y # lwG 0.00 # bg white
 grid :: Diag
 grid = Diag xGrid <> Diag yGrid
   where
-    yGrid p _ =
-      hcat' (with & sep .~ sqS p)
-            (replicate (floor . (/) (w' p) $ sqS p)
-                       (vrule $ h' p))  #
-      moveTo (p2 (xmin p, hOff p))      #
-      lw ultraThin
-    xGrid p _ =
-      vcat' (with & sep .~ sqS p)
-            (replicate (floor . (/) (h' p) $ sqS p)
-                       (hrule $ w' p))  #
-      alignB                            #
-      moveTo (p2 (wOff p, ymin p))      #
-      lw ultraThin
-      where
+    yGrid p _
+      | gd p =
+          hcat' (with & sep .~ sqS p)
+                (replicate (floor . (/) (w' p) $ sqS p)
+                           (vrule $ h' p))  #
+          moveTo (p2 (xmin p, hOff p))      #
+          lw ultraThin
+      | otherwise = mempty
+    xGrid p _
+      | gd p =
+          vcat' (with & sep .~ sqS p)
+                (replicate (floor . (/) (h' p) $ sqS p)
+                           (hrule $ w' p))  #
+          alignB                            #
+          moveTo (p2 (wOff p, ymin p))      #
+          lw ultraThin
+      | otherwise = mempty
+
+
+plotterBG :: Diag
+plotterBG = mconcat [xAxis, yAxis, grid, whiteRectB]
