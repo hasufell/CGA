@@ -122,7 +122,7 @@ ptCmpY :: PT -> PT -> Ordering
 ptCmpY p1' p2' = compare ((snd . unp2) p1') ((snd . unp2) p2')
 
 
--- |Compare the y-coordinate of two points.
+-- |Compare the x-coordinate of two points.
 ptCmpX :: PT -> PT -> Ordering
 ptCmpX p1' p2' = compare ((fst . unp2) p1') ((fst . unp2) p2')
 
