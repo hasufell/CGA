@@ -38,7 +38,7 @@ diag p pts = case alg p of
   where
     polys =
       mkDiag
-        (mconcat [maybeDiag (ct p) coordPointsText, polyLines])
+        (mconcat [maybeDiag (ct p) coordPointsText, coordPoints, polyLines])
         p (head pts)
       `atop`
       mkDiag
