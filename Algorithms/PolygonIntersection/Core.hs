@@ -53,7 +53,7 @@ sortLexPoly ps = maybe [] (`shiftM` ps) (elemIndex (yMax ps) ps)
 -- while saving the origin of that point. This is done in O(n).
 sortLexPolys :: ([PT], [PT]) -> [PolyPT]
 sortLexPolys (pA'@(_:_), pB'@(_:_)) =
-  queueToList . go (Q.fromList . sortLexPoly $ pA') $
+  queueToList $ go (Q.fromList . sortLexPoly $ pA')
                    (Q.fromList . sortLexPoly $ pB')
   where
     -- Start recursive algorithm, each polygon is represented by a Queue.
@@ -130,10 +130,7 @@ intersectionPoints xs' =
     -- Get the scan line or in other words the
     -- Segment pairs we are going to check for intersection.
     scanLine :: [PolyPT] -> ([Segment], [Segment])
-    scanLine sp@(_:_) =
-      (,)
-        (getSegment isPolyA)
-        (getSegment isPolyB)
+    scanLine sp@(_:_) = (,) (getSegment isPolyA) (getSegment isPolyB)
       where
         getSegment f = fromMaybe []
                                  ((\x -> [(id' x, suc x), (id' x, pre x)])
@@ -144,10 +141,10 @@ intersectionPoints xs' =
     -- both polygons we currently examine. This is done in O(1)
     -- since we have max 4 segments.
     segIntersections :: ([Segment], [Segment]) -> [PT]
-    segIntersections (a@(_:_), b@(_:_))
-      = catMaybes
-          . fmap (\[x, y] -> intersectSeg' x y)
-          $ combinations a b
+    segIntersections (a@(_:_), b@(_:_)) =
+      catMaybes
+        . fmap (\[x, y] -> intersectSeg' x y)
+        $ combinations a b
     segIntersections _ = []
 
     -- Gets all unique(!) combinations of two arrays. Both arrays

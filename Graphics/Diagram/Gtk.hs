@@ -13,29 +13,20 @@ import Parser.Meshparser
 diag :: DiagProp -> Object -> Diagram Cairo R2
 diag p obj@(Object _)
   | alg p == 0 =
-      mkDiag
-        (mconcat [coordPointsText,
-          coordPoints, plotterBG])
-        p obj
+      mkDiag (mconcat [coordPointsText, coordPoints, plotterBG])
+             p obj
   | alg p == 1 =
-      mkDiag
-        (mconcat
-          [convexHPText,
-          convexHP, convexHLs,
-          coordPoints, plotterBG])
-        p obj
+      mkDiag (mconcat [convexHPText, convexHP, convexHLs, coordPoints, plotterBG])
+             p obj
   | otherwise = mempty
 diag p objs@(Objects _)
   | alg p == 2 =
-      mkDiag (mconcat [polyLines, coordPointsText, coordPoints,
-                      plotterBG])
-        p objs
+      mkDiag (mconcat [polyLines, coordPointsText, coordPoints, plotterBG])
+             p objs
   | alg p == 3 =
-      mkDiag (mconcat [polyIntersectionText,
-                      polyIntersection, coordPointsText,
-                      coordPoints, polyLines,
-                      plotterBG])
-        p objs
+      mkDiag (mconcat [polyIntersectionText, polyIntersection, coordPointsText,
+                      coordPoints, polyLines, plotterBG])
+             p objs
   | otherwise = mempty
 
 
@@ -43,14 +34,5 @@ diag p objs@(Objects _)
 -- of an obj file.
 diagS :: DiagProp -> MeshString -> Diagram Cairo R2
 diagS p mesh
-  | alg p == 2 || alg p == 3 =
-      diag p.
-        Objects    .
-        facesToArr $
-        mesh
-  | otherwise =
-      (diag p       .
-          Object    .
-          meshToArr $
-          mesh) #
-        bg white
+  | alg p == 2 || alg p == 3 = diag p. Objects . facesToArr $ mesh
+  | otherwise = (diag p . Object . meshToArr $ mesh) # bg white
