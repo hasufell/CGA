@@ -75,15 +75,6 @@ det a b c =
     (cx, cy) = unp2 c
 
 
--- |Computes the determinant of 2 points.
-det' :: PT -> PT -> Double
-det' a b =
-  ax * by - ay * bx
-  where
-    (ax, ay) = unp2 a
-    (bx, by) = unp2 b
-
-
 -- |Get the point where two lines intesect, if any.
 intersectSeg' :: Segment -> Segment -> Maybe PT
 intersectSeg' (a, b) (c, d) =
