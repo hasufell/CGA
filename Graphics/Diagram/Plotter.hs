@@ -5,6 +5,7 @@ module Graphics.Diagram.Plotter where
 import Algebra.Vector
 import Algebra.VectorTypes
 import Algorithms.ConvexHull.GrahamScan
+import Algorithms.PolygonIntersection.Core
 import Data.Monoid
 import Diagrams.Backend.Cairo
 import Diagrams.Prelude hiding ((<>))
@@ -42,6 +43,54 @@ coordPointsText = Diag cpt
         zip vtf (pointToTextCoord <$> vtf) # translate (r2 (0, 10))
       where
         vtf = filter (inRange (dX p) (dY p)) vt
+
+
+-- |Draw the lines of the polygon.
+polyLines :: Diag
+polyLines = Diag pp
+  where
+    pp _ []  = mempty
+    pp p vt =
+        (strokeTrail        .
+          fromVertices      $
+          vtf ++ [head vtf])   #
+        moveTo (head vt)       #
+        lc black
+      where
+        vtf = filter (inRange (dX p) (dY p)) vt
+
+
+-- |Show the intersection points of two polygons as red dots.
+polyIntersection :: [PT]
+                 -> [PT]
+                 -> DiagProp
+                 -> Diagram Cairo R2
+polyIntersection pA pB p =
+  position (zip vtpi (repeat dot))
+  where
+    paF  = filter (inRange (dX p) (dY p)) pA
+    pbF  = filter (inRange (dX p) (dY p)) pB
+    dot  = (circle $ t p :: Diagram Cairo R2) # fc red # lc red
+    vtpi = intersectionPoints
+            . sortLexPolys
+            $ (sortLexPoly paF, sortLexPoly pbF)
+
+
+-- |Show the intersection points of two polygons as red dots.
+polyIntersectionText :: [PT]
+                     -> [PT]
+                     -> DiagProp
+                     -> Diagram Cairo R2
+polyIntersectionText pA pB p =
+  position $
+    zip vtpi
+        (pointToTextCoord # fc red <$> vtpi) # translate (r2 (0, 10))
+  where
+    paF  = filter (inRange (dX p) (dY p)) pA
+    pbF  = filter (inRange (dX p) (dY p)) pB
+    vtpi = intersectionPoints
+            . sortLexPolys
+            $ (sortLexPoly paF, sortLexPoly pbF)
 
 
 -- |Create a diagram which shows the points of the convex hull.

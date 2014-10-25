@@ -765,7 +765,9 @@ Public License instead of this License.
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="items" translatable="yes">Show points
-Show convex hull</property>
+Show convex hull
+Show polygons
+Show polygons intersection</property>
           </widget>
           <packing>
             <property name="expand">False</property>
