@@ -31,8 +31,9 @@ coordPoints = Diag cp
 -- in text format, such as "(1.0, 2.0)".
 pointToTextCoord :: PT -> Diagram Cairo R2
 pointToTextCoord pt =
-  text ("(" ++ show x ++ ", " ++ show y ++ ")") # scale 10
+  text ("(" ++ (show . trim') x ++ ", " ++ (show . trim') y ++ ")") # scale 10
   where
+    trim' x' = (fromInteger . round $ x' * (10^2)) / (10.0^^2)
     (x, y) = unp2 pt
 
 
