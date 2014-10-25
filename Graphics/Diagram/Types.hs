@@ -2,6 +2,7 @@
 
 module Graphics.Diagram.Types where
 
+import Algebra.Vector
 import Algebra.VectorTypes
 import Diagrams.Backend.Cairo
 import Diagrams.Prelude
@@ -14,11 +15,22 @@ type MeshString = String
 -- |Represents a Cairo Diagram. This allows us to create multiple
 -- diagrams with different algorithms but based on the same
 -- coordinates and common properties.
-data Diag = Diag {
-  mkDiag :: DiagProp
-         -> Object
-         -> Diagram Cairo R2
-}
+data Diag =
+  Diag
+  {
+    mkDiag :: DiagProp
+           -> Object
+           -> Diagram Cairo R2
+  }
+  | GifDiag
+  {
+    mkGifDiag :: DiagProp
+              -> Colour Double
+              -> ([PT] -> [[PT]])
+              -> [PT]
+              -> [Diagram Cairo R2]
+  }
+  | EmptyDiag (Diagram Cairo R2)
 
 
 data Object = Object [PT]
@@ -50,10 +62,22 @@ instance Def DiagProp where
 
 
 instance Monoid Diag where
-  mempty = Diag (\_ _ -> mempty)
-  mappend d1 d2 = Diag g
+  mempty = EmptyDiag mempty
+  mappend d1@(Diag {}) d2@(Diag {}) = Diag g
     where
-      g p vt = mkDiag d1 p vt <> mkDiag d2 p vt
+      g p obj = mkDiag d1 p obj <> mkDiag d2 p obj
+  mappend d1@(GifDiag {}) d2@(Diag {}) = GifDiag g
+    where
+      g p col f vt = mkGifDiag d1 p col f vt ++ [mkDiag d2 p (Object vt)]
+  mappend d1@(Diag {}) d2@(GifDiag {}) = GifDiag g
+    where
+      g p col f vt = mkDiag d2 p (Object vt) : mkGifDiag d1 p col f vt
+  mappend d1@(GifDiag {}) d2@(GifDiag {}) = GifDiag g
+    where
+      g p col f vt = mkGifDiag d1 p col f vt ++ mkGifDiag d2 p col f vt
+  mappend (EmptyDiag _) g = g
+  mappend g (EmptyDiag _) = g
+
   mconcat = foldr mappend mempty
 
 
@@ -111,3 +135,7 @@ maybeDiag :: Bool -> Diag -> Diag
 maybeDiag b d
   | b         = d
   | otherwise = mempty
+
+
+filterValidPT :: DiagProp -> [PT] -> [PT]
+filterValidPT p = filter (inRange (dX p) (dY p))

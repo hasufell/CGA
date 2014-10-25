@@ -2,7 +2,6 @@
 
 module Graphics.Diagram.Plotter where
 
-import Algebra.Vector
 import Algebra.VectorTypes
 import Algorithms.ConvexHull.GrahamScan
 import Algorithms.PolygonIntersection.Core
@@ -22,7 +21,7 @@ coordPoints = Diag cp
     cp p (Objects vts) = drawP (concat vts) p
     drawP [] _ = mempty
     drawP vt p =
-      position (zip (filter (inRange (dX p) (dY p)) vt)
+      position (zip (filterValidPT p vt)
         (repeat dot))
       where
         dot = (circle $ t p :: Diagram Cairo R2) # fc black
@@ -50,7 +49,7 @@ coordPointsText = Diag cpt
             zip vtf (pointToTextCoord <$> vtf) # translate (r2 (0, 10))
       | otherwise = mempty
       where
-        vtf = filter (inRange (dX p) (dY p)) vt
+        vtf = filterValidPT p vt
 
 
 -- |Draw the lines of the polygon.
@@ -67,7 +66,7 @@ polyLines = Diag pp
             vtf x' ++ [head . vtf $ x'])   #
           moveTo (head x')                 #
           lc black
-        vtf = filter (inRange (dX p) (dY p))
+        vtf = filterValidPT p
     pp _ _  = mempty
 
 
@@ -77,8 +76,8 @@ polyIntersection = Diag pi'
   where
     pi' p (Objects (x:y:_)) = position (zip vtpi (repeat dot))
       where
-        paF  = filter (inRange (dX p) (dY p)) x
-        pbF  = filter (inRange (dX p) (dY p)) y
+        paF  = filterValidPT p x
+        pbF  = filterValidPT p y
         dot  = (circle $ t p :: Diagram Cairo R2) # fc red # lc red
         vtpi = intersectionPoints
                 . sortLexPolys
@@ -97,8 +96,8 @@ polyIntersectionText = Diag pit'
                 (pointToTextCoord # fc red <$> vtpi) # translate (r2 (0, 10))
       | otherwise = mempty
       where
-        paF  = filter (inRange (dX p) (dY p)) x
-        pbF  = filter (inRange (dX p) (dY p)) y
+        paF  = filterValidPT p x
+        pbF  = filterValidPT p y
         vtpi = intersectionPoints
                 . sortLexPolys
                 $ (sortLexPoly paF, sortLexPoly pbF)
@@ -114,7 +113,7 @@ convexHP = Diag chp
         (repeat dot))
       where
         dot = (circle $ t p :: Diagram Cairo R2) # fc red # lc red
-        vtch = grahamCH $ filter (inRange (dX p) (dY p)) vt
+        vtch = grahamCH $ filterValidPT p vt
     chp _ _ = mempty
 
 
@@ -129,7 +128,7 @@ convexHPText = Diag chpt
                 (pointToTextCoord <$> vtchf) # translate (r2 (0, 10))
       | otherwise = mempty
       where
-        vtchf = grahamCH . filter (inRange (dX p) (dY p)) $ vt
+        vtchf = grahamCH . filterValidPT p $ vt
     chpt _ _ = mempty
 
 
@@ -148,40 +147,21 @@ convexHLs = Diag chl
         moveTo (head $ grahamCH vtf) #
         lc red
       where
-        vtf = filter (inRange (dX p) (dY p)) vt
+        vtf = filterValidPT p vt
     chl _ _ = mempty
 
 
 -- |Create list of diagrama which describe the lines along points of a half
 -- convex hull, for each iteration of the algorithm. Which half is chosen
 -- depends on the input.
-convexHStepsLs :: Colour Double
-               -> ([PT] -> [[PT]])
-               -> DiagProp
-               -> [PT]
-               -> [Diagram Cairo R2]
-convexHStepsLs col f p xs =
-  fmap mkChDiag (f xs')
+convexHStepsLs :: Diag
+convexHStepsLs = GifDiag chs
   where
-    xs' = filter (inRange (dX p) (dY p)) xs
-    mkChDiag vt =
-      (strokeTrail         .
-          fromVertices     $
-          vt)            #
-        moveTo (head vt) #
-        lc col
-
-
--- |Create list of diagrama which describe the lines along the lower
--- convex hull points, for each iteration of the algorithm.
-convexLHStepsLs :: DiagProp -> [PT] -> [Diagram Cairo R2]
-convexLHStepsLs = convexHStepsLs orange grahamLHSteps
-
-
--- |Create list of diagrama which describe the lines along the upper
--- convex hull points, for each iteration of the algorithm.
-convexUHStepsLs :: DiagProp -> [PT] -> [Diagram Cairo R2]
-convexUHStepsLs = convexHStepsLs purple grahamUHSteps
+    chs p col f vt =
+      fmap mkChDiag (f . filterValidPT p $ vt)
+      where
+        mkChDiag vt' =
+          (strokeTrail . fromVertices $ vt') # moveTo (head vt') # lc col
 
 
 -- |Creates a Diagram that shows an XAxis which is bound
