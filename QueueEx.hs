@@ -21,8 +21,3 @@ shiftQueueRight = (\(b, nq) -> Q.pushFront nq (fromJust b)) <$> Q.popBack
 -- |Convert a Queue back to a list.
 queueToList :: BankersDequeue a -> [a]
 queueToList q = Q.takeFront (Q.length q) q
-
-
--- |Unsafe version of Q.first.
-uQfirst :: BankersDequeue a -> a
-uQfirst = fromJust . Q.first
