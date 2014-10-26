@@ -50,7 +50,9 @@ sortLexPoly ps = maybe [] (`shiftM` ps) (elemIndex (yMax ps) ps)
 
 -- |Make a PolyPT list out of a regular list of points, so
 -- the predecessor and successors are all saved.
-mkPolyPTList :: (PT -> PT -> PT -> PolyPT) -> [PT] -> [PolyPT]
+mkPolyPTList :: (PT -> PT -> PT -> PolyPT) -- ^ PolyA or PolyB function
+             -> [PT]                       -- ^ polygon points
+             -> [PolyPT]
 mkPolyPTList f' pts@(x':y':_:_) =
   f' x' (last pts) y' : go f' pts
   where
@@ -71,9 +73,9 @@ sortLexPolys (pA'@(_:_), pB'@(_:_)) =
     -- Traverse predecessor and successor and insert them in the right
     -- order into the resulting queue.
     -- We start at the max y-coordinates of both polygons.
-    go :: BankersDequeue PolyPT
-       -> BankersDequeue PolyPT
-       -> BankersDequeue PolyPT
+    go :: BankersDequeue PolyPT -- polyA
+       -> BankersDequeue PolyPT -- polyB
+       -> BankersDequeue PolyPT -- sorted queue
     go pA pB
       -- Nothing to sort.
       | Q.null pA && Q.null pB = Q.empty
