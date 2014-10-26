@@ -11,7 +11,6 @@ import           Data.Maybe
 import           Diagrams.TwoD.Types
 import           MyPrelude
 import           QueueEx
-import           Safe
 
 
 -- |Describes a point on the convex hull of the polygon.
@@ -49,73 +48,56 @@ sortLexPoly ps = maybe [] (`shiftM` ps) (elemIndex (yMax ps) ps)
     yMax       = foldl1 (\x y -> if ptCmpY x y == GT then x else y)
 
 
+-- |Make a PolyPT list out of a regular list of points, so
+-- the predecessor and successors are all saved.
+mkPolyPTList :: (PT -> PT -> PT -> PolyPT) -> [PT] -> [PolyPT]
+mkPolyPTList f' pts@(x':y':_:_) =
+  f' x' (last pts) y' : go f' pts
+  where
+    go f (x:y:z:xs) = f y x z : go f (y:z:xs)
+    go f [x, y]     = [f y x x']
+    go _ _          = []
+mkPolyPTList _ _ = []
+
+
 -- |Sort the points of two polygons according to their y-coordinates,
 -- while saving the origin of that point. This is done in O(n).
 sortLexPolys :: ([PT], [PT]) -> [PolyPT]
 sortLexPolys (pA'@(_:_), pB'@(_:_)) =
-  queueToList $ go (Q.fromList . sortLexPoly $ pA')
-                   (Q.fromList . sortLexPoly $ pB')
+  queueToList $ go (Q.fromList . mkPolyPTList PolyA . sortLexPoly $ pA')
+                   (Q.fromList . mkPolyPTList PolyB . sortLexPoly $ pB')
   where
     -- Start recursive algorithm, each polygon is represented by a Queue.
     -- Traverse predecessor and successor and insert them in the right
     -- order into the resulting queue.
     -- We start at the max y-coordinates of both polygons.
-    go :: BankersDequeue PT -> BankersDequeue PT -> BankersDequeue PolyPT
+    go :: BankersDequeue PolyPT
+       -> BankersDequeue PolyPT
+       -> BankersDequeue PolyPT
     go pA pB
       -- Nothing to sort.
       | Q.null pA && Q.null pB = Q.empty
       -- Current point of polygon A is higher on the y-axis than the
       -- current point of polygon B, so insert it into the resulting
       -- queue and traverse the rest.
-      | ptCmpY (fromMaybe negInfPT . Q.first $ pA)
-               (fromMaybe posInfPT . Q.first $ pB) == GT
+      | ptCmpY (fromMaybe negInfPT (id' <$> Q.first pA))
+               (fromMaybe posInfPT (id' <$> Q.first pB)) == GT
         = Q.pushFront (go (maybeShift . snd . Q.popFront $ pA) pB)
-                      (mkPolyPT PolyA pA' pA)
+                      (fromJust . Q.first $ pA)
       -- Same as above, except that the current point of polygon B
       -- is higher.
       | otherwise = Q.pushFront (go pA (maybeShift . snd . Q.popFront $ pB))
-                                (mkPolyPT PolyB pB' pB)
-
-    mkPolyPT f xs qs = f (fromJust . Q.first $ qs)
-                         (getPT' polySuccessor xs qs)
-                         (getPT' polyPredecessor xs qs)
-      where
-        getPT' f' xs' = fromJust . f' xs' . uQfirst
+                                (fromJust . Q.first $ pB)
 
     -- Compare the first and the last element of the queue according
     -- to their y-coordinate and shift the queue (if necessary) so that
     -- the element with the highest value is at the front.
-    maybeShift :: BankersDequeue PT -> BankersDequeue PT
-    maybeShift q = if ptCmpY (fromMaybe posInfPT . Q.first $ q)
-                             (fromMaybe negInfPT . Q.last  $ q) == GT
+    maybeShift :: BankersDequeue PolyPT -> BankersDequeue PolyPT
+    maybeShift q = if ptCmpY (fromMaybe posInfPT (id' <$> Q.first q))
+                             (fromMaybe negInfPT (id' <$> Q.last q)) == GT
                      then q
                      else shiftQueueRight q
 sortLexPolys _ = []
-
-
--- |Get the successor of a point on a convex hull of a polygon.
--- Returns Nothing if the point is not on the convex hull. This
--- is done in O(n).
-polySuccessor :: [PT] -> PT -> Maybe PT
-polySuccessor pts = polyPreSucInternal (length pts - 1, 0, 1) pts
-
-
--- |Get the predecessor of a point on a convex hull of a polygon.
--- Returns Nothing if the point is not on the convex hull. This
--- is done in O(n).
-polyPredecessor :: [PT] -> PT -> Maybe PT
-polyPredecessor pts = polyPreSucInternal (0, length pts - 1, negate 1) pts
-
-
--- |Abstraction for polyPredecessor and polySuccessor.
-polyPreSucInternal :: (Int, Int, Int) -> [PT] -> PT -> Maybe PT
-polyPreSucInternal (i1, i2, i3) pts pt = case index of
-  Nothing     -> Nothing
-  Just index' -> if index' == i1
-                   then pts `atMay` i2
-                   else pts `atMay` (index' + i3)
-  where
-    index = elemIndex pt pts
 
 
 -- |Get all points that intersect between both polygons. This is done
