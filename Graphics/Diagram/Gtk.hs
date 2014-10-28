@@ -24,7 +24,7 @@ diag p objs@(Objects _)
       mkDiag (mconcat [polyLines, coordPointsText, coordPoints, plotterBG])
              p objs
   | alg p == 3 =
-      mkDiag (mconcat [polyIntersectionText, polyIntersection, coordPointsText,
+      mkDiag (mconcat [polyIntersectionText, polyIntersection,
                       coordPoints, polyLines, plotterBG])
              p objs
   | otherwise = mempty
