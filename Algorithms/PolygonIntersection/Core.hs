@@ -83,7 +83,7 @@ sortLexPolys (pA'@(_:_), pB'@(_:_)) =
       -- current point of polygon B, so insert it into the resulting
       -- queue and traverse the rest.
       | ptCmpY (fromMaybe negInfPT (id' <$> Q.first pA))
-               (fromMaybe posInfPT (id' <$> Q.first pB)) == GT
+               (fromMaybe negInfPT (id' <$> Q.first pB)) == GT
         = Q.pushFront (go (maybeShift . snd . Q.popFront $ pA) pB)
                       (fromJust . Q.first $ pA)
       -- Same as above, except that the current point of polygon B
