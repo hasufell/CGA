@@ -105,12 +105,12 @@ sortLexPolys _ = []
 -- |Get all points that intersect between both polygons. This is done
 -- in O(n).
 intersectionPoints :: [PolyPT] -> [PT]
-intersectionPoints []  = []
-intersectionPoints xs' =
-  rmdups $
-    (++) (segIntersections . scanLine $ xs')
-         (intersectionPoints (tail xs'))
+intersectionPoints xs' = rmdups . go $ xs'
   where
+    go [] = []
+    go xs = (++) (segIntersections . scanLine $ xs)
+                 (go (tail xs))
+
     -- Get the scan line or in other words the
     -- Segment pairs we are going to check for intersection.
     scanLine :: [PolyPT] -> ([Segment], [Segment])
