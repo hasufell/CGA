@@ -18,6 +18,10 @@ diag p obj@(Object _)
   | alg p == 1 =
       mkDiag (mconcat [convexHPText, convexHP, convexHLs, coordPoints, plotterBG])
              p obj
+  | alg p == 4 =
+      mkDiag (mconcat [squares, coordPointsText, coordPoints, polyLines,
+                       plotterBG])
+             p obj
   | otherwise = mempty
 diag p objs@(Objects _)
   | alg p == 2 =

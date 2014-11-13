@@ -4,11 +4,13 @@ module Graphics.Diagram.Plotter where
 
 import Algebra.VectorTypes
 import Algorithms.ConvexHull.GrahamScan
+import Algorithms.RangeSearch.Core
 import Algorithms.PolygonIntersection.Core
 import Data.Monoid
 import Diagrams.Backend.Cairo
 import Diagrams.Prelude hiding ((<>))
 import Graphics.Diagram.Types
+import Graphics.Gloss.Data.Extent
 
 
 -- |Creates a Diagram that shows the coordinates from the points
@@ -33,6 +35,7 @@ pointToTextCoord :: PT -> Diagram Cairo R2
 pointToTextCoord pt =
   text ("(" ++ (show . trim') x ++ ", " ++ (show . trim') y ++ ")") # scale 10
   where
+    trim' :: Double -> Double
     trim' x' = (fromInteger . round $ x' * (10^2)) / (10.0^^2)
     (x, y) = unp2 pt
 
@@ -163,6 +166,26 @@ convexHStepsLs = GifDiag chs
       where
         mkChDiag vt' =
           (strokeTrail . fromVertices $ vt') # moveTo (head vt') # lc col
+
+
+-- FIXME: hardcoded dimensions
+squares :: Diag
+squares = Diag f
+  where
+    f p (Object []) = mempty
+    f p (Object vt) =
+      mconcat
+      $ (\((xmin, xmax), (ymin, ymax)) -> rect (xmax - xmin) (ymax - ymin) #
+        moveTo (p2 (
+                     ((xmax + xmin) / 2),
+                     ((ymax + ymin) / 2)
+                   )
+               ) #
+        lw ultraThin)
+      <$> (quadTreeSquares ((0,500), (0,500)) . quadTree vtf $ (dX p, dY p))
+      where
+        vtf = filterValidPT p vt
+    f _ _ = mempty
 
 
 -- |Creates a Diagram that shows an XAxis which is bound

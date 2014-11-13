@@ -767,7 +767,8 @@ Public License instead of this License.
             <property name="items" translatable="yes">Show points
 Show convex hull
 Show polygons
-Show polygons intersection</property>
+Show polygons intersection
+Show quad tree squares</property>
           </widget>
           <packing>
             <property name="expand">False</property>
