@@ -138,4 +138,4 @@ maybeDiag b d
 
 
 filterValidPT :: DiagProp -> [PT] -> [PT]
-filterValidPT p = filter (inRange (dX p) (dY p))
+filterValidPT p = filter (inRange (dX p, dY p))

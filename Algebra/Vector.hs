@@ -11,11 +11,11 @@ import MyPrelude
 
 
 -- |Checks whether the Point is in a given dimension.
-inRange :: Coord -- ^ X dimension
-        -> Coord -- ^ Y dimension
-        -> PT    -- ^ Coordinates
-        -> Bool  -- ^ result
-inRange (xlD, xuD) (ylD, yuD) p = x <= xuD && x >= xlD && y <= yuD && y >= ylD
+inRange :: Square -- ^ the square, defined by x/y dimensions
+        -> PT     -- ^ Coordinate
+        -> Bool   -- ^ result
+inRange ((xlD, xuD), (ylD, yuD)) p =
+  x <= xuD && x >= xlD && y <= yuD && y >= ylD
   where
     (x, y) = unp2 p
 
