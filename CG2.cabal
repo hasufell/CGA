@@ -74,7 +74,7 @@ executable Gif
   main-is:             GifMain.hs
 
   -- Modules included in this executable, other than Main.
-  other-modules:       MyPrelude Graphics.Diagram.Gif Graphics.Diagram.Types Graphics.Diagram.Plotter Parser.PathParser Parser.Meshparser Parser.Core System.FileSystem.FileExt Algebra.Vector Algorithms.ConvexHull.GrahamScan QueueEx Algorithms.PolygonIntersection.Core
+  other-modules:       MyPrelude Graphics.Diagram.Gif Graphics.Diagram.Types Graphics.Diagram.Plotter Parser.PathParser Parser.Meshparser Parser.Core System.FileSystem.FileExt Algebra.Vector Algorithms.ConvexHull.GrahamScan QueueEx Algorithms.PolygonIntersection.Core Algorithms.RangeSearch.QuadTree
 
   -- LANGUAGE extensions used by modules in this package.
   -- other-extensions:
