@@ -18,6 +18,7 @@ module Algorithms.RangeSearch.Core
 import Algebra.VectorTypes
 import Algebra.Vector
 import Data.Foldable (foldlM)
+import Data.List (partition)
 import Data.Maybe (fromJust)
 import Diagrams.TwoD.Types
 
@@ -83,12 +84,16 @@ isSEchild _                 = False
 quadTree :: [PT]        -- ^ the points to divide
          -> Square      -- ^ the initial square around the points
          -> QuadTree PT -- ^ the quad tree
-quadTree pts' sq' = go (flip filter pts' . inRange $ sq') sq'
+quadTree []   _ = TNil
+quadTree [pt] _ = TLeaf pt
+quadTree pts sq = TNode (quadTree nWPT . nwSq $ sq) (quadTree nEPT . neSq $ sq)
+                        (quadTree sWPT . swSq $ sq) (quadTree sEPT . seSq $ sq)
   where
-    go []   _ = TNil
-    go [pt] _ = TLeaf pt
-    go pts sq = TNode (quadTree pts . nwSq $ sq) (quadTree pts . neSq $ sq)
-                      (quadTree pts . swSq $ sq) (quadTree pts . seSq $ sq)
+    -- this sets the priority in case a point is between multiple quads
+    (sWPT, sWO) = flip partition pts . inRange . swSq $ sq
+    (nWPT, nWO) = flip partition sWO . inRange . nwSq $ sq
+    (nEPT, nEO) = flip partition nWO . inRange . neSq $ sq
+    sEPT        = flip filter    nEO . inRange . seSq $ sq
 
 
 -- |Get all squares of a quad tree.
