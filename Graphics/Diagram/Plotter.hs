@@ -170,21 +170,17 @@ convexHStepsLs = GifDiag chs
           (strokeTrail . fromVertices $ vt') # moveTo (head vt') # lc col
 
 
--- FIXME: hardcoded dimensions
+-- |Create a diagram that shows all squares of the RangeSearch algorithm
+-- from the quad tree.
 squares :: Diag
 squares = Diag f
   where
     f p (Object []) = mempty
     f p (Object vt) =
       mconcat
-      $ (\((xmin, xmax), (ymin, ymax)) -> rect (xmax - xmin) (ymax - ymin) #
-        moveTo (p2 (
-                     ((xmax + xmin) / 2),
-                     ((ymax + ymin) / 2)
-                   )
-               ) #
-        lw ultraThin)
-      <$> (quadTreeSquares ((0,500), (0,500)) . quadTree vtf $ (dX p, dY p))
+      $ (\((xmin, xmax), (ymin, ymax)) -> rect (xmax - xmin) (ymax - ymin)
+        # moveTo (p2 ((xmax + xmin) / 2, (ymax + ymin) / 2)) # lw ultraThin)
+      <$> (quadTreeSquares (dX p, dY p) . quadTree vtf $ (dX p, dY p))
       where
         vtf = filterValidPT p vt
     f _ _ = mempty
