@@ -54,7 +54,9 @@ data MyGUI = MkMyGUI {
   -- |coord check button
   cC  :: CheckButton,
   -- |Path entry widget for the quad tree.
-  pE :: Entry
+  pE :: Entry,
+  -- |Horizontal box containing the path entry widget.
+  vbox7 :: Box
 }
 
 
@@ -87,6 +89,7 @@ makeMyGladeGUI = do
     <*> xmlGetWidget xml castToCheckButton "gridcheckbutton"
     <*> xmlGetWidget xml castToCheckButton "coordcheckbutton"
     <*> xmlGetWidget xml castToEntry "path"
+    <*> xmlGetWidget xml castToBox "vbox7"
 
 
 -- |Main entry point for the GTK GUI routines.
@@ -122,6 +125,7 @@ makeGUI startFile = do
   _ <- onExpose (da mygui) (\_ -> drawDiag mygui >>=
                              (\_ -> return True))
   _ <- on (cB mygui) changed (drawDiag mygui)
+  _ <- on (cB mygui) changed (showPathWidget mygui)
   _ <- on (gC mygui) toggled (drawDiag mygui)
   _ <- on (cC mygui) toggled (drawDiag mygui)
 
@@ -145,6 +149,7 @@ makeGUI startFile = do
 
   -- draw widgets and start main loop
   widgetShowAll (win mygui)
+  widgetHide (vbox7 mygui)
   mainGUI
 
 
@@ -158,6 +163,16 @@ showErrorDialog str = do
                                   str
   _ <- dialogRun errorDialog
   widgetDestroy errorDialog
+
+
+-- |May hide or show the widget that holds the quad tree path entry,
+-- depending on the context.
+showPathWidget :: MyGUI
+               -> IO ()
+showPathWidget mygui = do
+  item <- comboBoxGetActive (cB mygui)
+  if item == 4 then widgetShow (vbox7 mygui) else widgetHide (vbox7 mygui)
+  return ()
 
 
 -- |Draws a Diagram which is built from a given file to
