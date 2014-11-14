@@ -1,9 +1,10 @@
 {-# OPTIONS_HADDOCK ignore-exports #-}
 
-module Parser.Core (Parser,
+module Parser.Core (Parser(MkParser),
                runParser,
                satisfy,
                char,
+               string,
                posInt,
                posDouble,
                negDouble,
@@ -14,6 +15,8 @@ module Parser.Core (Parser,
 
 import Control.Applicative
 import Data.Char
+import Data.List
+import Data.Maybe
 import MyPrelude
 
 
@@ -64,6 +67,17 @@ satisfy p = MkParser f
 -- |Creates a Parser that accepts a given Char.
 char :: Char -> Parser Char
 char c = satisfy (== c)
+
+
+-- |Creates a Parser that accepts a given String.
+string :: String -> Parser String
+string str = MkParser f
+  where
+    f []     = Nothing
+    f allstr
+      | str `isPrefixOf` allstr =
+          Just(str, fromJust . stripPrefix str $ allstr)
+      | otherwise = Nothing
 
 
 -- |Creates a Parser that accepts positive integers.
