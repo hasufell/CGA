@@ -208,6 +208,29 @@ quadPathSquare = Diag f
         vtf = filterValidPT p vt
 
 
+-- |Create a list of diagrams that show the walk along the given path
+-- through the quad tree.
+gifQuadPath :: Diag
+gifQuadPath = GifDiag f
+  where
+    f p col _ vt =
+      (\((xmin, xmax), (ymin, ymax)) -> rect (xmax - xmin) (ymax - ymin)
+        # moveTo (p2 ((xmax + xmin) / 2,(ymax + ymin) / 2)) # lw thick # lc col)
+        <$> (getSquares (stringToQuads (pQt p)) (qt, []))
+      where
+        getSquares :: [QuadOrOrient] -> Zipper PT -> [Square]
+        getSquares [] z = [getSquareByZipper (dX p, dY p) z]
+        getSquares (q:qs) z = case q of
+          Orient x -> getSquareByZipper (dX p, dY p) z :
+                      getSquares qs (fromMaybe z (findNeighbor x z))
+          Quad x -> getSquareByZipper (dX p, dY p) z :
+                    getSquares qs (fromMaybe z (goQuad x z))
+        qt :: QuadTree PT
+        qt = quadTree vtf (dX p, dY p)
+        vtf :: [PT]
+        vtf = filterValidPT p vt
+
+
 -- |Creates a Diagram that shows an XAxis which is bound
 -- by the dimensions given in xD from DiagProp.
 xAxis :: Diag
