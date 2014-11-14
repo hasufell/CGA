@@ -6,6 +6,7 @@ module Algorithms.RangeSearch.Core
     goQuad,
     findNeighbor,
     lookupByPath',
+    getSquareByZipper,
     rootNode,
     testArr,
     Orient(North,East,West,South),
@@ -99,6 +100,18 @@ quadTreeSquares sq (TLeaf _)           = [sq]
 quadTreeSquares sq (TNode nw ne sw se) =
   quadTreeSquares (nwSq sq) nw ++ quadTreeSquares (neSq sq) ne ++
   quadTreeSquares (swSq sq) sw ++ quadTreeSquares (seSq sq) se
+
+
+-- |Get the current square of the zipper, relative to the to the given top
+-- square.
+getSquareByZipper :: Square -> Zipper a -> Square
+getSquareByZipper sq z = go sq (reverse . snd $ z)
+  where
+    go sq' []              = sq'
+    go sq' (NWCrumb {}:zs) = go (nwSq sq') zs
+    go sq' (NECrumb {}:zs) = go (neSq sq') zs
+    go sq' (SWCrumb {}:zs) = go (swSq sq') zs
+    go sq' (SECrumb {}:zs) = go (seSq sq') zs
 
 
 -- |Left fold over the tree leafs.
