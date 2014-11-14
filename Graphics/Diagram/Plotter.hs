@@ -197,8 +197,6 @@ quadPathSquare = Diag f
         # moveTo (p2 ((xmax + xmin) / 2,(ymax + ymin) / 2)) # lw thin # lc red)
         (getSquare (stringToQuads (pQt p)) (qt, []))
       where
-        quads :: [QuadOrOrient]
-        quads = stringToQuads (pQt p)
         getSquare :: [QuadOrOrient] -> Zipper PT -> Square
         getSquare [] z = getSquareByZipper (dX p, dY p) z
         getSquare (q:qs) z = case q of
