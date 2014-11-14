@@ -7,16 +7,9 @@ import Parser.Core
 import Algorithms.RangeSearch.Core (Quad(NW, NE, SW, SE), Orient(North, South, West, East))
 
 
--- |Can either be an Orientation or a Quad, corresponding to the
--- Algorithms.RangeSearch module.
-data QuadOrOrient = Orient Orient
-                  | Quad Quad
-  deriving (Show)
-
-
 -- |Parse a string such as "ne, n, sw, e" into
 -- [Quad NE, Orient North, Quad SW, Orient East].
-stringToQuads :: String -> [QuadOrOrient]
+stringToQuads :: String -> [Either Quad Orient]
 stringToQuads str = case runParser parsePath str of
   Nothing -> []
   Just xs -> fst xs
@@ -28,19 +21,19 @@ stringToQuads str = case runParser parsePath str of
 
 -- |Parses a string that represents a single squad into the
 -- QuadOrOrient ADT.
-parseQuad :: Parser QuadOrOrient
+parseQuad :: Parser (Either Quad Orient)
 parseQuad =
-  const (Quad NW) <$> (string "nw" <|> string "NW")
-    <|> const (Quad NE) <$> (string "ne" <|> string "NE")
-    <|> const (Quad SW) <$> (string "sw" <|> string "SW")
-    <|> const (Quad SE) <$> (string "se" <|> string "SE")
+  const (Left NW) <$> (string "nw" <|> string "NW")
+    <|> const (Left NE) <$> (string "ne" <|> string "NE")
+    <|> const (Left SW) <$> (string "sw" <|> string "SW")
+    <|> const (Left SE) <$> (string "se" <|> string "SE")
 
 
 -- |Parses a string that represents a single Orientation into the
 -- QuadOrOrient ADT.
-parseOrient :: Parser QuadOrOrient
+parseOrient :: Parser (Either Quad Orient)
 parseOrient =
-  const (Orient North) <$> (string "n" <|> string "N")
-    <|> const (Orient South) <$> (string "s" <|> string "S")
-    <|> const (Orient West) <$> (string "w" <|> string "W")
-    <|> const (Orient East) <$> (string "e" <|> string "E")
+  const (Right North) <$> (string "n" <|> string "N")
+    <|> const (Right South) <$> (string "s" <|> string "S")
+    <|> const (Right West) <$> (string "w" <|> string "W")
+    <|> const (Right East) <$> (string "e" <|> string "E")

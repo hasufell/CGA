@@ -197,11 +197,11 @@ quadPathSquare = Diag f
         # moveTo (p2 ((xmax + xmin) / 2,(ymax + ymin) / 2)) # lw thin # lc red)
         (getSquare (stringToQuads (pQt p)) (qt, []))
       where
-        getSquare :: [QuadOrOrient] -> Zipper PT -> Square
+        getSquare :: [Either Quad Orient] -> Zipper PT -> Square
         getSquare [] z = getSquareByZipper (dX p, dY p) z
         getSquare (q:qs) z = case q of
-          Orient x -> getSquare qs (fromMaybe z (findNeighbor x z))
-          Quad x -> getSquare qs (fromMaybe z (goQuad x z))
+          Right x -> getSquare qs (fromMaybe z (findNeighbor x z))
+          Left x  -> getSquare qs (fromMaybe z (goQuad x z))
         qt :: QuadTree PT
         qt = quadTree vtf (dX p, dY p)
         vtf :: [PT]
@@ -218,13 +218,13 @@ gifQuadPath = GifDiag f
         # moveTo (p2 ((xmax + xmin) / 2,(ymax + ymin) / 2)) # lw thick # lc col)
         <$> (getSquares (stringToQuads (pQt p)) (qt, []))
       where
-        getSquares :: [QuadOrOrient] -> Zipper PT -> [Square]
+        getSquares :: [Either Quad Orient] -> Zipper PT -> [Square]
         getSquares [] z = [getSquareByZipper (dX p, dY p) z]
         getSquares (q:qs) z = case q of
-          Orient x -> getSquareByZipper (dX p, dY p) z :
-                      getSquares qs (fromMaybe z (findNeighbor x z))
-          Quad x -> getSquareByZipper (dX p, dY p) z :
-                    getSquares qs (fromMaybe z (goQuad x z))
+          Right x -> getSquareByZipper (dX p, dY p) z :
+                       getSquares qs (fromMaybe z (findNeighbor x z))
+          Left x  -> getSquareByZipper (dX p, dY p) z :
+                       getSquares qs (fromMaybe z (goQuad x z))
         qt :: QuadTree PT
         qt = quadTree vtf (dX p, dY p)
         vtf :: [PT]
