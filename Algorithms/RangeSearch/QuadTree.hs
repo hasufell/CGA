@@ -1,4 +1,4 @@
-module Algorithms.RangeSearch.Core
+module Algorithms.RangeSearch.QuadTree
     (quadTree,
     quadTreeSquares,
     qtFoldl,
@@ -107,7 +107,7 @@ quadTreeSquares sq (TNode nw ne sw se) =
   quadTreeSquares (swSq sq) sw ++ quadTreeSquares (seSq sq) se
 
 
--- |Get the current square of the zipper, relative to the to the given top
+-- |Get the current square of the zipper, relative to the given top
 -- square.
 getSquareByZipper :: Square -> Zipper a -> Square
 getSquareByZipper sq z = go sq (reverse . snd $ z)
@@ -196,6 +196,9 @@ findNeighbor ot zr = case ot of
         checkParent (Just z') = Just z'
         checkParent _         = Nothing
 
+
+lookupByNeighbors :: [Orient] -> Zipper a -> Maybe (Zipper a)
+lookupByNeighbors = flip (foldlM (flip findNeighbor))
 
 
 testArr :: [PT]

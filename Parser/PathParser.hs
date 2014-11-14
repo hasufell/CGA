@@ -4,7 +4,7 @@ module Parser.PathParser where
 
 import Control.Applicative
 import Parser.Core
-import Algorithms.RangeSearch.Core (Quad(NW, NE, SW, SE), Orient(North, South, West, East))
+import Algorithms.RangeSearch.QuadTree (Quad(NW, NE, SW, SE), Orient(North, South, West, East))
 
 
 -- |Parse a string such as "ne, n, sw, e" into
