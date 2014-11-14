@@ -34,6 +34,7 @@ data QuadTree a
 -- |Represents a Quadrant in the 2D plane.
 data Quad = NW | NE
           | SW | SE
+  deriving (Show)
 
 -- |A Crumb used for the QuadTree Zipper.
 data Crumb a = NWCrumb (QuadTree a) (QuadTree a) (QuadTree a)
@@ -50,6 +51,7 @@ type Zipper a = (QuadTree a, Breadbrumbs a)
 
 -- |Orientation.
 data Orient = North | South | East | West
+  deriving (Show)
 
 
 -- |Get a sub-square of the current square, e.g. nw, ne, sw or se.
