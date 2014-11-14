@@ -8,9 +8,10 @@ module Algorithms.RangeSearch.Core
     lookupByPath',
     rootNode,
     testArr,
-    Orient,
-    Quad,
-    QuadTree)
+    Orient(North,East,West,South),
+    Quad(NW,NE,SW,SE),
+    QuadTree,
+    Zipper)
   where
 
 import Algebra.VectorTypes
