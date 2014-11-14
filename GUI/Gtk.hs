@@ -51,8 +51,10 @@ data MyGUI = MkMyGUI {
   cB  :: ComboBox,
   -- |grid check button
   gC  :: CheckButton,
-    -- |coord check button
-  cC  :: CheckButton
+  -- |coord check button
+  cC  :: CheckButton,
+  -- |Path entry widget for the quad tree.
+  pE :: Entry
 }
 
 
@@ -84,6 +86,7 @@ makeMyGladeGUI = do
     <*> xmlGetWidget xml castToComboBox "comboalgo"
     <*> xmlGetWidget xml castToCheckButton "gridcheckbutton"
     <*> xmlGetWidget xml castToCheckButton "coordcheckbutton"
+    <*> xmlGetWidget xml castToEntry "path"
 
 
 -- |Main entry point for the GTK GUI routines.
@@ -209,6 +212,7 @@ saveAndDrawDiag fp fps mygui =
       (daW, daH) <- widgetGetSize (da mygui)
       gd'        <- toggleButtonGetActive (gC mygui)
       ct'        <- toggleButtonGetActive (cC mygui)
+      pE'        <- entryGetText (pE mygui)
 
       let
         xD = (,)         <$>
@@ -230,7 +234,8 @@ saveAndDrawDiag fp fps mygui =
                     dY  = yD',
                     alg = alg',
                     gd  = gd',
-                    ct  = ct'})
+                    ct  = ct',
+                    pQt = pE'})
                   mesh)
           renderWithDrawable dw r
           if null fps

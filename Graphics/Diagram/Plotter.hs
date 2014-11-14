@@ -6,11 +6,13 @@ import Algebra.VectorTypes
 import Algorithms.ConvexHull.GrahamScan
 import Algorithms.RangeSearch.Core
 import Algorithms.PolygonIntersection.Core
+import Data.Maybe
 import Data.Monoid
 import Diagrams.Backend.Cairo
 import Diagrams.Prelude hiding ((<>))
 import Graphics.Diagram.Types
 import Graphics.Gloss.Data.Extent
+import Parser.PathParser
 
 
 -- |Creates a Diagram that shows the coordinates from the points
@@ -186,6 +188,30 @@ squares = Diag f
       where
         vtf = filterValidPT p vt
     f _ _ = mempty
+
+
+-- |Create a diagram that shows a single square of the RangeSearch algorithm
+-- from the quad tree in red, according to the given path in pQt.
+quadPathSquare :: Diag
+quadPathSquare = Diag f
+  where
+    f p (Object []) = mempty
+    f p (Object vt) =
+      (\((xmin, xmax), (ymin, ymax)) -> rect (xmax - xmin) (ymax - ymin)
+        # moveTo (p2 ((xmax + xmin) / 2,(ymax + ymin) / 2)) # lw thin # lc red)
+        (getSquare (stringToQuads (pQt p)) (qt, []))
+      where
+        quads :: [QuadOrOrient]
+        quads = stringToQuads (pQt p)
+        getSquare :: [QuadOrOrient] -> Zipper PT -> Square
+        getSquare [] z = getSquareByZipper (dX p, dY p) z
+        getSquare (q:qs) z = case q of
+          Orient x -> getSquare qs (fromMaybe z (findNeighbor x z))
+          Quad x -> getSquare qs (fromMaybe z (goQuad x z))
+        qt :: QuadTree PT
+        qt = quadTree vtf (dX p, dY p)
+        vtf :: [PT]
+        vtf = filterValidPT p vt
 
 
 -- |Creates a Diagram that shows an XAxis which is bound

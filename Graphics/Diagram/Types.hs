@@ -53,7 +53,9 @@ data DiagProp = MkProp {
   -- |If we want to show the coordinates as text.
   ct :: Bool,
   -- |Square size used to show the grid and x/y-axis.
-  sqS :: Double
+  sqS :: Double,
+  -- |The path to a quad in the quad tree.
+  pQt :: String
 }
 
 
@@ -83,7 +85,7 @@ instance Monoid Diag where
 
 -- |The default properties of the Diagram.
 defaultProp :: DiagProp
-defaultProp = MkProp 2 (0,500) (0,500) 0 False False 50
+defaultProp = MkProp 2 (0,500) (0,500) 0 False False 50 ""
 
 
 -- |Extract the lower bound of the x-axis dimension.
