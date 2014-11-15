@@ -189,7 +189,9 @@ onAlgoBoxChange mygui = do
     then do
       widgetShow (vbox7 mygui)
       widgetShow (treeWin mygui)
-    else widgetHide (vbox7 mygui)
+    else do
+      widgetHide (vbox7 mygui)
+      widgetHide (treeWin mygui)
   return ()
 
 
