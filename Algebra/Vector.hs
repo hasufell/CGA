@@ -14,8 +14,8 @@ import MyPrelude
 inRange :: Square -- ^ the square, defined by x/y dimensions
         -> PT     -- ^ Coordinate
         -> Bool   -- ^ result
-inRange ((xlD, xuD), (ylD, yuD)) p =
-  x <= xuD && x >= xlD && y <= yuD && y >= ylD
+inRange ((xmin, xmax), (ymin, ymax)) p =
+  x <= xmax && x >= xmin && y <= ymax && y >= ymin
   where
     (x, y) = unp2 p
 
