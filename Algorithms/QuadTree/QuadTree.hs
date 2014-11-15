@@ -1,4 +1,4 @@
-module Algorithms.RangeSearch.QuadTree
+module Algorithms.QuadTree.QuadTree
     (quadTree,
     quadTreeSquares,
     qtFoldl,

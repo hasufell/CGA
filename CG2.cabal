@@ -67,7 +67,7 @@ executable Gtk
                        Algorithms.ConvexHull.GrahamScan
                        QueueEx
                        Algorithms.PolygonIntersection.Core
-                       Algorithms.RangeSearch.QuadTree
+                       Algorithms.QuadTree.QuadTree
 
   -- LANGUAGE extensions used by modules in this package.
   -- other-extensions:
@@ -111,7 +111,7 @@ executable Gif
                        Algorithms.ConvexHull.GrahamScan
                        QueueEx
                        Algorithms.PolygonIntersection.Core
-                       Algorithms.RangeSearch.QuadTree
+                       Algorithms.QuadTree.QuadTree
 
   -- LANGUAGE extensions used by modules in this package.
   -- other-extensions:

@@ -4,7 +4,7 @@ module Graphics.Diagram.Plotter where
 
 import Algebra.VectorTypes
 import Algorithms.ConvexHull.GrahamScan
-import Algorithms.RangeSearch.QuadTree
+import Algorithms.QuadTree.QuadTree
 import Algorithms.PolygonIntersection.Core
 import Data.Maybe
 import Data.Monoid
