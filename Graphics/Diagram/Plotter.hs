@@ -189,6 +189,7 @@ squares = Diag f
 
 
 
+-- |Get the quad tree corresponding to the given points and diagram properties.
 qt :: [PT] -> DiagProp -> QuadTree PT
 qt vt p = quadTree (filterValidPT p vt) (dX p, dY p)
 
