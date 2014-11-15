@@ -62,7 +62,6 @@ executable Gtk
                        Parser.PathParser
                        Parser.Meshparser
                        Parser.Core
-                       System.FileSystem.FileExt
                        Algebra.Vector
                        Algorithms.ConvexHull.GrahamScan
                        QueueEx
@@ -86,6 +85,7 @@ executable Gtk
                        safe >= 0.3.8,
                        containers >= 0.5.0.0,
                        diagrams-contrib >= 1.1.2.1
+                       filepath >= 1.3.0.2
 
   -- Directories containing source files.
   -- hs-source-dirs:
@@ -106,7 +106,6 @@ executable Gif
                        Parser.PathParser
                        Parser.Meshparser
                        Parser.Core
-                       System.FileSystem.FileExt
                        Algebra.Vector
                        Algorithms.ConvexHull.GrahamScan
                        QueueEx

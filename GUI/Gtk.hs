@@ -14,7 +14,7 @@ import Graphics.UI.Gtk
 import Graphics.UI.Gtk.Glade
 import MyPrelude
 import System.Directory
-import System.FileSystem.FileExt
+import System.FilePath.Posix
 import Text.Read
 
 
@@ -231,7 +231,7 @@ saveAndDrawDiag :: FilePath -- ^ obj file to parse
                 -> MyGUI
                 -> IO Int
 saveAndDrawDiag fp fps mygui =
-  if cmpExt "obj" fp
+  if (==) ".obj" . takeExtension $ fp
     then do
       mesh            <- readFile fp
       mainDrawWindow  <- widgetGetDrawWindow (mainDraw mygui)
