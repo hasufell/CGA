@@ -8,7 +8,6 @@ module Algorithms.RangeSearch.QuadTree
     lookupByPath',
     getSquareByZipper,
     rootNode,
-    testArr,
     Orient(North,East,West,South),
     Quad(NW,NE,SW,SE),
     QuadTree,
@@ -201,15 +200,3 @@ lookupByNeighbors :: [Orient] -> Zipper a -> Maybe (Zipper a)
 lookupByNeighbors = flip (foldlM (flip findNeighbor))
 
 
-testArr :: [PT]
-testArr = [p2 (200.0, 450.0),
-           p2 (400.0, 350.0),
-           p2 (100.0, 300.0),
-           p2 (25.0 , 350.0),
-           p2 (225.0, 225.0),
-           p2 (400.0, 150.0),
-           p2 (300.0, 100.0),
-           p2 (300.0, 300.0),
-           p2 (300.0, 350.0),
-           p2 (50.0 , 450.0),
-           p2 (100.0, 25.0)]
