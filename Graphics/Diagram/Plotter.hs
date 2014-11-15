@@ -29,7 +29,7 @@ coordPoints = Diag cp
       position (zip (filterValidPT p vt)
         (repeat dot))
       where
-        dot = (circle $ t p :: Diagram Cairo R2) # fc black
+        dot = (circle $ dotSize p :: Diagram Cairo R2) # fc black
 
 
 -- |Creates a Diagram from a point that shows the coordinates
@@ -52,7 +52,7 @@ coordPointsText = Diag cpt
     cpt p (Objects vts) = drawT (concat vts) p
     drawT [] _ = mempty
     drawT vt p
-      | ct p =
+      | showCoordText p =
           position $
             zip vtf (pointToTextCoord <$> vtf) # translate (r2 (0, 10))
       | otherwise = mempty
@@ -86,7 +86,7 @@ polyIntersection = Diag pi'
       where
         paF  = filterValidPT p x
         pbF  = filterValidPT p y
-        dot  = (circle $ t p :: Diagram Cairo R2) # fc red # lc red
+        dot  = (circle $ dotSize p :: Diagram Cairo R2) # fc red # lc red
         vtpi = intersectionPoints
                 . sortLexPolys
                 $ (sortLexPoly paF, sortLexPoly pbF)
@@ -98,7 +98,7 @@ polyIntersectionText :: Diag
 polyIntersectionText = Diag pit'
   where
     pit' p (Objects (x:y:_))
-      | ct p =
+      | showCoordText p =
           position $
             zip vtpi
                 (pointToTextCoord # fc red <$> vtpi) # translate (r2 (0, 10))
@@ -120,7 +120,7 @@ convexHP = Diag chp
       position (zip vtch
         (repeat dot))
       where
-        dot = (circle $ t p :: Diagram Cairo R2) # fc red # lc red
+        dot = (circle $ dotSize p :: Diagram Cairo R2) # fc red # lc red
         vtch = grahamCH $ filterValidPT p vt
     chp _ _ = mempty
 
@@ -130,7 +130,7 @@ convexHPText :: Diag
 convexHPText = Diag chpt
   where
     chpt p (Object vt)
-      | ct p =
+      | showCoordText p =
           position $
             zip vtchf
                 (pointToTextCoord <$> vtchf) # translate (r2 (0, 10))
@@ -182,7 +182,7 @@ squares = Diag f
       mconcat
       $ (\((xmin', xmax'), (ymin', ymax')) -> rect (xmax' - xmin') (ymax' - ymin')
         # moveTo (p2 ((xmax' + xmin') / 2, (ymax' + ymin') / 2)) # lw ultraThin)
-      <$> (quadTreeSquares (dX p, dY p) . quadTree vtf $ (dX p, dY p))
+      <$> (quadTreeSquares (xDimension p, yDimension p) . quadTree vtf $ (xDimension p, yDimension p))
       where
         vtf = filterValidPT p vt
     f _ _ = mempty
@@ -191,11 +191,11 @@ squares = Diag f
 
 -- |Get the quad tree corresponding to the given points and diagram properties.
 qt :: [PT] -> DiagProp -> QuadTree PT
-qt vt p = quadTree (filterValidPT p vt) (dX p, dY p)
+qt vt p = quadTree (filterValidPT p vt) (xDimension p, yDimension p)
 
 
 -- |Create a diagram that shows a single square of the RangeSearch algorithm
--- from the quad tree in red, according to the given path in pQt.
+-- from the quad tree in red, according to the given path in quadPath.
 quadPathSquare :: Diag
 quadPathSquare = Diag f
   where
@@ -203,10 +203,10 @@ quadPathSquare = Diag f
     f p (Object vt) =
       (\((xmin', xmax'), (ymin', ymax')) -> rect (xmax' - xmin') (ymax' - ymin')
         # moveTo (p2 ((xmax' + xmin') / 2,(ymax' + ymin') / 2)) # lw thin # lc red)
-        (getSquare (stringToQuads (pQt p)) (qt vt p, []))
+        (getSquare (stringToQuads (quadPath p)) (qt vt p, []))
       where
         getSquare :: [Either Quad Orient] -> Zipper PT -> Square
-        getSquare [] z = getSquareByZipper (dX p, dY p) z
+        getSquare [] z = getSquareByZipper (xDimension p, yDimension p) z
         getSquare (q:qs) z = case q of
           Right x -> getSquare qs (fromMaybe z (findNeighbor x z))
           Left x  -> getSquare qs (fromMaybe z (goQuad x z))
@@ -221,14 +221,14 @@ gifQuadPath = GifDiag f
     f p col _ vt =
       (\((xmin', xmax'), (ymin', ymax')) -> rect (xmax' - xmin') (ymax' - ymin')
         # moveTo (p2 ((xmax' + xmin') / 2,(ymax' + ymin') / 2)) # lw thick # lc col)
-        <$> getSquares (stringToQuads (pQt p)) (qt vt p, [])
+        <$> getSquares (stringToQuads (quadPath p)) (qt vt p, [])
       where
         getSquares :: [Either Quad Orient] -> Zipper PT -> [Square]
-        getSquares [] z = [getSquareByZipper (dX p, dY p) z]
+        getSquares [] z = [getSquareByZipper (xDimension p, yDimension p) z]
         getSquares (q:qs) z = case q of
-          Right x -> getSquareByZipper (dX p, dY p) z :
+          Right x -> getSquareByZipper (xDimension p, yDimension p) z :
                        getSquares qs (fromMaybe z (findNeighbor x z))
-          Left x  -> getSquareByZipper (dX p, dY p) z :
+          Left x  -> getSquareByZipper (xDimension p, yDimension p) z :
                        getSquares qs (fromMaybe z (goQuad x z))
 
 
@@ -238,7 +238,7 @@ treePretty = Diag f
   where
     f _ (Object []) = mempty
     f p (Object vt) =
-      prettyRoseTree (quadTreeToRoseTree . flip getCurQT (qt vt p, []) . stringToQuads . pQt $ p)
+      prettyRoseTree (quadTreeToRoseTree . flip getCurQT (qt vt p, []) . stringToQuads . quadPath $ p)
       where
         getCurQT :: [Either Quad Orient] -> Zipper PT -> Zipper PT
         getCurQT [] z = z
@@ -269,23 +269,23 @@ xAxis =
     Diag labels
   where
     hRule p _ =
-      arrowAt (p2 (xmin p, if ymin p <= 0 then 0 else ymin p))
-              (r2 (w' p, 0))
+      arrowAt (p2 (diagXmin p, if diagYmin p <= 0 then 0 else diagYmin p))
+              (r2 (diagWidth p, 0))
     segments p _ =
-      hcat' (with & sep .~ sqS p)
-            (replicate (floor . (/) (w' p) $ sqS p)
+      hcat' (with & sep .~ squareSize p)
+            (replicate (floor . (/) (diagWidth p) $ squareSize p)
                        (vrule 10)) #
-      moveTo (p2 (xmin p, if ymin p <= 0 then 0 else ymin p))
+      moveTo (p2 (diagXmin p, if diagYmin p <= 0 then 0 else diagYmin p))
     labels p _ =
       position $
         zip (mkPoint <$> xs)
             ((\x -> (text . show $ x) # scale 10) <$> xs)
       where
         xs :: [Int]
-        xs = take (floor . (/) (w' p) $ sqS p)
-                  (iterate (+(floor . sqS $ p)) (floor . xmin $ p))
+        xs = take (floor . (/) (diagWidth p) $ squareSize p)
+                  (iterate (+(floor . squareSize $ p)) (floor . diagXmin $ p))
         mkPoint x = p2 (fromIntegral x,
-                        -15 + (if ymin p <= 0 then 0 else ymin p))
+                        -15 + (if diagYmin p <= 0 then 0 else diagYmin p))
 
 
 -- |Creates a Diagram that shows an YAxis which is bound
@@ -297,23 +297,23 @@ yAxis =
     Diag labels
   where
     vRule p _ =
-      arrowAt (p2 (if xmin p <= 0 then 0 else xmin p, ymin p))
-              (r2 (0, h' p))
+      arrowAt (p2 (if diagXmin p <= 0 then 0 else diagXmin p, diagYmin p))
+              (r2 (0, diagHeight p))
     segments p _ =
-      vcat' (with & sep .~ sqS p)
-            (replicate (floor . (/) (h' p) $ sqS p)
+      vcat' (with & sep .~ squareSize p)
+            (replicate (floor . (/) (diagHeight p) $ squareSize p)
                        (hrule 10)) #
       alignB                       #
-      moveTo (p2 (if xmin p <= 0 then 0 else xmin p, ymin p))
+      moveTo (p2 (if diagXmin p <= 0 then 0 else diagXmin p, diagYmin p))
     labels p _ =
       position $
         zip (mkPoint <$> ys)
             ((\x -> (text . show $ x) # scale 10) <$> ys)
         where
           ys :: [Int]
-          ys = take (floor . (/) (h' p) $ sqS p)
-                    (iterate (+(floor . sqS $ p)) (floor . ymin $ p))
-          mkPoint y = p2 (-15 + (if xmin p <= 0 then 0 else xmin p),
+          ys = take (floor . (/) (diagHeight p) $ squareSize p)
+                    (iterate (+(floor . squareSize $ p)) (floor . diagYmin $ p))
+          mkPoint y = p2 (-15 + (if diagXmin p <= 0 then 0 else diagXmin p),
                           fromIntegral y)
 
 
@@ -323,8 +323,8 @@ whiteRectB :: Diag
 whiteRectB = Diag rect'
   where
     rect' p _ =
-      whiteRect (w' p + (w' p / 10)) (h' p + (h' p / 10)) #
-        moveTo (p2 (wOff p, hOff p))
+      whiteRect (diagWidth p + (diagWidth p / 10)) (diagHeight p + (diagHeight p / 10)) #
+        moveTo (p2 (diagWidthOffset p, diagHeightOffset p))
       where
 
 
@@ -339,20 +339,20 @@ grid :: Diag
 grid = Diag xGrid <> Diag yGrid
   where
     yGrid p _
-      | gd p =
-          hcat' (with & sep .~ sqS p)
-                (replicate (floor . (/) (w' p) $ sqS p)
-                           (vrule $ h' p))  #
-          moveTo (p2 (xmin p, hOff p))      #
+      | haveGrid p =
+          hcat' (with & sep .~ squareSize p)
+                (replicate (floor . (/) (diagWidth p) $ squareSize p)
+                           (vrule $ diagHeight p))  #
+          moveTo (p2 (diagXmin p, diagHeightOffset p))      #
           lw ultraThin
       | otherwise = mempty
     xGrid p _
-      | gd p =
-          vcat' (with & sep .~ sqS p)
-                (replicate (floor . (/) (h' p) $ sqS p)
-                           (hrule $ w' p))  #
+      | haveGrid p =
+          vcat' (with & sep .~ squareSize p)
+                (replicate (floor . (/) (diagHeight p) $ squareSize p)
+                           (hrule $ diagWidth p))  #
           alignB                            #
-          moveTo (p2 (wOff p, ymin p))      #
+          moveTo (p2 (diagWidthOffset p, diagYmin p))      #
           lw ultraThin
       | otherwise = mempty
 

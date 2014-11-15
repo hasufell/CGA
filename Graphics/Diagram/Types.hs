@@ -41,26 +41,26 @@ data Object = Object [PT]
 -- This can also be seen as a context when merging multiple diagrams.
 data DiagProp = MkProp {
   -- |The thickness of the dots.
-  t :: Double,
+  dotSize :: Double,
   -- |The dimensions of the x-axis.
-  dX :: Coord,
+  xDimension :: Coord,
   -- |The dimensions of the y-axis.
-  dY :: Coord,
+  yDimension :: Coord,
   -- |Algorithm to use.
-  alg :: Int,
+  algo :: Int,
   -- |If we want to show the grid.
-  gd :: Bool,
+  haveGrid :: Bool,
   -- |If we want to show the coordinates as text.
-  ct :: Bool,
+  showCoordText :: Bool,
   -- |Square size used to show the grid and x/y-axis.
-  sqS :: Double,
+  squareSize :: Double,
   -- |The path to a quad in the quad tree.
-  pQt :: String
+  quadPath :: String
 }
 
 
 instance Def DiagProp where
-  def = defaultProp
+  def = diagDefaultProp
 
 
 instance Monoid Diag where
@@ -84,50 +84,50 @@ instance Monoid Diag where
 
 
 -- |The default properties of the Diagram.
-defaultProp :: DiagProp
-defaultProp = MkProp 2 (0,500) (0,500) 0 False False 50 ""
+diagDefaultProp :: DiagProp
+diagDefaultProp = MkProp 2 (0,500) (0,500) 0 False False 50 ""
 
 
 -- |Extract the lower bound of the x-axis dimension.
-xmin :: DiagProp -> Double
-xmin = fst . dX
+diagXmin :: DiagProp -> Double
+diagXmin = fst . xDimension
 
 
 -- |Extract the upper bound of the x-axis dimension.
-xmax :: DiagProp -> Double
-xmax = snd . dX
+diagXmax :: DiagProp -> Double
+diagXmax = snd . xDimension
 
 
 -- |Extract the lower bound of the y-axis dimension.
-ymin :: DiagProp -> Double
-ymin = fst . dY
+diagYmin :: DiagProp -> Double
+diagYmin = fst . yDimension
 
 
 -- |Extract the upper bound of the y-axis dimension.
-ymax :: DiagProp -> Double
-ymax = snd . dY
+diagYmax :: DiagProp -> Double
+diagYmax = snd . yDimension
 
 
 -- |The full width of the x dimension.
-w' :: DiagProp -> Double
-w' p = xmax p - xmin p
+diagWidth :: DiagProp -> Double
+diagWidth p = diagXmax p - diagXmin p
 
 
 -- |The full height of the y dimension.
-h' :: DiagProp -> Double
-h' p = ymax p - ymin p
+diagHeight :: DiagProp -> Double
+diagHeight p = diagYmax p - diagYmin p
 
 
 -- |The offset on the x-axis to move the grid and the white rectangle
 -- to the right place.
-wOff :: DiagProp -> Double
-wOff p = xmin p + (w' p / 2)
+diagWidthOffset :: DiagProp -> Double
+diagWidthOffset p = diagXmin p + (diagWidth p / 2)
 
 
 -- |The offset on the y-axis to move the grid and the white rectangle
 -- to the right place.
-hOff :: DiagProp -> Double
-hOff p = ymin p + (h' p / 2)
+diagHeightOffset :: DiagProp -> Double
+diagHeightOffset p = diagYmin p + (diagWidth p / 2)
 
 
 -- |Returns the specified diagram if True is passed,
@@ -140,4 +140,4 @@ maybeDiag b d
 
 
 filterValidPT :: DiagProp -> [PT] -> [PT]
-filterValidPT p = filter (inRange (dX p, dY p))
+filterValidPT p = filter (inRange (xDimension p, yDimension p))

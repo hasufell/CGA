@@ -3,7 +3,7 @@
 module GUI.Gtk (makeGUI) where
 
 import Control.Applicative
-import Control.Monad
+import Control.Monad(unless)
 import Control.Monad.IO.Class
 import Diagrams.Prelude
 import Diagrams.Backend.Cairo
@@ -24,41 +24,41 @@ import Text.Read
 -- runtime.
 data MyGUI = MkMyGUI {
   -- |main Window
-  win :: Window,
+  rootWin :: Window,
   -- |Tree Window
-  winT :: Window,
+  treeWin :: Window,
   -- |delete Button
-  dB  :: Button,
+  delButton  :: Button,
   -- |save Button
-  sB  :: Button,
+  saveButton  :: Button,
   -- |quit Button
-  qB  :: Button,
+  quitButton  :: Button,
   -- |file chooser button
-  fB  :: FileChooserButton,
+  fileButton  :: FileChooserButton,
   -- |drawing area
-  da  :: DrawingArea,
+  mainDraw  :: DrawingArea,
   -- |drawing area for the tree
-  daT :: DrawingArea,
+  treeDraw :: DrawingArea,
   -- |scaler for point thickness
-  hs  :: HScale,
+  ptScale  :: HScale,
   -- |entry widget for lower x bound
-  xl  :: Entry,
+  xminEntry  :: Entry,
   -- |entry widget for upper x bound
-  xu  :: Entry,
+  xmaxEntry  :: Entry,
   -- |entry widget for lower y bound
-  yl  :: Entry,
+  yminEntry  :: Entry,
   -- |entry widget for upper y bound
-  yu  :: Entry,
+  ymaxEntry  :: Entry,
   -- |about dialog
-  aD  :: AboutDialog,
+  aboutDialog  :: AboutDialog,
   -- |combo box for choosing the algorithm
-  cB  :: ComboBox,
+  algoBox  :: ComboBox,
   -- |grid check button
-  gC  :: CheckButton,
+  gridCheckBox  :: CheckButton,
   -- |coord check button
-  cC  :: CheckButton,
+  coordCheckBox  :: CheckButton,
   -- |Path entry widget for the quad tree.
-  pE  :: Entry,
+  quadPathEntry  :: Entry,
   -- |Horizontal box containing the path entry widget.
   vbox7 :: Box
 }
@@ -112,58 +112,58 @@ makeGUI startFile = do
   -- adjust properties
   if startFile == ""
     then do
-      _ <- fileChooserSetCurrentFolder (fB mygui) homedir
+      _ <- fileChooserSetCurrentFolder (fileButton mygui) homedir
       return ()
     else do
-      _ <- fileChooserSetFilename (fB mygui) startFile
+      _ <- fileChooserSetFilename (fileButton mygui) startFile
       return ()
-  comboBoxSetActive (cB mygui) 0
+  comboBoxSetActive (algoBox mygui) 0
 
   -- callbacks
-  _ <- onDestroy  (win mygui) mainQuit
-  _ <- onClicked  (dB mygui) $ drawDiag mygui
-  _ <- onClicked  (sB mygui) $ saveDiag mygui
-  _ <- onClicked  (qB mygui) mainQuit
-  _ <- onResponse (aD mygui) (\x -> case x of
-                                ResponseCancel -> widgetHideAll (aD mygui)
+  _ <- onDestroy  (rootWin mygui) mainQuit
+  _ <- onClicked  (delButton mygui) $ drawDiag mygui
+  _ <- onClicked  (saveButton mygui) $ saveDiag mygui
+  _ <- onClicked  (quitButton mygui) mainQuit
+  _ <- onResponse (aboutDialog mygui) (\x -> case x of
+                                ResponseCancel -> widgetHideAll (aboutDialog mygui)
                                 _ -> return ())
   -- have to redraw for window overlapping and resizing on expose
-  _ <- onExpose (da mygui) (\_ -> drawDiag mygui >>=
+  _ <- onExpose (mainDraw mygui) (\_ -> drawDiag mygui >>=
                              (\_ -> return True))
-  _ <- onExpose (daT mygui) (\_ -> drawDiag mygui >>=
+  _ <- onExpose (treeDraw mygui) (\_ -> drawDiag mygui >>=
                              (\_ -> return True))
-  _ <- on (cB mygui) changed (drawDiag mygui)
-  _ <- on (cB mygui) changed (onPathWidgetChange mygui)
-  _ <- on (gC mygui) toggled (drawDiag mygui)
-  _ <- on (cC mygui) toggled (drawDiag mygui)
+  _ <- on (algoBox mygui) changed (drawDiag mygui)
+  _ <- on (algoBox mygui) changed (onAlgoBoxChange mygui)
+  _ <- on (gridCheckBox mygui) toggled (drawDiag mygui)
+  _ <- on (coordCheckBox mygui) toggled (drawDiag mygui)
 
   -- hotkeys
-  _ <- win mygui `on` keyPressEvent $ tryEvent $ do
+  _ <- rootWin mygui `on` keyPressEvent $ tryEvent $ do
     [Control] <- eventModifier
     "q"       <- eventKeyName
     liftIO mainQuit
-  _ <- winT mygui `on` keyPressEvent $ tryEvent $ do
+  _ <- treeWin mygui `on` keyPressEvent $ tryEvent $ do
     [Control] <- eventModifier
     "q"       <- eventKeyName
-    liftIO (widgetHide $ winT mygui)
-  _ <- win mygui `on` keyPressEvent $ tryEvent $ do
+    liftIO (widgetHide $ treeWin mygui)
+  _ <- rootWin mygui `on` keyPressEvent $ tryEvent $ do
     [Control] <- eventModifier
     "s"       <- eventKeyName
     liftIO $ saveDiag mygui
-  _ <- win mygui `on` keyPressEvent $ tryEvent $ do
+  _ <- rootWin mygui `on` keyPressEvent $ tryEvent $ do
     [Control] <- eventModifier
     "d"       <- eventKeyName
     liftIO $ drawDiag mygui
-  _ <- win mygui `on` keyPressEvent $ tryEvent $ do
+  _ <- rootWin mygui `on` keyPressEvent $ tryEvent $ do
     [Control] <- eventModifier
     "a"       <- eventKeyName
-    liftIO $ widgetShowAll (aD mygui)
+    liftIO $ widgetShowAll (aboutDialog mygui)
 
   -- draw widgets and start main loop
-  widgetShowAll (win mygui)
-  widgetShowAll (winT mygui)
+  widgetShowAll (rootWin mygui)
+  widgetShowAll (treeWin mygui)
   widgetHide (vbox7 mygui)
-  widgetHide (winT mygui)
+  widgetHide (treeWin mygui)
   mainGUI
 
 
@@ -181,14 +181,14 @@ showErrorDialog str = do
 
 -- |May hide or show the widget that holds the quad tree path entry,
 -- depending on the context and may also pop up the tree window.
-onPathWidgetChange :: MyGUI
-               -> IO ()
-onPathWidgetChange mygui = do
-  item <- comboBoxGetActive (cB mygui)
+onAlgoBoxChange :: MyGUI
+                -> IO ()
+onAlgoBoxChange mygui = do
+  item <- comboBoxGetActive (algoBox mygui)
   if item == 4
     then do
       widgetShow (vbox7 mygui)
-      widgetShow (winT mygui)
+      widgetShow (treeWin mygui)
     else widgetHide (vbox7 mygui)
   return ()
 
@@ -198,7 +198,7 @@ onPathWidgetChange mygui = do
 drawDiag :: MyGUI
           -> IO ()
 drawDiag mygui = do
-  fp <- fileChooserGetFilename (fB mygui)
+  fp <- fileChooserGetFilename (fileButton mygui)
   case fp of
     Just x -> do
       ret <- saveAndDrawDiag x "" mygui
@@ -213,7 +213,7 @@ drawDiag mygui = do
 saveDiag :: MyGUI
           -> IO ()
 saveDiag mygui = do
-  fp <- fileChooserGetFilename (fB mygui)
+  fp <- fileChooserGetFilename (fileButton mygui)
   case fp of
     Just x -> do
       ret <- saveAndDrawDiag x "out.svg" mygui
@@ -233,55 +233,53 @@ saveAndDrawDiag :: FilePath -- ^ obj file to parse
 saveAndDrawDiag fp fps mygui =
   if cmpExt "obj" fp
     then do
-      mesh       <- readFile fp
-      dw         <- widgetGetDrawWindow (da mygui)
-      dwT        <- widgetGetDrawWindow (daT mygui)
-      adjustment <- rangeGetAdjustment (hs mygui)
-      scaleVal   <- adjustmentGetValue adjustment
-      xlD'       <- entryGetText (xl mygui)
-      xuD'       <- entryGetText (xu mygui)
-      ylD'       <- entryGetText (yl mygui)
-      yuD'       <- entryGetText (yu mygui)
-      alg'       <- comboBoxGetActive (cB mygui)
-      (daW, daH) <- widgetGetSize (da mygui)
-      (daTW, daTH) <- widgetGetSize (daT mygui)
-      gd'        <- toggleButtonGetActive (gC mygui)
-      ct'        <- toggleButtonGetActive (cC mygui)
-      pE'        <- entryGetText (pE mygui)
+      mesh            <- readFile fp
+      mainDrawWindow  <- widgetGetDrawWindow (mainDraw mygui)
+      treeDrawWindow  <- widgetGetDrawWindow (treeDraw mygui)
+      adjustment      <- rangeGetAdjustment (ptScale mygui)
+      scaleVal        <- adjustmentGetValue adjustment
+      xminEntryText   <- entryGetText (xminEntry mygui)
+      xmaxEntryText   <- entryGetText (xmaxEntry mygui)
+      yminEntryText   <- entryGetText (yminEntry mygui)
+      ymaxEntryText   <- entryGetText (ymaxEntry mygui)
+      algoActive      <- comboBoxGetActive (algoBox mygui)
+      (daW, daH)      <- widgetGetSize (mainDraw mygui)
+      (daTW, daTH)    <- widgetGetSize (treeDraw mygui)
+      gridActive      <- toggleButtonGetActive (gridCheckBox mygui)
+      coordTextActive <- toggleButtonGetActive (coordCheckBox mygui)
+      quadPathEntry'  <- entryGetText (quadPathEntry mygui)
 
       let
-        xD = (,)         <$>
-          readMaybe xlD' <*>
-          readMaybe xuD' :: Maybe (Double, Double)
-        yD = (,)         <$>
-          readMaybe ylD' <*>
-          readMaybe yuD' :: Maybe (Double, Double)
-        renderDiag winWidth winHeight buildDiag xD' yD' =
+        xDim = (,)         <$>
+          readMaybe xminEntryText <*>
+          readMaybe xmaxEntryText :: Maybe (Double, Double)
+        yDim = (,)         <$>
+          readMaybe yminEntryText <*>
+          readMaybe ymaxEntryText :: Maybe (Double, Double)
+        renderDiag winWidth winHeight buildDiag xDim' yDim' =
           renderDia Cairo
             (CairoOptions fps
                (Dims (fromIntegral winWidth) (fromIntegral winHeight))
                SVG False)
             (buildDiag (def{
-                t   = scaleVal,
-                dX  = xD',
-                dY  = yD',
-                alg = alg',
-                gd  = gd',
-                ct  = ct',
-                pQt = pE'})
+                dotSize       = scaleVal,
+                xDimension    = xDim',
+                yDimension    = yDim',
+                algo          = algoActive,
+                haveGrid      = gridActive,
+                showCoordText = coordTextActive,
+                quadPath      = quadPathEntry'})
               mesh)
 
-      case (xD, yD) of
-        (Just xD', Just yD') -> do
-          let (s, r)  = renderDiag daW daH diagS xD' yD'
-          let (_, r') = renderDiag daTW daTH diagTreeS xD' yD'
+      case (xDim, yDim) of
+        (Just xDim', Just yDim') -> do
+          let (s, r)  = renderDiag daW daH diagS xDim' yDim'
+          let (_, r') = renderDiag daTW daTH diagTreeS xDim' yDim'
 
-          renderWithDrawable dw r
-          renderWithDrawable dwT r'
+          renderWithDrawable mainDrawWindow r
+          renderWithDrawable treeDrawWindow r'
 
-          if null fps
-            then return ()
-            else s
+          unless (null fps) s
           return 0
         _ -> return 1
 
