@@ -261,7 +261,7 @@ treePretty = Diag f
 
 
 -- |Creates a Diagram that shows an XAxis which is bound
--- by the dimensions given in xD from DiagProp.
+-- by the dimensions given in xDimension from DiagProp.
 xAxis :: Diag
 xAxis =
   Diag hRule      <>
@@ -289,7 +289,7 @@ xAxis =
 
 
 -- |Creates a Diagram that shows an YAxis which is bound
--- by the dimensions given in yD from DiagProp.
+-- by the dimensions given in yDimension from DiagProp.
 yAxis :: Diag
 yAxis =
   Diag vRule      <>
