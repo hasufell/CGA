@@ -13,7 +13,6 @@ import Diagrams.Backend.Cairo
 import Diagrams.Prelude hiding ((<>))
 import Diagrams.TwoD.Layout.Tree
 import Graphics.Diagram.Types
-import Graphics.Gloss.Data.Extent
 import Parser.PathParser
 
 
@@ -40,7 +39,8 @@ pointToTextCoord pt =
   text ("(" ++ (show . trim') x ++ ", " ++ (show . trim') y ++ ")") # scale 10
   where
     trim' :: Double -> Double
-    trim' x' = (fromInteger . round $ x' * (10^2)) / (10.0^^2)
+    trim' x' = fromInteger . round $ x' * (10^(2 :: Int)) /
+                                          (10.0^^(2 :: Int))
     (x, y) = unp2 pt
 
 
@@ -177,15 +177,20 @@ convexHStepsLs = GifDiag chs
 squares :: Diag
 squares = Diag f
   where
-    f p (Object []) = mempty
+    f _ (Object []) = mempty
     f p (Object vt) =
       mconcat
-      $ (\((xmin, xmax), (ymin, ymax)) -> rect (xmax - xmin) (ymax - ymin)
-        # moveTo (p2 ((xmax + xmin) / 2, (ymax + ymin) / 2)) # lw ultraThin)
+      $ (\((xmin', xmax'), (ymin', ymax')) -> rect (xmax' - xmin') (ymax' - ymin')
+        # moveTo (p2 ((xmax' + xmin') / 2, (ymax' + ymin') / 2)) # lw ultraThin)
       <$> (quadTreeSquares (dX p, dY p) . quadTree vtf $ (dX p, dY p))
       where
         vtf = filterValidPT p vt
     f _ _ = mempty
+
+
+
+qt :: [PT] -> DiagProp -> QuadTree PT
+qt vt p = quadTree (filterValidPT p vt) (dX p, dY p)
 
 
 -- |Create a diagram that shows a single square of the RangeSearch algorithm
@@ -193,21 +198,18 @@ squares = Diag f
 quadPathSquare :: Diag
 quadPathSquare = Diag f
   where
-    f p (Object []) = mempty
+    f _ (Object []) = mempty
     f p (Object vt) =
-      (\((xmin, xmax), (ymin, ymax)) -> rect (xmax - xmin) (ymax - ymin)
-        # moveTo (p2 ((xmax + xmin) / 2,(ymax + ymin) / 2)) # lw thin # lc red)
-        (getSquare (stringToQuads (pQt p)) (qt, []))
+      (\((xmin', xmax'), (ymin', ymax')) -> rect (xmax' - xmin') (ymax' - ymin')
+        # moveTo (p2 ((xmax' + xmin') / 2,(ymax' + ymin') / 2)) # lw thin # lc red)
+        (getSquare (stringToQuads (pQt p)) (qt vt p, []))
       where
         getSquare :: [Either Quad Orient] -> Zipper PT -> Square
         getSquare [] z = getSquareByZipper (dX p, dY p) z
         getSquare (q:qs) z = case q of
           Right x -> getSquare qs (fromMaybe z (findNeighbor x z))
           Left x  -> getSquare qs (fromMaybe z (goQuad x z))
-        qt :: QuadTree PT
-        qt = quadTree vtf (dX p, dY p)
-        vtf :: [PT]
-        vtf = filterValidPT p vt
+    f _ _  = mempty
 
 
 -- |Create a list of diagrams that show the walk along the given path
@@ -216,9 +218,9 @@ gifQuadPath :: Diag
 gifQuadPath = GifDiag f
   where
     f p col _ vt =
-      (\((xmin, xmax), (ymin, ymax)) -> rect (xmax - xmin) (ymax - ymin)
-        # moveTo (p2 ((xmax + xmin) / 2,(ymax + ymin) / 2)) # lw thick # lc col)
-        <$> (getSquares (stringToQuads (pQt p)) (qt, []))
+      (\((xmin', xmax'), (ymin', ymax')) -> rect (xmax' - xmin') (ymax' - ymin')
+        # moveTo (p2 ((xmax' + xmin') / 2,(ymax' + ymin') / 2)) # lw thick # lc col)
+        <$> getSquares (stringToQuads (pQt p)) (qt vt p, [])
       where
         getSquares :: [Either Quad Orient] -> Zipper PT -> [Square]
         getSquares [] z = [getSquareByZipper (dX p, dY p) z]
@@ -227,28 +229,23 @@ gifQuadPath = GifDiag f
                        getSquares qs (fromMaybe z (findNeighbor x z))
           Left x  -> getSquareByZipper (dX p, dY p) z :
                        getSquares qs (fromMaybe z (goQuad x z))
-        qt :: QuadTree PT
-        qt = quadTree vtf (dX p, dY p)
-        vtf :: [PT]
-        vtf = filterValidPT p vt
 
 
 -- |A diagram that shows the full Quad Tree with nodes.
 treePretty :: Diag
 treePretty = Diag f
   where
-    f p (Object []) = mempty
+    f _ (Object []) = mempty
     f p (Object vt) =
-      prettyRoseTree (quadTreeToRoseTree . flip getCurQT (qt, []) . stringToQuads . pQt $ p)
+      prettyRoseTree (quadTreeToRoseTree . flip getCurQT (qt vt p, []) . stringToQuads . pQt $ p)
       where
-        qt = quadTree (filterValidPT p vt) (dX p, dY p)
         getCurQT :: [Either Quad Orient] -> Zipper PT -> Zipper PT
         getCurQT [] z = z
         getCurQT (q:qs) z = case q of
           Right x -> getCurQT qs (fromMaybe z (findNeighbor x z))
           Left x  -> getCurQT qs (fromMaybe z (goQuad x z))
         prettyRoseTree :: Tree String -> Diagram Cairo R2
-        prettyRoseTree t =
+        prettyRoseTree tree =
           renderTree (\n -> case head n of
                         '*' ->
                           (text n # fontSizeL 5.0)
@@ -257,8 +254,9 @@ treePretty = Diag f
                           (text n # fontSizeL 5.0)
                             <> rect 50.0 20.0 # fc white)
                      (~~)
-                     (symmLayout' (with & slHSep .~ 60 & slVSep .~ 40) t)
+                     (symmLayout' (with & slHSep .~ 60 & slVSep .~ 40) tree)
           # scale 2 # alignT # bg white
+    f _ _  = mempty
 
 
 -- |Creates a Diagram that shows an XAxis which is bound
