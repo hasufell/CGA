@@ -180,8 +180,8 @@ squares = Diag f
     f _ (Object []) = mempty
     f p (Object vt) =
       mconcat
-      $ (\((xmin', xmax'), (ymin', ymax')) -> rect (xmax' - xmin') (ymax' - ymin')
-        # moveTo (p2 ((xmax' + xmin') / 2, (ymax' + ymin') / 2)) # lw ultraThin)
+      $ (\((xmin, xmax), (ymin, ymax)) -> rect (xmax - xmin) (ymax - ymin)
+        # moveTo (p2 ((xmax + xmin) / 2, (ymax + ymin) / 2)) # lw ultraThin)
       <$> (quadTreeSquares (xDimension p, yDimension p) . quadTree vtf $ (xDimension p, yDimension p))
       where
         vtf = filterValidPT p vt
@@ -201,8 +201,8 @@ quadPathSquare = Diag f
   where
     f _ (Object []) = mempty
     f p (Object vt) =
-      (\((xmin', xmax'), (ymin', ymax')) -> rect (xmax' - xmin') (ymax' - ymin')
-        # moveTo (p2 ((xmax' + xmin') / 2,(ymax' + ymin') / 2)) # lw thin # lc red)
+      (\((xmin, xmax), (ymin, ymax)) -> rect (xmax - xmin) (ymax - ymin)
+        # moveTo (p2 ((xmax + xmin) / 2,(ymax + ymin) / 2)) # lw thin # lc red)
         (getSquare (stringToQuads (quadPath p)) (qt vt p, []))
       where
         getSquare :: [Either Quad Orient] -> Zipper PT -> Square
@@ -219,8 +219,8 @@ gifQuadPath :: Diag
 gifQuadPath = GifDiag f
   where
     f p col _ vt =
-      (\((xmin', xmax'), (ymin', ymax')) -> rect (xmax' - xmin') (ymax' - ymin')
-        # moveTo (p2 ((xmax' + xmin') / 2,(ymax' + ymin') / 2)) # lw thick # lc col)
+      (\((xmin, xmax), (ymin, ymax)) -> rect (xmax - xmin) (ymax - ymin)
+        # moveTo (p2 ((xmax + xmin) / 2,(ymax + ymin) / 2)) # lw thick # lc col)
         <$> getSquares (stringToQuads (quadPath p)) (qt vt p, [])
       where
         getSquares :: [Either Quad Orient] -> Zipper PT -> [Square]
