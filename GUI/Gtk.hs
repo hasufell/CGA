@@ -25,6 +25,8 @@ import Text.Read
 data MyGUI = MkMyGUI {
   -- |main Window
   win :: Window,
+  -- |Tree Window
+  winT :: Window,
   -- |delete Button
   dB  :: Button,
   -- |save Button
@@ -35,6 +37,8 @@ data MyGUI = MkMyGUI {
   fB  :: FileChooserButton,
   -- |drawing area
   da  :: DrawingArea,
+  -- |drawing area for the tree
+  daT :: DrawingArea,
   -- |scaler for point thickness
   hs  :: HScale,
   -- |entry widget for lower x bound
@@ -54,7 +58,7 @@ data MyGUI = MkMyGUI {
   -- |coord check button
   cC  :: CheckButton,
   -- |Path entry widget for the quad tree.
-  pE :: Entry,
+  pE  :: Entry,
   -- |Horizontal box containing the path entry widget.
   vbox7 :: Box
 }
@@ -73,12 +77,14 @@ makeMyGladeGUI = do
 
   MkMyGUI
     <$> xmlGetWidget xml castToWindow "window1"
+    <*> xmlGetWidget xml castToWindow "window2"
     <*> xmlGetWidget xml castToButton "drawButton"
     <*> xmlGetWidget xml castToButton "saveButton"
     <*> xmlGetWidget xml castToButton "quitButton"
     <*> xmlGetWidget xml castToFileChooserButton
           "filechooserButton"
     <*> xmlGetWidget xml castToDrawingArea "drawingarea"
+    <*> xmlGetWidget xml castToDrawingArea "treedrawingarea"
     <*> xmlGetWidget xml castToHScale "hscale"
     <*> xmlGetWidget xml castToEntry "xlD"
     <*> xmlGetWidget xml castToEntry "xuD"
@@ -124,8 +130,10 @@ makeGUI startFile = do
   -- have to redraw for window overlapping and resizing on expose
   _ <- onExpose (da mygui) (\_ -> drawDiag mygui >>=
                              (\_ -> return True))
+  _ <- onExpose (daT mygui) (\_ -> drawDiag mygui >>=
+                             (\_ -> return True))
   _ <- on (cB mygui) changed (drawDiag mygui)
-  _ <- on (cB mygui) changed (showPathWidget mygui)
+  _ <- on (cB mygui) changed (onPathWidgetChange mygui)
   _ <- on (gC mygui) toggled (drawDiag mygui)
   _ <- on (cC mygui) toggled (drawDiag mygui)
 
@@ -134,6 +142,10 @@ makeGUI startFile = do
     [Control] <- eventModifier
     "q"       <- eventKeyName
     liftIO mainQuit
+  _ <- winT mygui `on` keyPressEvent $ tryEvent $ do
+    [Control] <- eventModifier
+    "q"       <- eventKeyName
+    liftIO (widgetHide $ winT mygui)
   _ <- win mygui `on` keyPressEvent $ tryEvent $ do
     [Control] <- eventModifier
     "s"       <- eventKeyName
@@ -149,7 +161,9 @@ makeGUI startFile = do
 
   -- draw widgets and start main loop
   widgetShowAll (win mygui)
+  widgetShowAll (winT mygui)
   widgetHide (vbox7 mygui)
+  widgetHide (winT mygui)
   mainGUI
 
 
@@ -166,12 +180,16 @@ showErrorDialog str = do
 
 
 -- |May hide or show the widget that holds the quad tree path entry,
--- depending on the context.
-showPathWidget :: MyGUI
+-- depending on the context and may also pop up the tree window.
+onPathWidgetChange :: MyGUI
                -> IO ()
-showPathWidget mygui = do
+onPathWidgetChange mygui = do
   item <- comboBoxGetActive (cB mygui)
-  if item == 4 then widgetShow (vbox7 mygui) else widgetHide (vbox7 mygui)
+  if item == 4
+    then do
+      widgetShow (vbox7 mygui)
+      widgetShow (winT mygui)
+    else widgetHide (vbox7 mygui)
   return ()
 
 
@@ -217,6 +235,7 @@ saveAndDrawDiag fp fps mygui =
     then do
       mesh       <- readFile fp
       dw         <- widgetGetDrawWindow (da mygui)
+      dwT        <- widgetGetDrawWindow (daT mygui)
       adjustment <- rangeGetAdjustment (hs mygui)
       scaleVal   <- adjustmentGetValue adjustment
       xlD'       <- entryGetText (xl mygui)
@@ -225,6 +244,7 @@ saveAndDrawDiag fp fps mygui =
       yuD'       <- entryGetText (yu mygui)
       alg'       <- comboBoxGetActive (cB mygui)
       (daW, daH) <- widgetGetSize (da mygui)
+      (daTW, daTH) <- widgetGetSize (daT mygui)
       gd'        <- toggleButtonGetActive (gC mygui)
       ct'        <- toggleButtonGetActive (cC mygui)
       pE'        <- entryGetText (pE mygui)
@@ -236,23 +256,29 @@ saveAndDrawDiag fp fps mygui =
         yD = (,)         <$>
           readMaybe ylD' <*>
           readMaybe yuD' :: Maybe (Double, Double)
+        renderDiag winWidth winHeight buildDiag xD' yD' =
+          renderDia Cairo
+            (CairoOptions fps
+               (Dims (fromIntegral winWidth) (fromIntegral winHeight))
+               SVG False)
+            (buildDiag (def{
+                t   = scaleVal,
+                dX  = xD',
+                dY  = yD',
+                alg = alg',
+                gd  = gd',
+                ct  = ct',
+                pQt = pE'})
+              mesh)
 
       case (xD, yD) of
         (Just xD', Just yD') -> do
-          let (s, r) = renderDia Cairo
-                (CairoOptions fps
-                   (Dims (fromIntegral daW) (fromIntegral daH))
-                   SVG False)
-                (diagS (def{
-                    t   = scaleVal,
-                    dX  = xD',
-                    dY  = yD',
-                    alg = alg',
-                    gd  = gd',
-                    ct  = ct',
-                    pQt = pE'})
-                  mesh)
+          let (s, r)  = renderDiag daW daH diagS xD' yD'
+          let (_, r') = renderDiag daTW daTH diagTreeS xD' yD'
+
           renderWithDrawable dw r
+          renderWithDrawable dwT r'
+
           if null fps
             then return ()
             else s

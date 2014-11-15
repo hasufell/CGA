@@ -867,4 +867,16 @@ Show quad tree squares</property>
       </widget>
     </child>
   </widget>
+  <widget class="GtkWindow" id="window2">
+    <property name="width_request">800</property>
+    <property name="height_request">500</property>
+    <property name="can_focus">False</property>
+    <property name="type_hint">dialog</property>
+    <child>
+      <widget class="GtkDrawingArea" id="treedrawingarea">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+      </widget>
+    </child>
+  </widget>
 </glade-interface>

@@ -40,3 +40,11 @@ diagS :: DiagProp -> MeshString -> Diagram Cairo R2
 diagS p mesh
   | alg p == 2 || alg p == 3 = diag p. Objects . facesToArr $ mesh
   | otherwise = (diag p . Object . meshToArr $ mesh) # bg white
+
+
+-- |Create the tree diagram from a String which is supposed to be the contents
+-- of an obj file.
+diagTreeS :: DiagProp -> MeshString -> Diagram Cairo R2
+diagTreeS p mesh
+  | alg p == 4 = mkDiag treePretty p (Object . meshToArr  $mesh)
+  | otherwise  = mempty

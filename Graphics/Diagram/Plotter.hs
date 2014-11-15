@@ -8,8 +8,10 @@ import Algorithms.RangeSearch.QuadTree
 import Algorithms.PolygonIntersection.Core
 import Data.Maybe
 import Data.Monoid
+import Data.Tree
 import Diagrams.Backend.Cairo
 import Diagrams.Prelude hiding ((<>))
+import Diagrams.TwoD.Layout.Tree
 import Graphics.Diagram.Types
 import Graphics.Gloss.Data.Extent
 import Parser.PathParser
@@ -229,6 +231,23 @@ gifQuadPath = GifDiag f
         qt = quadTree vtf (dX p, dY p)
         vtf :: [PT]
         vtf = filterValidPT p vt
+
+
+-- |A diagram that shows the full Quad Tree with nodes.
+treePretty :: Diag
+treePretty = Diag f
+  where
+    f p (Object []) = mempty
+    f p (Object vt) = prettyRoseTree (quadTreeToRoseTree (qt, []))
+      where
+        qt = quadTree (filterValidPT p vt) (dX p, dY p)
+        prettyRoseTree :: Tree String -> Diagram Cairo R2
+        prettyRoseTree t =
+          renderTree (\n -> (text n # fontSizeL 5.0)
+                        <> rect 50.0 20.0 # fc white)
+                     (~~)
+                     (symmLayout' (with & slHSep .~ 60 & slVSep .~ 40) t)
+          # scale 2 # alignT # bg white
 
 
 -- |Creates a Diagram that shows an XAxis which is bound

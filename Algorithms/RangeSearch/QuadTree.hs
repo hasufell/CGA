@@ -8,6 +8,7 @@ module Algorithms.RangeSearch.QuadTree
     lookupByPath',
     getSquareByZipper,
     rootNode,
+    quadTreeToRoseTree,
     Orient(North,East,West,South),
     Quad(NW,NE,SW,SE),
     QuadTree,
@@ -19,6 +20,7 @@ import Algebra.Vector
 import Data.Foldable (foldlM)
 import Data.List (partition)
 import Data.Maybe (fromJust)
+import Data.Tree
 import Diagrams.TwoD.Types
 
 
@@ -200,3 +202,19 @@ lookupByNeighbors :: [Orient] -> Zipper a -> Maybe (Zipper a)
 lookupByNeighbors = flip (foldlM (flip findNeighbor))
 
 
+quadTreeToRoseTree :: Zipper PT -> Tree String
+quadTreeToRoseTree z = case z of
+  (TNil, _)    -> Node printOrigin []
+  (TLeaf a, _) -> Node (printOrigin ++ "\n" ++ (show . unp2 $ a)) []
+  _            -> Node printOrigin
+                    [quadTreeToRoseTree (fromJust . goNW $ z)
+                    , quadTreeToRoseTree (fromJust . goNE $ z)
+                    , quadTreeToRoseTree (fromJust . goSW $ z)
+                    , quadTreeToRoseTree (fromJust . goSE $ z)]
+  where
+    printOrigin
+      | isNWchild z = "NW"
+      | isNEchild z = "NE"
+      | isSWchild z = "SW"
+      | isSEchild z = "SE"
+      | otherwise   = "root"
