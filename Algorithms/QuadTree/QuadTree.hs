@@ -9,6 +9,7 @@ module Algorithms.QuadTree.QuadTree
     getSquareByZipper,
     rootNode,
     quadTreeToRoseTree,
+    lookupByNeighbors,
     Orient(North,East,West,South),
     Quad(NW,NE,SW,SE),
     QuadTree,
