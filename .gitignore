@@ -7,3 +7,7 @@ Main
 *.gif
 
 dist/
+
+# cabal
+.cabal-sandbox/
+cabal.sandbox.config
