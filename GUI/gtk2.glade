@@ -871,6 +871,7 @@ Show quad tree squares</property>
     <property name="width_request">800</property>
     <property name="height_request">500</property>
     <property name="can_focus">False</property>
+    <property name="title" translatable="yes">QuadTree</property>
     <property name="type_hint">dialog</property>
     <child>
       <widget class="GtkDrawingArea" id="treedrawingarea">
