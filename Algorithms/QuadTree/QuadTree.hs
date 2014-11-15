@@ -203,18 +203,23 @@ lookupByNeighbors = flip (foldlM (flip findNeighbor))
 
 
 quadTreeToRoseTree :: Zipper PT -> Tree String
-quadTreeToRoseTree z = case z of
-  (TNil, _)    -> Node printOrigin []
-  (TLeaf a, _) -> Node (printOrigin ++ "\n" ++ (show . unp2 $ a)) []
-  _            -> Node printOrigin
-                    [quadTreeToRoseTree (fromJust . goNW $ z)
-                    , quadTreeToRoseTree (fromJust . goNE $ z)
-                    , quadTreeToRoseTree (fromJust . goSW $ z)
-                    , quadTreeToRoseTree (fromJust . goSE $ z)]
+quadTreeToRoseTree z' = go (rootNode z')
   where
-    printOrigin
-      | isNWchild z = "NW"
-      | isNEchild z = "NE"
-      | isSWchild z = "SW"
-      | isSEchild z = "SE"
-      | otherwise   = "root"
+    go z = case z of
+      (TNil, _)    -> Node markAndPrintOrigin []
+      (TLeaf a, _) -> Node (markAndPrintOrigin ++ "\n" ++ (show . unp2 $ a)) []
+      _            -> Node markAndPrintOrigin
+                        [go (fromJust . goNW $ z)
+                        , go (fromJust . goNE $ z)
+                        , go (fromJust . goSW $ z)
+                        , go (fromJust . goSE $ z)]
+      where
+        markAndPrintOrigin
+          | z' == z   = "* " ++ printOrigin
+          | otherwise = printOrigin
+        printOrigin
+          | isNWchild z = "NW"
+          | isNEchild z = "NE"
+          | isSWchild z = "SW"
+          | isSEchild z = "SE"
+          | otherwise   = "root"

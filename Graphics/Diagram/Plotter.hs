@@ -238,13 +238,24 @@ treePretty :: Diag
 treePretty = Diag f
   where
     f p (Object []) = mempty
-    f p (Object vt) = prettyRoseTree (quadTreeToRoseTree (qt, []))
+    f p (Object vt) =
+      prettyRoseTree (quadTreeToRoseTree . flip getCurQT (qt, []) . stringToQuads . pQt $ p)
       where
         qt = quadTree (filterValidPT p vt) (dX p, dY p)
+        getCurQT :: [Either Quad Orient] -> Zipper PT -> Zipper PT
+        getCurQT [] z = z
+        getCurQT (q:qs) z = case q of
+          Right x -> getCurQT qs (fromMaybe z (findNeighbor x z))
+          Left x  -> getCurQT qs (fromMaybe z (goQuad x z))
         prettyRoseTree :: Tree String -> Diagram Cairo R2
         prettyRoseTree t =
-          renderTree (\n -> (text n # fontSizeL 5.0)
-                        <> rect 50.0 20.0 # fc white)
+          renderTree (\n -> case head n of
+                        '*' ->
+                          (text n # fontSizeL 5.0)
+                            <> rect 50.0 20.0 # fc red
+                        _   ->
+                          (text n # fontSizeL 5.0)
+                            <> rect 50.0 20.0 # fc white)
                      (~~)
                      (symmLayout' (with & slHSep .~ 60 & slVSep .~ 40) t)
           # scale 2 # alignT # bg white
