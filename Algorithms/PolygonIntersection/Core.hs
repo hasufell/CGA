@@ -127,8 +127,8 @@ intersectionPoints xs' = rmdups . go $ xs'
     segIntersections :: ([Segment], [Segment]) -> [PT]
     segIntersections (a@(_:_), b@(_:_)) =
       catMaybes
-        . fmap (\[x, y] -> intersectSeg' x y)
-        $ combinations a b
+      . fmap (\[x, y] -> intersectSeg' x y)
+      $ combinations a b
     segIntersections _ = []
 
     -- Gets all unique(!) combinations of two arrays. Both arrays

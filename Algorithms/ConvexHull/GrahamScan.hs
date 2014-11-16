@@ -82,13 +82,13 @@ grahamCH vs = grahamUCH vs ++ (tailInit . grahamLCH $ vs)
 -- |Get the lower part of the convex hull.
 grahamLCH :: [PT] -> [PT]
 grahamLCH vs = uncurry (\x y -> last . scanH x $ y)
-                 (first reverse . splitAt 3 . sortedXY $ vs)
+                       (first reverse . splitAt 3 . sortedXY $ vs)
 
 
 -- |Get the upper part of the convex hull.
 grahamUCH :: [PT] -> [PT]
 grahamUCH vs = uncurry (\x y -> last . scanH x $ y)
-                 (first reverse . splitAt 3 . reverse . sortedXY $ vs)
+                       (first reverse . splitAt 3 . reverse . sortedXY $ vs)
 
 
 -- |This scans only a half of the convex hull, but all steps (the last
@@ -119,10 +119,10 @@ grahamCHSteps c xs' ys' = take c . scanH xs' $ ys'
 -- |Get all iterations of the upper hull of the graham scan algorithm.
 grahamUHSteps :: [PT] -> [[PT]]
 grahamUHSteps vs =
-  (++) [getLastX 2 . sortedXY $ vs]           .
-    rmdups                                    .
-    grahamCHSteps ((* 2) . length $ vs) uH    $
-    uHRest
+  (++) [getLastX 2 . sortedXY $ vs]
+  . rmdups
+  . grahamCHSteps ((* 2) . length $ vs) uH
+  $ uHRest
   where
     (uH, uHRest) = first reverse . splitAt 3 . reverse . sortedXY $ vs
 
@@ -130,9 +130,9 @@ grahamUHSteps vs =
 -- |Get all iterations of the lower hull of the graham scan algorithm.
 grahamLHSteps :: [PT] -> [[PT]]
 grahamLHSteps vs =
-  (++) [take 2 . sortedXY $ vs]               .
-    rmdups                                    .
-    grahamCHSteps ((* 2) . length $ vs) lH    $
-    lHRest
+  (++) [take 2 . sortedXY $ vs]
+  . rmdups
+  . grahamCHSteps ((* 2) . length $ vs) lH
+  $ lHRest
   where
     (lH, lHRest) = first reverse . splitAt 3 . sortedXY $ vs
