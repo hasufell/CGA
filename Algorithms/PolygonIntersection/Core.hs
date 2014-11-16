@@ -13,6 +13,7 @@ import           MyPrelude
 import           QueueEx
 
 
+-- TODO: probably use a zipper.
 -- |Describes a point on the convex hull of the polygon.
 -- In addition to the point itself, both it's predecessor and
 -- successor are saved for convenience.
