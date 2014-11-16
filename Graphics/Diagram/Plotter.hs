@@ -157,7 +157,7 @@ convexHLs = Diag chl
 convexHStepsLs :: Diag
 convexHStepsLs = GifDiag chs
   where
-    chs p col f vt =
+    chs _ col f vt =
       fmap mkChDiag (f vt)
       where
         mkChDiag vt' =
