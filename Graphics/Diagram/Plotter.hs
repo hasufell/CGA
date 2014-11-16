@@ -26,8 +26,7 @@ coordPoints = Diag cp
     cp p (Objects vts) = drawP (concat vts) p
     drawP [] _ = mempty
     drawP vt p =
-      position (zip (filterValidPT p vt)
-        (repeat dot))
+      position (zip vt (repeat dot))
       where
         dot = (circle $ dotSize p :: Diagram Cairo R2) # fc black
 
@@ -54,11 +53,9 @@ coordPointsText = Diag cpt
     drawT vt p
       | showCoordText p =
           position
-          $ zip vtf (pointToTextCoord <$> vtf)
+          $ zip vt (pointToTextCoord <$> vt)
           # translate (r2 (0, 10))
       | otherwise = mempty
-      where
-        vtf = filterValidPT p vt
 
 
 -- |Draw the lines of the polygon.
@@ -66,15 +63,14 @@ polyLines :: Diag
 polyLines = Diag pp
   where
     pp _ (Objects []) = mempty
-    pp p (Objects (x:y:_)) =
+    pp _ (Objects (x:y:_)) =
       strokePoly x <> strokePoly y
       where
         strokePoly x' =
           (strokeTrail
            . fromVertices
-           $ vtf x' ++ [head . vtf $ x'])
+           $ x' ++ [head x'])
           # moveTo (head x') # lc black
-        vtf = filterValidPT p
     pp _ _  = mempty
 
 
@@ -87,8 +83,8 @@ polyIntersection = Diag pi'
         dot  = (circle $ dotSize p :: Diagram Cairo R2) # fc red # lc red
         vtpi = intersectionPoints
                . sortLexPolys
-               $ (sortLexPoly . filterValidPT p $ x,
-                  sortLexPoly . filterValidPT p $ y)
+               $ (sortLexPoly x,
+                  sortLexPoly y)
     pi' _ _ = mempty
 
 
@@ -106,8 +102,8 @@ polyIntersectionText = Diag pit'
       where
         vtpi = intersectionPoints
                 . sortLexPolys
-                $ (sortLexPoly . filterValidPT p $ x,
-                   sortLexPoly . filterValidPT p $ y)
+                $ (sortLexPoly x,
+                   sortLexPoly y)
     pit' _ _ = mempty
 
 
@@ -120,7 +116,7 @@ convexHP = Diag chp
         (repeat dot))
       where
         dot = (circle $ dotSize p :: Diagram Cairo R2) # fc red # lc red
-        vtch = grahamCH $ filterValidPT p vt
+        vtch = grahamCH vt
     chp _ _ = mempty
 
 
@@ -135,7 +131,7 @@ convexHPText = Diag chpt
                 (pointToTextCoord <$> vtchf) # translate (r2 (0, 10))
       | otherwise = mempty
       where
-        vtchf = grahamCH . filterValidPT p $ vt
+        vtchf = grahamCH vt
     chpt _ _ = mempty
 
 
@@ -145,15 +141,13 @@ convexHLs :: Diag
 convexHLs = Diag chl
   where
     chl _ (Object []) = mempty
-    chl p (Object vt) =
+    chl _ (Object vt) =
       (strokeTrail
        . fromVertices
-       . flip (++) [head $ grahamCH vtf]
+       . flip (++) [head $ grahamCH vt]
        . grahamCH
-       $ vtf)
-      # moveTo (head $ grahamCH vtf) # lc red
-      where
-        vtf = filterValidPT p vt
+       $ vt)
+      # moveTo (head $ grahamCH vt) # lc red
     chl _ _ = mempty
 
 
@@ -164,7 +158,7 @@ convexHStepsLs :: Diag
 convexHStepsLs = GifDiag chs
   where
     chs p col f vt =
-      fmap mkChDiag (f . filterValidPT p $ vt)
+      fmap mkChDiag (f vt)
       where
         mkChDiag vt' =
           (strokeTrail . fromVertices $ vt') # moveTo (head vt') # lc col
@@ -181,17 +175,15 @@ squares = Diag f
       $ (\((xmin, xmax), (ymin, ymax)) -> rect (xmax - xmin) (ymax - ymin)
         # moveTo (p2 ((xmax + xmin) / 2, (ymax + ymin) / 2)) # lw ultraThin)
       <$> (quadTreeSquares (xDimension p, yDimension p)
-        . quadTree vtf
+        . quadTree vt
         $ (xDimension p, yDimension p))
-      where
-        vtf = filterValidPT p vt
     f _ _ = mempty
 
 
 
 -- |Get the quad tree corresponding to the given points and diagram properties.
 qt :: [PT] -> DiagProp -> QuadTree PT
-qt vt p = quadTree (filterValidPT p vt) (xDimension p, yDimension p)
+qt vt p = quadTree vt (xDimension p, yDimension p)
 
 
 -- |Create a diagram that shows a single square of the RangeSearch algorithm

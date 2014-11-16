@@ -38,13 +38,21 @@ diag p objs@(Objects _)
 -- of an obj file.
 diagS :: DiagProp -> MeshString -> Diagram Cairo R2
 diagS p mesh
-  | algo p == 2 || algo p == 3 = diag p. Objects . facesToArr $ mesh
-  | otherwise = (diag p . Object . meshToArr $ mesh) # bg white
+  | algo p == 2 || algo p == 3 =
+      diag p
+      . Objects
+      . fmap (filterValidPT p)
+      . facesToArr
+      $ mesh
+  | otherwise = (diag p . Object . filterValidPT p . meshToArr $ mesh) # bg white
 
 
 -- |Create the tree diagram from a String which is supposed to be the contents
 -- of an obj file.
 diagTreeS :: DiagProp -> MeshString -> Diagram Cairo R2
 diagTreeS p mesh
-  | algo p == 4 = mkDiag treePretty p (Object . meshToArr  $mesh)
+  | algo p == 4 = mkDiag treePretty p (Object
+                                       . filterValidPT p
+                                       . meshToArr
+                                       $ mesh)
   | otherwise  = mempty
