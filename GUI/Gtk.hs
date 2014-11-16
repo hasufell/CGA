@@ -28,37 +28,37 @@ data MyGUI = MkMyGUI {
   -- |Tree Window
   treeWin :: Window,
   -- |delete Button
-  delButton  :: Button,
+  delButton :: Button,
   -- |save Button
-  saveButton  :: Button,
+  saveButton :: Button,
   -- |quit Button
-  quitButton  :: Button,
+  quitButton :: Button,
   -- |file chooser button
-  fileButton  :: FileChooserButton,
+  fileButton :: FileChooserButton,
   -- |drawing area
-  mainDraw  :: DrawingArea,
+  mainDraw :: DrawingArea,
   -- |drawing area for the tree
   treeDraw :: DrawingArea,
   -- |scaler for point thickness
-  ptScale  :: HScale,
+  ptScale :: HScale,
   -- |entry widget for lower x bound
-  xminEntry  :: Entry,
+  xminEntry :: Entry,
   -- |entry widget for upper x bound
-  xmaxEntry  :: Entry,
+  xmaxEntry :: Entry,
   -- |entry widget for lower y bound
-  yminEntry  :: Entry,
+  yminEntry :: Entry,
   -- |entry widget for upper y bound
-  ymaxEntry  :: Entry,
+  ymaxEntry :: Entry,
   -- |about dialog
-  aboutDialog  :: AboutDialog,
+  aboutDialog :: AboutDialog,
   -- |combo box for choosing the algorithm
-  algoBox  :: ComboBox,
+  algoBox :: ComboBox,
   -- |grid check button
-  gridCheckBox  :: CheckButton,
+  gridCheckBox :: CheckButton,
   -- |coord check button
-  coordCheckBox  :: CheckButton,
+  coordCheckBox :: CheckButton,
   -- |Path entry widget for the quad tree.
-  quadPathEntry  :: Entry,
+  quadPathEntry :: Entry,
   -- |Horizontal box containing the path entry widget.
   vbox7 :: Box
 }
@@ -81,8 +81,7 @@ makeMyGladeGUI = do
     <*> xmlGetWidget xml castToButton "drawButton"
     <*> xmlGetWidget xml castToButton "saveButton"
     <*> xmlGetWidget xml castToButton "quitButton"
-    <*> xmlGetWidget xml castToFileChooserButton
-          "filechooserButton"
+    <*> xmlGetWidget xml castToFileChooserButton "filechooserButton"
     <*> xmlGetWidget xml castToDrawingArea "drawingarea"
     <*> xmlGetWidget xml castToDrawingArea "treedrawingarea"
     <*> xmlGetWidget xml castToHScale "hscale"
@@ -120,21 +119,22 @@ makeGUI startFile = do
   comboBoxSetActive (algoBox mygui) 0
 
   -- callbacks
-  _ <- onDestroy  (rootWin mygui) mainQuit
-  _ <- onClicked  (delButton mygui) $ drawDiag mygui
-  _ <- onClicked  (saveButton mygui) $ saveDiag mygui
-  _ <- onClicked  (quitButton mygui) mainQuit
-  _ <- onResponse (aboutDialog mygui) (\x -> case x of
-                                ResponseCancel -> widgetHideAll (aboutDialog mygui)
-                                _ -> return ())
+  _ <- onDestroy  (rootWin mygui)     mainQuit
+  _ <- onClicked  (delButton mygui)   $ drawDiag mygui
+  _ <- onClicked  (saveButton mygui)  $ saveDiag mygui
+  _ <- onClicked  (quitButton mygui)  mainQuit
+  _ <- onResponse (aboutDialog mygui)
+         (\x -> case x of
+            ResponseCancel -> widgetHideAll (aboutDialog mygui)
+            _              -> return ())
   -- have to redraw for window overlapping and resizing on expose
   _ <- onExpose (mainDraw mygui) (\_ -> drawDiag mygui >>=
-                             (\_ -> return True))
+                                        (\_ -> return True))
   _ <- onExpose (treeDraw mygui) (\_ -> drawDiag mygui >>=
-                             (\_ -> return True))
-  _ <- on (algoBox mygui) changed (drawDiag mygui)
-  _ <- on (algoBox mygui) changed (onAlgoBoxChange mygui)
-  _ <- on (gridCheckBox mygui) toggled (drawDiag mygui)
+                                        (\_ -> return True))
+  _ <- on (algoBox mygui)       changed (drawDiag mygui)
+  _ <- on (algoBox mygui)       changed (onAlgoBoxChange mygui)
+  _ <- on (gridCheckBox mygui)  toggled (drawDiag mygui)
   _ <- on (coordCheckBox mygui) toggled (drawDiag mygui)
 
   -- hotkeys

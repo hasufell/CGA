@@ -258,9 +258,9 @@ treePretty = Diag f
 -- by the dimensions given in xDimension from DiagProp.
 xAxis :: Diag
 xAxis =
-  Diag hRule      <>
-    Diag segments <>
-    Diag labels
+  Diag hRule
+  <> Diag segments
+  <> Diag labels
   where
     hRule p _ =
       arrowAt (p2 (diagXmin p, if diagYmin p <= 0 then 0 else diagYmin p))
@@ -286,9 +286,9 @@ xAxis =
 -- by the dimensions given in yDimension from DiagProp.
 yAxis :: Diag
 yAxis =
-  Diag vRule      <>
-    Diag segments <>
-    Diag labels
+  Diag vRule
+  <> Diag segments
+  <> Diag labels
   where
     vRule p _ =
       arrowAt (p2 (if diagXmin p <= 0 then 0 else diagXmin p, diagYmin p))

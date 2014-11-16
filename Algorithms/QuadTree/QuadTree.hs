@@ -187,10 +187,10 @@ findNeighbor ot zr = case ot of
       | is1 z = goUp z >>= go1
       | is2 z = goUp z >>= go2
       | otherwise = checkParent
-                      . go is1 is2 is3 go1 go2 go3 go4
-                      . fromJust
-                      . goUp
-                      $ z
+                    . go is1 is2 is3 go1 go2 go3 go4
+                    . fromJust
+                    . goUp
+                    $ z
       where
         checkParent (Just (z'@(TNode {}, _)))
           | is3 z     = go3 z'
