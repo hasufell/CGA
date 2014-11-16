@@ -20,7 +20,7 @@ gifDiag p xs =
    (upperHullList
      <> fmap (<> last upperHullList) lowerHullList
      <> [mkDiag (mconcat [convexHPText, convexHP, convexHLs])
-         p{ ct = True } (Object xs)])
+         p{ showCoordText = True } (Object xs)])
   where
     upperHullList = mkGifDiag convexHStepsLs p purple grahamUHSteps xs
     lowerHullList = mkGifDiag convexHStepsLs p orange grahamLHSteps xs
