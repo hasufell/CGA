@@ -121,15 +121,16 @@ getSquareByZipper sq z = go sq (reverse . snd $ z)
     go sq' (SECrumb {}:zs) = go (seSq sq') zs
 
 
--- |Left fold over the tree leafs.
-qtFoldl :: (a -> b -> a) -> a -> QuadTree b -> a
-qtFoldl _ sv (TNil)              = sv
-qtFoldl f sv (TLeaf a)           = f sv a
-qtFoldl f sv (TNode nw ne sw se) = foldl (qtFoldl f) sv [nw, ne, sw, se]
+-- |Left fold over the tree.
+qtFoldl :: (a -> QuadTree b -> a) -> a -> QuadTree b -> a
+qtFoldl f sv qt@(TNode nw ne sw se) = foldl (qtFoldl f)
+                                            (f sv qt)
+                                            [nw, ne, sw, se]
+qtFoldl f sv qt = f sv qt
 
 
--- |Right fold over the tree leafs.
-qtFoldr :: (b -> a -> a) -> a -> QuadTree b -> a
+-- |Right fold over the tree.
+qtFoldr :: (QuadTree b -> a -> a) -> a -> QuadTree b -> a
 qtFoldr f sv qt = qtFoldl (\g b x -> g (f b x)) id qt sv
 
 
