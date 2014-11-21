@@ -4,9 +4,10 @@ module Parser.Meshparser (meshToArr, facesToArr) where
 
 import Algebra.VectorTypes
 import Control.Applicative
-import Data.Maybe
+import Data.Attoparsec.ByteString.Char8
+import Data.Either
+import qualified Data.ByteString.Char8 as B
 import Diagrams.TwoD.Types
-import Parser.Core
 
 
 -- |Convert a text String with multiple vertices and faces into
@@ -16,7 +17,7 @@ facesToArr str = fmap (fmap (\y -> meshs str !! (fromIntegral y - 1)))
                       (faces str)
   where
     meshs = meshToArr
-    faces = fmap fst . catMaybes . fmap (runParser parseFace) . lines
+    faces = rights . fmap (parseOnly parseFace) . B.lines . B.pack
 
 
 -- |Convert a text String with multiple vertices into
@@ -24,19 +25,20 @@ facesToArr str = fmap (fmap (\y -> meshs str !! (fromIntegral y - 1)))
 meshToArr :: String   -- ^ the string to convert
           -> [PT]     -- ^ the resulting vertice table
 meshToArr =
-  fmap (p2 . fst)
-    . catMaybes
-    . fmap (runParser parseVertice)
-    . lines
+  fmap p2
+    . rights
+    . fmap (parseOnly parseVertice)
+    . B.lines
+    . B.pack
 
 
 -- |Creates a Parser that accepts a single vertice, such as 'v 1.0 2.0'.
 parseVertice :: Parser (Double, Double)
 parseVertice =
   (,)
-    <$> (char 'v' *> spaces *> allDouble)
-    <*> (spaces *> allDouble)
+    <$> (char 'v' *> many' space *> double)
+    <*> (many' space *> double)
 
 
 parseFace :: Parser [Integer]
-parseFace = char 'f' *> oneOrMore (spaces *> posInt)
+parseFace = char 'f' *> many1' (many' space *> decimal)
