@@ -12,24 +12,23 @@ import Diagrams.TwoD.Types
 
 -- |Convert a text String with multiple vertices and faces into
 -- a list of vertices, ordered by the faces specification.
-facesToArr :: String -> [[PT]]
+facesToArr :: B.ByteString -> [[PT]]
 facesToArr str = fmap (fmap (\y -> meshs str !! (fromIntegral y - 1)))
                       (faces str)
   where
     meshs = meshToArr
-    faces = rights . fmap (parseOnly parseFace) . B.lines . B.pack
+    faces = rights . fmap (parseOnly parseFace) . B.lines
 
 
 -- |Convert a text String with multiple vertices into
 -- an array of float tuples.
-meshToArr :: String   -- ^ the string to convert
-          -> [PT]     -- ^ the resulting vertice table
+meshToArr :: B.ByteString -- ^ the string to convert
+          -> [PT]         -- ^ the resulting vertice table
 meshToArr =
   fmap p2
     . rights
     . fmap (parseOnly parseVertice)
     . B.lines
-    . B.pack
 
 
 -- |Creates a Parser that accepts a single vertice, such as 'v 1.0 2.0'.

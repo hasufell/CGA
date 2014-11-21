@@ -2,6 +2,7 @@
 
 module Graphics.Diagram.Gtk where
 
+import qualified Data.ByteString.Char8 as B
 import Diagrams.Backend.Cairo
 import Diagrams.Prelude
 import Graphics.Diagram.Plotter
@@ -36,7 +37,7 @@ diag p objs@(Objects _)
 
 -- |Create the Diagram from a String which is supposed to be the contents
 -- of an obj file.
-diagS :: DiagProp -> MeshString -> Diagram Cairo R2
+diagS :: DiagProp -> B.ByteString -> Diagram Cairo R2
 diagS p mesh
   | algo p == 2 || algo p == 3 =
       diag p
@@ -49,7 +50,7 @@ diagS p mesh
 
 -- |Create the tree diagram from a String which is supposed to be the contents
 -- of an obj file.
-diagTreeS :: DiagProp -> MeshString -> Diagram Cairo R2
+diagTreeS :: DiagProp -> B.ByteString -> Diagram Cairo R2
 diagTreeS p mesh
   | algo p == 4 = mkDiag treePretty p (Object
                                        . filterValidPT p

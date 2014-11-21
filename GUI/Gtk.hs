@@ -5,6 +5,7 @@ module GUI.Gtk (makeGUI) where
 import Control.Applicative
 import Control.Monad(unless)
 import Control.Monad.IO.Class
+import qualified Data.ByteString.Char8 as B
 import Diagrams.Prelude
 import Diagrams.Backend.Cairo
 import Diagrams.Backend.Cairo.Internal
@@ -235,7 +236,7 @@ saveAndDrawDiag :: FilePath -- ^ obj file to parse
 saveAndDrawDiag fp fps mygui =
   if (==) ".obj" . takeExtension $ fp
     then do
-      mesh            <- readFile fp
+      mesh            <- B.readFile fp
       mainDrawWindow  <- widgetGetDrawWindow (mainDraw mygui)
       treeDrawWindow  <- widgetGetDrawWindow (treeDraw mygui)
       adjustment      <- rangeGetAdjustment (ptScale mygui)

@@ -5,6 +5,7 @@ module Graphics.Diagram.Gif where
 import Algebra.VectorTypes
 import Algorithms.ConvexHull.GrahamScan
 import Codec.Picture.Gif
+import qualified Data.ByteString.Char8 as B
 import Data.Monoid
 import Diagrams.Backend.Cairo
 import Diagrams.Prelude hiding ((<>))
@@ -33,5 +34,5 @@ gifDiag p xs =
 
 -- |Same as gifDiag, except that it takes a string containing the
 -- mesh file content instead of the the points.
-gifDiagS :: DiagProp -> MeshString -> [(Diagram Cairo R2, GifDelay)]
+gifDiagS :: DiagProp -> B.ByteString -> [(Diagram Cairo R2, GifDelay)]
 gifDiagS p = gifDiag p . filterValidPT p . meshToArr
