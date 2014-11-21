@@ -20,8 +20,7 @@ stringToQuads str = case parseOnly parsePath (B.pack str) of
                              <* many' space)
 
 
--- |Parses a string that represents a single squad into the
--- QuadOrOrient ADT.
+-- |Parses a string that represents a single quad.
 parseQuad :: Parser (Either Quad Orient)
 parseQuad =
   const (Left NW) <$> (string (B.pack "nw") <|> string (B.pack "NW"))
@@ -30,8 +29,7 @@ parseQuad =
     <|> const (Left SE) <$> (string (B.pack "se") <|> string (B.pack "SE"))
 
 
--- |Parses a string that represents a single Orientation into the
--- QuadOrOrient ADT.
+-- |Parses a string that represents a single Orientation.
 parseOrient :: Parser (Either Quad Orient)
 parseOrient =
   const (Right North) <$> (string (B.pack "n") <|> string (B.pack "N"))
