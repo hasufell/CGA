@@ -4,6 +4,7 @@ module Algorithms.KDTree.KDTree where
 import Algebra.VectorTypes
 import Algebra.Vector
 import Data.Maybe (fromJust, catMaybes)
+import Data.Tree
 import Diagrams.TwoD.Types
 import MyPrelude (pivot,if',Not, not')
 import Safe
@@ -81,17 +82,47 @@ partitionX (xs, ys) = (\(x, y) -> (y, x))
                       . partition' (fromJust . pivot $ xs) $ (ys, xs)
 
 
--- |Execute a range search in O(log n).
-rangeSearch :: KDTree PT -> Square -> [PT]
-rangeSearch KTNil _ = []
-rangeSearch (KTNode ln pt Vertical rn) sq@(_, (y1, y2)) =
-    [pt | inRange sq pt]
-    ++ (if y1 < (snd . unp2 $ pt) then rangeSearch ln sq else [])
-    ++ (if (snd . unp2 $ pt) < y2 then rangeSearch rn sq else [])
-rangeSearch (KTNode ln pt Horizontal rn) sq@((x1, x2), _) =
-    [pt | inRange sq pt]
-    ++ (if x1 < (fst . unp2 $ pt) then rangeSearch ln sq else [])
-    ++ (if (fst . unp2 $ pt) < x2 then rangeSearch rn sq else [])
+-- |Execute a range search in O(log n). It returns a tuple
+-- of the points found in the range and also gives back a pretty
+-- rose tree suitable for printing.
+rangeSearch :: KDTree PT -> Square -> ([PT], Tree String)
+rangeSearch kd' sq' = (goPt kd' sq', goTree kd' sq' True)
+  where
+    -- either y1 or x1 depending on the orientation
+    p1'  dir ((x1, _), (y1, _)) = if' (dir == Vertical) y1 x1
+    -- either y2 or x2 depending on the orientation
+    p2'  dir ((_, x2), (_, y2)) = if' (dir == Vertical) y2 x2
+    -- either the second or first of the tuple, depending on the orientation
+    cur' dir = if' (dir == Vertical) snd fst
+    -- All points in the range.
+    goPt :: KDTree PT -> Square -> [PT]
+    goPt KTNil _ = []
+    goPt (KTNode ln pt dir rn) sq =
+      [pt | inRange sq pt]
+      ++ (if' (p1' dir sq < (cur' dir . unp2 $ pt))
+              (goPt ln sq)
+              []
+         )
+      ++ (if' ((cur' dir . unp2 $ pt) < p2' dir sq)
+              (goPt rn sq)
+              [])
+        where
+    -- A pretty rose tree suitable for printing.
+    goTree :: KDTree PT -> Square -> Bool -> Tree String
+    goTree KTNil _ _ = Node "nil" []
+    goTree (KTNode ln pt dir rn) sq vis =
+      Node treeText
+           [if' (p1' dir sq < (cur' dir . unp2 $ pt))
+                (goTree ln sq vis)
+                (goTree ln sq False)
+           , if' ((cur' dir . unp2 $ pt) < p2' dir sq)
+                 (goTree rn sq vis)
+                 (goTree rn sq False)]
+        where
+          treeText
+            | vis && inRange sq pt = "** " ++ (show . unp2 $ pt)
+            | vis                  = "* " ++ (show . unp2 $ pt)
+            | otherwise            = show . unp2 $ pt
 
 
 
@@ -128,5 +159,12 @@ getVal _                = Nothing
 getDirection :: KDTree a -> Maybe Direction
 getDirection (KTNode _ _ dir _) = Just dir
 getDirection _                  = Nothing
+
+
+-- |Convert a kd-tree to a rose tree, for pretty printing.
+kdTreeToRoseTree :: KDTree PT -> Tree String
+kdTreeToRoseTree (KTNil) = Node "nil" []
+kdTreeToRoseTree (KTNode ln val _ rn) =
+  Node (show . unp2 $ val) [kdTreeToRoseTree ln, kdTreeToRoseTree rn]
 
 

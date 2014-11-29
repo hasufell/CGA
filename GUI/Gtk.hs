@@ -6,6 +6,7 @@ import Control.Applicative
 import Control.Monad(unless)
 import Control.Monad.IO.Class
 import qualified Data.ByteString.Char8 as B
+import Data.Maybe
 import Diagrams.Prelude
 import Diagrams.Backend.Cairo
 import Diagrams.Backend.Cairo.Internal
@@ -61,7 +62,17 @@ data MyGUI = MkMyGUI {
   -- |Path entry widget for the quad tree.
   quadPathEntry :: Entry,
   -- |Horizontal box containing the path entry widget.
-  vbox7 :: Box
+  vbox7 :: Box,
+  -- |Horizontal box containing the Rang search entry widgets.
+  vbox10 :: Box,
+  -- |Range entry widget for lower x bound
+  rangeXminEntry :: Entry,
+  -- |Range entry widget for upper x bound
+  rangeXmaxEntry :: Entry,
+  -- |Range entry widget for lower y bound
+  rangeYminEntry :: Entry,
+  -- |Range entry widget for upper y bound
+  rangeYmaxEntry :: Entry
 }
 
 
@@ -96,6 +107,11 @@ makeMyGladeGUI = do
     <*> xmlGetWidget xml castToCheckButton "coordcheckbutton"
     <*> xmlGetWidget xml castToEntry "path"
     <*> xmlGetWidget xml castToBox "vbox7"
+    <*> xmlGetWidget xml castToBox "vbox10"
+    <*> xmlGetWidget xml castToEntry "rxMin"
+    <*> xmlGetWidget xml castToEntry "rxMax"
+    <*> xmlGetWidget xml castToEntry "ryMin"
+    <*> xmlGetWidget xml castToEntry "ryMax"
 
 
 -- |Main entry point for the GTK GUI routines.
@@ -164,6 +180,7 @@ makeGUI startFile = do
   widgetShowAll (rootWin mygui)
   widgetShowAll (treeWin mygui)
   widgetHide (vbox7 mygui)
+  widgetHide (vbox10 mygui)
   widgetHide (treeWin mygui)
   mainGUI
 
@@ -192,6 +209,13 @@ onAlgoBoxChange mygui = do
       widgetShow (treeWin mygui)
     else do
       widgetHide (vbox7 mygui)
+      widgetHide (treeWin mygui)
+  if item == 5
+    then do
+      widgetShow (vbox10 mygui)
+      widgetShow (treeWin mygui)
+    else do
+      widgetHide (vbox10 mygui)
       widgetHide (treeWin mygui)
   return ()
 
@@ -251,6 +275,10 @@ saveAndDrawDiag fp fps mygui =
       gridActive      <- toggleButtonGetActive (gridCheckBox mygui)
       coordTextActive <- toggleButtonGetActive (coordCheckBox mygui)
       quadPathEntry'  <- entryGetText (quadPathEntry mygui)
+      rxminEntryText   <- entryGetText (rangeXminEntry mygui)
+      rxmaxEntryText   <- entryGetText (rangeXmaxEntry mygui)
+      ryminEntryText   <- entryGetText (rangeYminEntry mygui)
+      rymaxEntryText   <- entryGetText (rangeYmaxEntry mygui)
 
       let
         xDim = (,)         <$>
@@ -259,31 +287,36 @@ saveAndDrawDiag fp fps mygui =
         yDim = (,)         <$>
           readMaybe yminEntryText <*>
           readMaybe ymaxEntryText :: Maybe (Double, Double)
-        renderDiag winWidth winHeight buildDiag xDim' yDim' =
+        rxDim = (,)         <$>
+          readMaybe rxminEntryText <*>
+          readMaybe rxmaxEntryText :: Maybe (Double, Double)
+        ryDim = (,)         <$>
+          readMaybe ryminEntryText <*>
+          readMaybe rymaxEntryText :: Maybe (Double, Double)
+        renderDiag winWidth winHeight buildDiag =
           renderDia Cairo
             (CairoOptions fps
                (Dims (fromIntegral winWidth) (fromIntegral winHeight))
                SVG False)
             (buildDiag (def{
                 dotSize       = scaleVal,
-                xDimension    = xDim',
-                yDimension    = yDim',
+                xDimension    = fromMaybe (0, 500) xDim,
+                yDimension    = fromMaybe (0, 500) yDim,
                 algo          = algoActive,
                 haveGrid      = gridActive,
                 showCoordText = coordTextActive,
-                quadPath      = quadPathEntry'})
+                quadPath      = quadPathEntry',
+                rangeSquare   = (fromMaybe (0, 500) rxDim,
+                                 fromMaybe (0, 500) ryDim)
+                })
               mesh)
+        (s, r)  = renderDiag daW daH diagS
+        (_, r') = renderDiag daTW daTH diagTreeS
 
-      case (xDim, yDim) of
-        (Just xDim', Just yDim') -> do
-          let (s, r)  = renderDiag daW daH diagS xDim' yDim'
-          let (_, r') = renderDiag daTW daTH diagTreeS xDim' yDim'
+      renderWithDrawable mainDrawWindow r
+      renderWithDrawable treeDrawWindow r'
 
-          renderWithDrawable mainDrawWindow r
-          renderWithDrawable treeDrawWindow r'
-
-          unless (null fps) s
-          return 0
-        _ -> return 1
+      unless (null fps) s
+      return 0
 
     else return 2

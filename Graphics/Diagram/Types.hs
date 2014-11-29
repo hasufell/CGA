@@ -55,7 +55,9 @@ data DiagProp = MkProp {
   -- |Square size used to show the grid and x/y-axis.
   squareSize :: Double,
   -- |The path to a quad in the quad tree.
-  quadPath :: String
+  quadPath :: String,
+  -- |The square for the kd-tree range search.
+  rangeSquare :: Square
 }
 
 
@@ -85,7 +87,8 @@ instance Monoid Diag where
 
 -- |The default properties of the Diagram.
 diagDefaultProp :: DiagProp
-diagDefaultProp = MkProp 2 (0,500) (0,500) 0 False False 50 ""
+diagDefaultProp = MkProp 2 (0,500) (0,500)
+                    0 False False 50 "" ((0,500),(0,500))
 
 
 -- |Extract the lower bound of the x-axis dimension.

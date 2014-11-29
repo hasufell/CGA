@@ -16,6 +16,7 @@ import Diagrams.TwoD.Layout.Tree
 import Graphics.Diagram.Types
 import Parser.PathParser
 
+import qualified Debug.Trace as D
 
 -- |Creates a Diagram that shows the coordinates from the points
 -- as dots. The points and thickness of the dots can be controlled
@@ -23,13 +24,20 @@ import Parser.PathParser
 coordPoints :: Diag
 coordPoints = Diag cp
   where
-    cp p (Object vt) = drawP vt p
-    cp p (Objects vts) = drawP (concat vts) p
-    drawP [] _ = mempty
-    drawP vt p =
-      position (zip vt (repeat dot))
-      where
-        dot = (circle $ dotSize p :: Diagram Cairo R2) # fc black
+    cp p (Object vt) = drawP vt (dotSize p) black
+    cp p (Objects vts) = drawP (concat vts) (dotSize p) black
+
+
+-- |Draw a list of points.
+drawP :: [PT]              -- ^ the points to draw
+      -> Double            -- ^ dot size
+      -> Colour Double     -- ^ fc and lc
+      -> Diagram Cairo R2  -- ^ the resulting diagram
+drawP [] _ _    = mempty
+drawP vt ds col =
+  position (zip vt (repeat dot))
+  where
+    dot = (circle ds :: Diagram Cairo R2) # fc col # lc col
 
 
 -- |Creates a Diagram from a point that shows the coordinates
@@ -182,7 +190,7 @@ squares = Diag f
 
 
 -- |Draw the squares of the kd-tree.
-kdSquares:: Diag
+kdSquares :: Diag
 kdSquares = Diag f
   where
     f _ (Object []) = mempty
@@ -209,6 +217,46 @@ kdSquares = Diag f
             where
               (_, y') = unp2 pt
         kdLines _ _ = []
+    f _ _ = mempty
+
+
+-- |Draw the range rectangle and highlight the points inside that range.
+kdRange :: Diag
+kdRange = Diag f
+  where
+    f _ (Object []) = mempty
+    f p (Object vt) =
+      (\((xmin, xmax), (ymin, ymax)) -> rect (xmax - xmin) (ymax - ymin)
+          # moveTo (p2 ((xmax + xmin) / 2, (ymax + ymin) / 2))
+          # lc red)
+        (rangeSquare p)
+      <> drawP ptsInRange (dotSize p) red
+      where
+        ptsInRange = fst . rangeSearch (kdTree vt Vertical) $ rangeSquare p
+    f _ _ = mempty
+
+
+-- |The kd-tree visualized as binary tree.
+kdTreeDiag :: Diag
+kdTreeDiag = Diag f
+  where
+    f _ (Object []) = mempty
+    f p (Object vt) =
+      renderTree (\n -> case n of
+                   '*':'*':_ -> (text n # fontSizeL 5.0)
+                                 <> rect 50.0 20.0 # fc green
+                   '*':_     -> (text n # fontSizeL 5.0)
+                                 <> rect 50.0 20.0 # fc red
+                   _         -> (text n # fontSizeL 5.0)
+                                 <> rect 50.0 20.0 # fc white)
+                 (~~)
+                 (symmLayout' (with & slHSep .~ 60 & slVSep .~ 40) roseTree)
+      # scale 2 # alignT # bg white
+      where
+        roseTree = snd
+                   . rangeSearch (kdTree vt Vertical)
+                   $ rangeSquare p
+
     f _ _ = mempty
 
 

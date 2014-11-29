@@ -24,7 +24,7 @@ diag p obj@(Object _)
                        coordPoints, polyLines, plotterBG])
              p obj
   | algo p == 5 =
-      mkDiag (mconcat [kdSquares, coordPointsText,
+      mkDiag (mconcat [kdRange, kdSquares, coordPointsText,
                        coordPoints, plotterBG])
              p obj
   | otherwise = mempty
@@ -57,6 +57,10 @@ diagS p mesh
 diagTreeS :: DiagProp -> B.ByteString -> Diagram Cairo R2
 diagTreeS p mesh
   | algo p == 4 = mkDiag treePretty p (Object
+                                       . filterValidPT p
+                                       . meshToArr
+                                       $ mesh)
+  | algo p == 5 = mkDiag kdTreeDiag p (Object
                                        . filterValidPT p
                                        . meshToArr
                                        $ mesh)
