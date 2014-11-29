@@ -4,6 +4,7 @@ module Algebra.Vector where
 
 import Algebra.VectorTypes
 import Control.Applicative
+import Data.List (sortBy)
 import Diagrams.TwoD.Types
 import Graphics.Gloss.Geometry.Line
 import GHC.Float
@@ -110,6 +111,22 @@ notcw a b c = case getOrient a b c of
 -- |Sort X and Y coordinates lexicographically.
 sortedXY :: [PT] -> [PT]
 sortedXY = fmap p2 . sortLex . fmap unp2
+
+
+-- |Sort all points according to their X-coordinates only.
+sortedX :: [PT] -> [PT]
+sortedX xs =
+  fmap p2
+  . sortBy (\(a1, _) (a2, _) -> compare a1 a2)
+  $ fmap unp2 xs
+
+
+-- |Sort all points according to their Y-coordinates only.
+sortedY :: [PT] -> [PT]
+sortedY xs =
+  fmap p2
+  . sortBy (\(_, b1) (_, b2) -> compare b1 b2)
+  $ fmap unp2 xs
 
 
 -- |Apply a function on the coordinates of a point.
