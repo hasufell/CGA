@@ -49,10 +49,10 @@ data Crumb a = NWCrumb (QuadTree a) (QuadTree a) (QuadTree a)
   deriving (Show, Eq)
 
 -- |A list of Crumbs.
-type Breadbrumbs a = [Crumb a]
+type Breadcrumbs a = [Crumb a]
 
 -- |Zipper for the QuadTree.
-type Zipper a = (QuadTree a, Breadbrumbs a)
+type Zipper a = (QuadTree a, Breadcrumbs a)
 
 -- |Orientation.
 data Orient = North | South | East | West
