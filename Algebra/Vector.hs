@@ -11,7 +11,7 @@ import MyPrelude
 
 
 -- |Checks whether the Point is in a given dimension.
-inRange :: Square -- ^ the square, defined by x/y dimensions
+inRange :: Square -- ^ the square: ((xmin, xmax), (ymin, ymax))
         -> PT     -- ^ Coordinate
         -> Bool   -- ^ result
 inRange ((xmin, xmax), (ymin, ymax)) p =
