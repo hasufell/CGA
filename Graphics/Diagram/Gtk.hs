@@ -23,6 +23,10 @@ diag p obj@(Object _)
       mkDiag (mconcat [quadPathSquare, squares, coordPointsText,
                        coordPoints, polyLines, plotterBG])
              p obj
+  | algo p == 5 =
+      mkDiag (mconcat [kdSquares, coordPointsText,
+                       coordPoints, plotterBG])
+             p obj
   | otherwise = mempty
 diag p objs@(Objects _)
   | algo p == 2 =
