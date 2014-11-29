@@ -85,3 +85,9 @@ shiftM :: Int -> [a] -> [a]
 shiftM _ [] = []
 shiftM 0 xs = xs
 shiftM n xs = drop n xs ++ take n xs
+
+
+-- |Get the pivot of a list.
+pivot :: [a] -> Maybe a
+pivot [] = Nothing
+pivot xs = Just . (!!) xs . flip div 2 . length $ xs
