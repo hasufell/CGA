@@ -58,6 +58,7 @@ executable Gtk
                        Algorithms.ConvexHull.GrahamScan
                        Algorithms.PolygonIntersection.Core
                        Algorithms.QuadTree.QuadTree
+                       Algorithms.KDTree.KDTree
                        Graphics.Diagram.Gtk
                        Graphics.Diagram.Plotter
                        Graphics.Diagram.Types
@@ -104,6 +105,7 @@ executable Gif
                        Algorithms.ConvexHull.GrahamScan
                        Algorithms.PolygonIntersection.Core
                        Algorithms.QuadTree.QuadTree
+                       Algorithms.KDTree.KDTree
                        Graphics.Diagram.Gif
                        Graphics.Diagram.Plotter
                        Graphics.Diagram.Types
