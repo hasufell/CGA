@@ -207,16 +207,15 @@ onAlgoBoxChange mygui = do
     then do
       widgetShow (vbox7 mygui)
       widgetShow (treeWin mygui)
-    else do
-      widgetHide (vbox7 mygui)
-      widgetHide (treeWin mygui)
-  if item == 5
-    then do
-      widgetShow (vbox10 mygui)
-      widgetShow (treeWin mygui)
-    else do
-      widgetHide (vbox10 mygui)
-      widgetHide (treeWin mygui)
+    else
+      if item == 5
+        then do
+          widgetShow (vbox10 mygui)
+          widgetShow (treeWin mygui)
+      else do
+        widgetHide (vbox7 mygui)
+        widgetHide (treeWin mygui)
+
   return ()
 
 
