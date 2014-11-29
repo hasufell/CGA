@@ -188,25 +188,27 @@ kdSquares = Diag f
     f _ (Object []) = mempty
     f p (Object vt) =
       mconcat
-      . fmap fromVertices
-      $ drawAll (kdTree vt Horizontal) (xDimension p, yDimension p)
+      . fmap (uncurry (~~))
+      $ kdLines (kdTree vt Horizontal) (xDimension p, yDimension p)
       where
-        drawAll :: KDTree PT -> Square -> [[PT]]
-        drawAll (KTNode ln pt Horizontal rn) ((xmin, xmax), (ymin, ymax)) =
-          (\(x, _) -> [[p2 (x, ymin), p2 (x, ymax)]])
+        -- Gets all lines that make up the kdSquares. Every line is
+        -- described by two points, start and end respectively.
+        kdLines :: KDTree PT -> Square -> [(PT, PT)]
+        kdLines (KTNode ln pt Horizontal rn) ((xmin, xmax), (ymin, ymax)) =
+          (\(x, _) -> [(p2 (x, ymin), p2 (x, ymax))])
             (unp2 pt)
-          ++ drawAll ln ((xmin, x'), (ymin, ymax))
-          ++ drawAll rn ((x', xmax), (ymin, ymax))
+          ++ kdLines ln ((xmin, x'), (ymin, ymax))
+          ++ kdLines rn ((x', xmax), (ymin, ymax))
             where
               (x', _) = unp2 pt
-        drawAll (KTNode ln pt Vertical rn) ((xmin, xmax), (ymin, ymax)) =
-          (\(_, y) -> [[p2 (xmin, y), p2 (xmax, y)]])
+        kdLines (KTNode ln pt Vertical rn) ((xmin, xmax), (ymin, ymax)) =
+          (\(_, y) -> [(p2 (xmin, y), p2 (xmax, y))])
             (unp2 pt)
-          ++ drawAll ln ((xmin, xmax), (ymin, y'))
-          ++ drawAll rn ((xmin, xmax), (y', ymax))
+          ++ kdLines ln ((xmin, xmax), (ymin, y'))
+          ++ kdLines rn ((xmin, xmax), (y', ymax))
             where
               (_, y') = unp2 pt
-        drawAll _ _ = [[]]
+        kdLines _ _ = []
     f _ _ = mempty
 
 
