@@ -10,6 +10,11 @@ class Def a where
   def :: a
 
 
+-- |For negating random types.
+class Not b where
+  not' :: b -> b
+
+
 -- |Split an array into subarrays depending on a given condition.
 splitBy :: (a -> Bool) -- ^ condition
         -> [a]         -- ^ array to split
