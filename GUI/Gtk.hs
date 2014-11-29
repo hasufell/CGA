@@ -205,14 +205,17 @@ onAlgoBoxChange mygui = do
   item <- comboBoxGetActive (algoBox mygui)
   if item == 4
     then do
+      widgetHide (vbox10 mygui)
       widgetShow (vbox7 mygui)
       widgetShow (treeWin mygui)
     else
       if item == 5
         then do
+          widgetHide (vbox7 mygui)
           widgetShow (vbox10 mygui)
           widgetShow (treeWin mygui)
       else do
+        widgetHide (vbox10 mygui)
         widgetHide (vbox7 mygui)
         widgetHide (treeWin mygui)
 
