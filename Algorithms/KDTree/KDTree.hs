@@ -1,6 +1,19 @@
 {-# OPTIONS_HADDOCK ignore-exports #-}
 
-module Algorithms.KDTree.KDTree where
+module Algorithms.KDTree.KDTree (kdTree
+                                 , kdFoldl
+                                 , kdFoldr
+                                 , kdTreeToRoseTree
+                                 , rangeSearch
+                                 , getValS
+                                 , isLeaf
+                                 , getVal
+                                 , getDirection
+                                 , goLeft
+                                 , goRight
+                                 , Direction(Vertical, Horizontal)
+                                 , KDTree(KTNil, KTNode))
+  where
 
 
 import Algebra.VectorTypes
