@@ -5,6 +5,7 @@ module Graphics.Diagram.Plotter where
 import Algebra.VectorTypes
 import Algorithms.ConvexHull.GrahamScan
 import Algorithms.QuadTree.QuadTree
+import Algorithms.KDTree.KDTree
 import Algorithms.PolygonIntersection.Core
 import Data.Maybe
 import Data.Monoid
@@ -179,6 +180,34 @@ squares = Diag f
         $ (xDimension p, yDimension p))
     f _ _ = mempty
 
+
+-- |Draw the squares of the kd-tree.
+kdSquares:: Diag
+kdSquares = Diag f
+  where
+    f _ (Object []) = mempty
+    f p (Object vt) =
+      mconcat
+      . fmap fromVertices
+      $ drawAll (kdTree vt Horizontal) (xDimension p, yDimension p)
+      where
+        drawAll :: KDTree PT -> Square -> [[PT]]
+        drawAll (KTNode ln pt Horizontal rn) ((xmin, xmax), (ymin, ymax)) =
+          (\(x, _) -> [[p2 (x, ymin), p2 (x, ymax)]])
+            (unp2 pt)
+          ++ drawAll ln ((xmin, x'), (ymin, ymax))
+          ++ drawAll rn ((x', xmax), (ymin, ymax))
+            where
+              (x', _) = unp2 pt
+        drawAll (KTNode ln pt Vertical rn) ((xmin, xmax), (ymin, ymax)) =
+          (\(_, y) -> [[p2 (xmin, y), p2 (xmax, y)]])
+            (unp2 pt)
+          ++ drawAll ln ((xmin, xmax), (ymin, y'))
+          ++ drawAll rn ((xmin, xmax), (y', ymax))
+            where
+              (_, y') = unp2 pt
+        drawAll _ _ = [[]]
+    f _ _ = mempty
 
 
 -- |Get the quad tree corresponding to the given points and diagram properties.
