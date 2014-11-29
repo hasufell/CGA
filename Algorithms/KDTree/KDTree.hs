@@ -1,3 +1,5 @@
+{-# OPTIONS_HADDOCK ignore-exports #-}
+
 module Algorithms.KDTree.KDTree where
 
 
