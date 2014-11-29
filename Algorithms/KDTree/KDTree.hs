@@ -168,3 +168,12 @@ kdTreeToRoseTree (KTNode ln val _ rn) =
   Node (show . unp2 $ val) [kdTreeToRoseTree ln, kdTreeToRoseTree rn]
 
 
+goLeft :: KDTree a -> Maybe (KDTree a)
+goLeft (KTNode ln _ _ _) = Just ln
+goLeft _                 = Nothing
+
+
+goRight :: KDTree a -> Maybe (KDTree a)
+goRight (KTNode _ _ _ rn) = Just rn
+goRight _                 = Nothing
+
