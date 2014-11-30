@@ -125,14 +125,16 @@ rangeSearch kd' sq' = (goPt kd' sq', goTree kd' sq' True)
     -- A pretty rose tree suitable for printing.
     goTree :: KDTree PT -> Square -> Bool -> Tree String
     goTree KTNil _ _ = Node "nil" []
-    goTree (KTNode ln pt dir rn) sq vis =
-      Node treeText
-           [if' (p1' dir sq < (cur' dir . unp2 $ pt))
-                (goTree ln sq vis)
-                (goTree ln sq False)
-           , if' ((cur' dir . unp2 $ pt) < p2' dir sq)
-                 (goTree rn sq vis)
-                 (goTree rn sq False)]
+    goTree (KTNode ln pt dir rn) sq vis
+      | ln == KTNil && rn == KTNil = Node treeText []
+      | otherwise =
+          Node treeText
+               [if' (p1' dir sq < (cur' dir . unp2 $ pt))
+                    (goTree ln sq vis)
+                    (goTree ln sq False)
+               , if' ((cur' dir . unp2 $ pt) < p2' dir sq)
+                     (goTree rn sq vis)
+                     (goTree rn sq False)]
         where
           treeText
             | vis && inRange sq pt = "** " ++ (show . unp2 $ pt)
