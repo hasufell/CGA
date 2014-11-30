@@ -87,9 +87,8 @@ polyLines = Diag pp
 polyIntersection :: Diag
 polyIntersection = Diag pi'
   where
-    pi' p (Objects (x:y:_)) = position (zip vtpi (repeat dot))
+    pi' p (Objects (x:y:_)) = drawP vtpi (dotSize p) red
       where
-        dot  = (circle $ dotSize p :: Diagram Cairo R2) # fc red # lc red
         vtpi = intersectionPoints
                . sortLexPolys
                $ (sortLexPoly x,
@@ -120,12 +119,7 @@ polyIntersectionText = Diag pit'
 convexHP :: Diag
 convexHP = Diag chp
   where
-    chp p (Object vt) =
-      position (zip vtch
-        (repeat dot))
-      where
-        dot = (circle $ dotSize p :: Diagram Cairo R2) # fc red # lc red
-        vtch = grahamCH vt
+    chp p (Object vt) = drawP (grahamCH vt) (dotSize p) red
     chp _ _ = mempty
 
 
