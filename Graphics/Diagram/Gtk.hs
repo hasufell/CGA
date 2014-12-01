@@ -61,8 +61,4 @@ diagS p mesh
 -- |Create the tree diagram from a String which is supposed to be the contents
 -- of an obj file.
 diagTreeS :: DiagProp -> B.ByteString -> Diagram Cairo R2
-diagTreeS p mesh = diag p diagTreAlgos
-                     . Object
-                     . filterValidPT p
-                     . meshToArr
-                     $ mesh
+diagTreeS p = diag p diagTreAlgos . Object . filterValidPT p . meshToArr
