@@ -69,15 +69,16 @@ kdTree xs' = go (sortedX xs') (sortedY xs')
 --   partition' (pivot xs) (ys, xs)
 -- and get ((y1, y2), (x1, x2)).
 partition' :: PT                           -- ^ the pivot to partition against
+           -> (PT -> PT -> Ordering)       -- ^ ptCmpY or ptCmpX
            -> ([PT], [PT])                 -- ^ both lists (X, Y) or (Y, X)
            -> (([PT], [PT]), ([PT], [PT])) -- ^ ((x1, x2), (y1, y2)) or
                                            --   ((y1, y2), (x1, x2))
-partition' piv (xs, ys) = ((x1, x2), (y1, y2))
+partition' piv cmp' (xs, ys) = ((x1, x2), (y1, y2))
   where
     y1 = takeWhile (/= piv) ys
     y2 = tailDef [] . dropWhile (/= piv) $ ys
-    x1 = foldr (\x y -> [x | x `elem` y1] ++ y) [] xs
-    x2 = foldr (\x y -> [x | x `elem` y2] ++ y) [] xs
+    x1 = foldr (\x y -> [x | cmp' x piv == LT] ++ y) [] xs
+    x2 = foldr (\x y -> [x | cmp' x piv == GT] ++ y) [] xs
 
 
 -- |Partition two sorted lists of points X and Y against the pivot of
@@ -85,7 +86,7 @@ partition' piv (xs, ys) = ((x1, x2), (y1, y2))
 -- pivot.
 partitionY :: ([PT], [PT])                 -- ^ both lists (X, Y)
            -> (([PT], [PT]), ([PT], [PT])) -- ^ ((x1, x2), (y1, y2))
-partitionY (xs, ys) = partition' (fromJust . pivot $ ys) (xs, ys)
+partitionY (xs, ys) = partition' (fromJust . pivot $ ys) ptCmpY (xs, ys)
 
 
 -- |Partition two sorted lists of points X and Y against the pivot of
@@ -94,7 +95,7 @@ partitionY (xs, ys) = partition' (fromJust . pivot $ ys) (xs, ys)
 partitionX :: ([PT], [PT])                 -- ^ both lists (X, Y)
            -> (([PT], [PT]), ([PT], [PT])) -- ^ ((x1, x2), (y1, y2))
 partitionX (xs, ys) = (\(x, y) -> (y, x))
-                      . partition' (fromJust . pivot $ xs) $ (ys, xs)
+                      . partition' (fromJust . pivot $ xs) ptCmpX $ (ys, xs)
 
 
 -- |Execute a range search in O(log n). It returns a tuple
