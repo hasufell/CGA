@@ -18,26 +18,36 @@ import Parser.PathParser
 
 import qualified Debug.Trace as D
 
+
+-- |Draw a list of points.
+drawP :: [PT]              -- ^ the points to draw
+      -> Double            -- ^ dot size
+      -> Diagram Cairo R2  -- ^ the resulting diagram
+drawP [] _  = mempty
+drawP vt ds =
+  position (zip vt (repeat dot))
+  where
+    dot = (circle ds :: Diagram Cairo R2)
+
+
+-- |Create a rectangle around a diagonal line, which has sw
+-- as startpoint and nw as endpoint.
+rectByDiagonal :: (Double, Double)  -- ^ sw point
+               -> (Double, Double)  -- ^ nw point
+               -> Diagram Cairo R2
+rectByDiagonal (xmin, xmax) (ymin, ymax) =
+  rect (xmax - xmin) (ymax - ymin)
+  # moveTo (p2 ((xmax + xmin) / 2, (ymax + ymin) / 2))
+
+
 -- |Creates a Diagram that shows the coordinates from the points
 -- as dots. The points and thickness of the dots can be controlled
 -- via DiagProp.
 coordPoints :: Diag
 coordPoints = Diag cp
   where
-    cp p (Object vt) = drawP vt (dotSize p) black
-    cp p (Objects vts) = drawP (concat vts) (dotSize p) black
-
-
--- |Draw a list of points.
-drawP :: [PT]              -- ^ the points to draw
-      -> Double            -- ^ dot size
-      -> Colour Double     -- ^ fc and lc
-      -> Diagram Cairo R2  -- ^ the resulting diagram
-drawP [] _ _    = mempty
-drawP vt ds col =
-  position (zip vt (repeat dot))
-  where
-    dot = (circle ds :: Diagram Cairo R2) # fc col # lc col
+    cp p (Object vt) = drawP vt (dotSize p) # fc black # lc black
+    cp p (Objects vts) = drawP (concat vts) (dotSize p) # fc black # lc black
 
 
 -- |Creates a Diagram from a point that shows the coordinates
@@ -87,7 +97,7 @@ polyLines = Diag pp
 polyIntersection :: Diag
 polyIntersection = Diag pi'
   where
-    pi' p (Objects (x:y:_)) = drawP vtpi (dotSize p) red
+    pi' p (Objects (x:y:_)) = drawP vtpi (dotSize p) # fc red # lc red
       where
         vtpi = intersectionPoints
                . sortLexPolys
@@ -119,7 +129,7 @@ polyIntersectionText = Diag pit'
 convexHP :: Diag
 convexHP = Diag chp
   where
-    chp p (Object vt) = drawP (grahamCH vt) (dotSize p) red
+    chp p (Object vt) = drawP (grahamCH vt) (dotSize p) # fc red # lc red
     chp _ _ = mempty
 
 
@@ -175,9 +185,9 @@ squares = Diag f
     f _ (Object []) = mempty
     f p (Object vt) =
       mconcat
-      $ (\((xmin, xmax), (ymin, ymax)) -> rect (xmax - xmin) (ymax - ymin)
-        # moveTo (p2 ((xmax + xmin) / 2, (ymax + ymin) / 2)) # lw ultraThin)
-      <$> (quadTreeSquares (xDimension p, yDimension p)
+      $ (uncurry rectByDiagonal # lw ultraThin)
+      <$>
+      (quadTreeSquares (xDimension p, yDimension p)
         . quadTree vt
         $ (xDimension p, yDimension p))
     f _ _ = mempty
@@ -220,11 +230,8 @@ kdRange = Diag f
   where
     f _ (Object []) = mempty
     f p (Object vt) =
-      (\((xmin, xmax), (ymin, ymax)) -> rect (xmax - xmin) (ymax - ymin)
-          # moveTo (p2 ((xmax + xmin) / 2, (ymax + ymin) / 2))
-          # lc red)
-        (rangeSquare p)
-      <> drawP ptsInRange (dotSize p) red
+      (uncurry rectByDiagonal # lc red) (rangeSquare p)
+      <> drawP ptsInRange (dotSize p) # fc red # lc red
       where
         ptsInRange = fst . rangeSearch (kdTree vt Vertical) $ rangeSquare p
     f _ _ = mempty
@@ -266,8 +273,7 @@ quadPathSquare = Diag f
   where
     f _ (Object []) = mempty
     f p (Object vt) =
-      (\((xmin, xmax), (ymin, ymax)) -> rect (xmax - xmin) (ymax - ymin)
-        # moveTo (p2 ((xmax + xmin) / 2,(ymax + ymin) / 2)) # lw thin # lc red)
+      (uncurry rectByDiagonal # lw thin # lc red)
       (getSquare (stringToQuads (quadPath p)) (qt vt p, []))
       where
         getSquare :: [Either Quad Orient] -> Zipper PT -> Square
@@ -284,8 +290,7 @@ gifQuadPath :: Diag
 gifQuadPath = GifDiag f
   where
     f p col _ vt =
-      (\((xmin, xmax), (ymin, ymax)) -> rect (xmax - xmin) (ymax - ymin)
-        # moveTo (p2 ((xmax + xmin) / 2,(ymax + ymin) / 2)) # lw thick # lc col)
+      (uncurry rectByDiagonal # lw thick # lc col)
       <$> getSquares (stringToQuads (quadPath p)) (qt vt p, [])
       where
         getSquares :: [Either Quad Orient] -> Zipper PT -> [Square]
