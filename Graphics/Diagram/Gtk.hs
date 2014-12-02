@@ -30,7 +30,7 @@ diagAlgos =
                  coordPoints, polyLines, plotterBG]
   ,DiagAlgo 4 [quadPathSquare, squares, coordPointsText,
                  coordPoints, polyLines, plotterBG]
-  ,DiagAlgo 5 [kdSquares, coordPointsText, coordPoints, plotterBG]]
+  ,DiagAlgo 5 [kdRange, kdSquares, coordPointsText, coordPoints, plotterBG]]
 
 
 -- |Introspective data structure holding all algorithms for the
