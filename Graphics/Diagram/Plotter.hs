@@ -327,10 +327,8 @@ xAxis =
                           (replicate (floor . (/) (diagWidth p) $ squareSize p)
                                      (vrule 10))
       # moveTo (p2 (diagXmin p, if diagYmin p <= 0 then 0 else diagYmin p))
-    labels p _ =
-      position $
-        zip (mkPoint <$> xs)
-            ((\x -> (text . show $ x) # scale 10) <$> xs)
+    labels p _ = position . zip (mkPoint <$> xs)
+                                $ ((\x -> (text . show $ x) # scale 10) <$> xs)
       where
         xs :: [Int]
         xs = take (floor . (/) (diagWidth p) $ squareSize p)
@@ -347,19 +345,15 @@ yAxis =
   <> Diag segments
   <> Diag labels
   where
-    vRule p _ =
-      arrowAt (p2 (if diagXmin p <= 0 then 0 else diagXmin p, diagYmin p))
-              (r2 (0, diagHeight p))
-    segments p _ =
-      vcat' (with & sep .~ squareSize p)
-            (replicate (floor . (/) (diagHeight p) $ squareSize p)
-                       (hrule 10))
+    vRule p _ = arrowAt (p2 (if diagXmin p <= 0 then 0 else diagXmin p, diagYmin p))
+                        (r2 (0, diagHeight p))
+    segments p _ = vcat' (with & sep .~ squareSize p)
+                         (replicate (floor . (/) (diagHeight p) $ squareSize p)
+                                    (hrule 10))
       # alignB
       # moveTo (p2 (if diagXmin p <= 0 then 0 else diagXmin p, diagYmin p))
-    labels p _ =
-      position $
-        zip (mkPoint <$> ys)
-            ((\x -> (text . show $ x) # scale 10) <$> ys)
+    labels p _ = position . zip (mkPoint <$> ys)
+                                $ ((\x -> (text . show $ x) # scale 10) <$> ys)
         where
           ys :: [Int]
           ys = take (floor . (/) (diagHeight p) $ squareSize p)
@@ -373,10 +367,9 @@ yAxis =
 whiteRectB :: Diag
 whiteRectB = Diag rect'
   where
-    rect' p _ =
-      whiteRect (diagWidth p + (diagWidth p / 10))
-                (diagHeight p + (diagHeight p / 10))
-      # moveTo (p2 (diagWidthOffset p, diagHeightOffset p))
+    rect' p _ = whiteRect (diagWidth p + (diagWidth p / 10))
+                          (diagHeight p + (diagHeight p / 10))
+                  # moveTo (p2 (diagWidthOffset p, diagHeightOffset p))
       where
 
 
