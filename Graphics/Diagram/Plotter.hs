@@ -25,7 +25,7 @@ drawP [] _  = mempty
 drawP vt ds =
   position (zip vt (repeat dot))
   where
-    dot = (circle ds :: Diagram Cairo R2)
+    dot = circle ds :: Diagram Cairo R2
 
 
 -- |Create a rectangle around a diagonal line, which has sw
@@ -35,7 +35,7 @@ rectByDiagonal :: (Double, Double)  -- ^ sw point
                -> Diagram Cairo R2
 rectByDiagonal (xmin, xmax) (ymin, ymax) =
   rect (xmax - xmin) (ymax - ymin)
-  # moveTo (p2 ((xmax + xmin) / 2, (ymax + ymin) / 2))
+    # moveTo (p2 ((xmax + xmin) / 2, (ymax + ymin) / 2))
 
 
 -- |Creates a Diagram that shows the coordinates from the points
@@ -68,9 +68,7 @@ coordPointsText = Diag cpt
     cpt p (Objects vts) = drawT (concat vts) p
     drawT [] _ = mempty
     drawT vt p
-      | showCoordText p =
-          position
-          $ zip vt (pointToTextCoord <$> vt)
+      | showCoordText p = position $ zip vt (pointToTextCoord <$> vt)
           # translate (r2 (0, 10))
       | otherwise = mempty
 
@@ -83,10 +81,7 @@ polyLines = Diag pp
     pp _ (Objects (x:y:_)) =
       strokePoly x <> strokePoly y
       where
-        strokePoly x' =
-          (strokeTrail
-           . fromVertices
-           $ x' ++ [head x'])
+        strokePoly x' = (strokeTrail . fromVertices $ x' ++ [head x'])
           # moveTo (head x') # lc black
     pp _ _  = mempty
 
@@ -97,10 +92,7 @@ polyIntersection = Diag pi'
   where
     pi' p (Objects (x:y:_)) = drawP vtpi (dotSize p) # fc red # lc red
       where
-        vtpi = intersectionPoints
-               . sortLexPolys
-               $ (sortLexPoly x,
-                  sortLexPoly y)
+        vtpi = intersectionPoints . sortLexPolys $ (sortLexPoly x, sortLexPoly y)
     pi' _ _ = mempty
 
 
@@ -109,10 +101,7 @@ polyIntersectionText :: Diag
 polyIntersectionText = Diag pit'
   where
     pit' p (Objects (x:y:_))
-      | showCoordText p =
-          position
-          . zip vtpi
-          $ (pointToTextCoord # fc red <$> vtpi)
+      | showCoordText p = position . zip vtpi $ (pointToTextCoord # fc red <$> vtpi)
           # translate (r2 (0, 10))
       | otherwise = mempty
       where
@@ -137,9 +126,7 @@ convexHPText = Diag chpt
   where
     chpt p (Object vt)
       | showCoordText p =
-          position $
-            zip vtchf
-                (pointToTextCoord <$> vtchf) # translate (r2 (0, 10))
+          position $ zip vtchf (pointToTextCoord <$> vtchf) # translate (r2 (0, 10))
       | otherwise = mempty
       where
         vtchf = grahamCH vt
@@ -153,12 +140,8 @@ convexHLs = Diag chl
   where
     chl _ (Object []) = mempty
     chl _ (Object vt) =
-      (strokeTrail
-       . fromVertices
-       . flip (++) [head $ grahamCH vt]
-       . grahamCH
-       $ vt)
-      # moveTo (head $ grahamCH vt) # lc red
+      (strokeTrail . fromVertices . flip (++) [head $ grahamCH vt] . grahamCH $ vt)
+        # moveTo (head $ grahamCH vt) # lc red
     chl _ _ = mempty
 
 
@@ -168,11 +151,9 @@ convexHLs = Diag chl
 convexHStepsLs :: Diag
 convexHStepsLs = GifDiag chs
   where
-    chs _ col f vt =
-      fmap mkChDiag (f vt)
+    chs _ col f vt = fmap mkChDiag (f vt)
       where
-        mkChDiag vt' =
-          (strokeTrail . fromVertices $ vt') # moveTo (head vt') # lc col
+        mkChDiag vt' = (strokeTrail . fromVertices $ vt') # moveTo (head vt') # lc col
 
 
 -- |Create a diagram that shows all squares of the RangeSearch algorithm
@@ -184,10 +165,10 @@ squares = Diag f
     f p (Object vt) =
       mconcat
       $ (uncurry rectByDiagonal # lw ultraThin)
-      <$>
-      (quadTreeSquares (xDimension p, yDimension p)
-        . quadTree vt
-        $ (xDimension p, yDimension p))
+        <$>
+        (quadTreeSquares (xDimension p, yDimension p)
+          . quadTree vt
+          $ (xDimension p, yDimension p))
     f _ _ = mempty
 
 
@@ -229,7 +210,7 @@ kdRange = Diag f
     f _ (Object []) = mempty
     f p (Object vt) =
       (uncurry rectByDiagonal # lc red) (rangeSquare p)
-      <> drawP ptsInRange (dotSize p) # fc red # lc red
+        <> drawP ptsInRange (dotSize p) # fc red # lc red
       where
         ptsInRange = fst . rangeSearch (kdTree vt Vertical) $ rangeSquare p
     f _ _ = mempty
@@ -338,13 +319,11 @@ xAxis =
   <> Diag segments
   <> Diag labels
   where
-    hRule p _ =
-      arrowAt (p2 (diagXmin p, if diagYmin p <= 0 then 0 else diagYmin p))
-              (r2 (diagWidth p, 0))
-    segments p _ =
-      hcat' (with & sep .~ squareSize p)
-            (replicate (floor . (/) (diagWidth p) $ squareSize p)
-                       (vrule 10))
+    hRule p _ = arrowAt (p2 (diagXmin p, if diagYmin p <= 0 then 0 else diagYmin p))
+                        (r2 (diagWidth p, 0))
+    segments p _ =  hcat' (with & sep .~ squareSize p)
+                          (replicate (floor . (/) (diagWidth p) $ squareSize p)
+                                     (vrule 10))
       # moveTo (p2 (diagXmin p, if diagYmin p <= 0 then 0 else diagYmin p))
     labels p _ =
       position $
@@ -410,17 +389,15 @@ grid :: Diag
 grid = Diag xGrid <> Diag yGrid
   where
     yGrid p _
-      | haveGrid p =
-          hcat' (with & sep .~ squareSize p)
-                (replicate (floor . (/) (diagWidth p) $ squareSize p)
-                           (vrule $ diagHeight p))
+      | haveGrid p = hcat' (with & sep .~ squareSize p)
+                           (replicate (floor . (/) (diagWidth p) $ squareSize p)
+                                      (vrule $ diagHeight p))
           # moveTo (p2 (diagXmin p, diagHeightOffset p)) # lw ultraThin
       | otherwise = mempty
     xGrid p _
-      | haveGrid p =
-          vcat' (with & sep .~ squareSize p)
-                (replicate (floor . (/) (diagHeight p) $ squareSize p)
-                           (hrule $ diagWidth p))
+      | haveGrid p = vcat' (with & sep .~ squareSize p)
+                           (replicate (floor . (/) (diagHeight p) $ squareSize p)
+                                      (hrule $ diagWidth p))
           # alignB # moveTo (p2 (diagWidthOffset p, diagYmin p)) # lw ultraThin
       | otherwise = mempty
 
