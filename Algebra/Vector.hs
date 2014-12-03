@@ -2,13 +2,25 @@
 
 module Algebra.Vector where
 
-import Algebra.VectorTypes
 import Control.Applicative
 import Data.List (sortBy)
 import Diagrams.TwoD.Types
 import Graphics.Gloss.Geometry.Line
 import GHC.Float
 import MyPrelude
+
+
+type Vec     = R2
+type PT      = P2
+type Coord   = (Double, Double)
+type Segment = (PT, PT)
+type Square  = (Coord, Coord)
+
+
+data Alignment = CW
+               | CCW
+               | CL
+  deriving (Eq)
 
 
 -- |Checks whether the Point is in a given dimension.

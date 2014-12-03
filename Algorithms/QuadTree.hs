@@ -16,7 +16,6 @@ module Algorithms.QuadTree
     QTZipper)
   where
 
-import Algebra.VectorTypes
 import Algebra.Vector
 import Data.Foldable (foldlM)
 import Data.List (partition)

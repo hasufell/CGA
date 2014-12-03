@@ -16,7 +16,6 @@ module Algorithms.KDTree (kdTree
   where
 
 
-import Algebra.VectorTypes
 import Algebra.Vector
 import Data.Maybe (fromJust, catMaybes)
 import Data.Tree

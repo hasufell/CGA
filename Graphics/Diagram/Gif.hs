@@ -2,7 +2,6 @@
 
 module Graphics.Diagram.Gif where
 
-import Algebra.VectorTypes
 import Algorithms.GrahamScan
 import Codec.Picture.Gif
 import qualified Data.ByteString.Char8 as B

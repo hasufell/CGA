@@ -2,7 +2,6 @@ module Algorithms.PolygonIntersection where
 
 
 import           Algebra.Vector
-import           Algebra.VectorTypes
 import           Control.Applicative
 import           Data.Dequeue (BankersDequeue)
 import qualified Data.Dequeue           as Q

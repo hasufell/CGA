@@ -2,7 +2,7 @@
 
 module Graphics.Diagram.Plotter where
 
-import Algebra.VectorTypes
+import Algebra.Vector(PT,Square)
 import Algorithms.GrahamScan
 import Algorithms.QuadTree
 import Algorithms.KDTree

@@ -3,7 +3,6 @@
 module Algorithms.GrahamScan where
 
 import Algebra.Vector
-import Algebra.VectorTypes
 import MyPrelude
 
 

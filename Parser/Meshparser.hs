@@ -2,7 +2,7 @@
 
 module Parser.Meshparser (meshToArr, facesToArr) where
 
-import Algebra.VectorTypes
+import Algebra.Vector(PT)
 import Control.Applicative
 import Data.Attoparsec.ByteString.Char8
 import Data.Either

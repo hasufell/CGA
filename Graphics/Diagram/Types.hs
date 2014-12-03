@@ -3,7 +3,6 @@
 module Graphics.Diagram.Types where
 
 import Algebra.Vector
-import Algebra.VectorTypes
 import Diagrams.Backend.Cairo
 import Diagrams.Prelude
 import MyPrelude
