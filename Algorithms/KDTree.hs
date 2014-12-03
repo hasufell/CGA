@@ -1,18 +1,18 @@
 {-# OPTIONS_HADDOCK ignore-exports #-}
 
-module Algorithms.KDTree.KDTree (kdTree
-                                 , kdFoldl
-                                 , kdFoldr
-                                 , kdTreeToRoseTree
-                                 , rangeSearch
-                                 , getValS
-                                 , isLeaf
-                                 , getVal
-                                 , getDirection
-                                 , goLeft
-                                 , goRight
-                                 , Direction(Vertical, Horizontal)
-                                 , KDTree(KTNil, KTNode))
+module Algorithms.KDTree (kdTree
+                         , kdFoldl
+                         , kdFoldr
+                         , kdTreeToRoseTree
+                         , rangeSearch
+                         , getValS
+                         , isLeaf
+                         , getVal
+                         , getDirection
+                         , goLeft
+                         , goRight
+                         , Direction(Vertical, Horizontal)
+                         , KDTree(KTNil, KTNode))
   where
 
 

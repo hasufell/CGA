@@ -1,4 +1,4 @@
-module Algorithms.QuadTree.QuadTree
+module Algorithms.QuadTree
     (quadTree,
     quadTreeSquares,
     qtFoldl,

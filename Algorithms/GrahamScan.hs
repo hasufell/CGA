@@ -1,6 +1,6 @@
 {-# OPTIONS_HADDOCK ignore-exports #-}
 
-module Algorithms.ConvexHull.GrahamScan where
+module Algorithms.GrahamScan where
 
 import Algebra.Vector
 import Algebra.VectorTypes

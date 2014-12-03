@@ -3,10 +3,10 @@
 module Graphics.Diagram.Plotter where
 
 import Algebra.VectorTypes
-import Algorithms.ConvexHull.GrahamScan
-import Algorithms.QuadTree.QuadTree
-import Algorithms.KDTree.KDTree
-import Algorithms.PolygonIntersection.Core
+import Algorithms.GrahamScan
+import Algorithms.QuadTree
+import Algorithms.KDTree
+import Algorithms.PolygonIntersection
 import Data.Maybe
 import Data.Monoid
 import Data.Tree

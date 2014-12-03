@@ -1,4 +1,4 @@
-module Algorithms.PolygonIntersection.Core where
+module Algorithms.PolygonIntersection where
 
 
 import           Algebra.Vector

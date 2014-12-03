@@ -1,4 +1,4 @@
-import Algorithms.ConvexHull.GrahamScan
+import Algorithms.GrahamScan
 import Parser.Meshparser
 import System.Environment
 import System.FileSystem.FileExt

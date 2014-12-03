@@ -55,10 +55,10 @@ executable Gtk
 
   -- Modules included in this executable, other than Main.
   other-modules:       Algebra.Vector
-                       Algorithms.ConvexHull.GrahamScan
-                       Algorithms.PolygonIntersection.Core
-                       Algorithms.QuadTree.QuadTree
-                       Algorithms.KDTree.KDTree
+                       Algorithms.GrahamScan
+                       Algorithms.PolygonIntersection
+                       Algorithms.QuadTree
+                       Algorithms.KDTree
                        Graphics.Diagram.Gtk
                        Graphics.Diagram.Plotter
                        Graphics.Diagram.Types
@@ -102,10 +102,10 @@ executable Gif
 
   -- Modules included in this executable, other than Main.
   other-modules:       Algebra.Vector
-                       Algorithms.ConvexHull.GrahamScan
-                       Algorithms.PolygonIntersection.Core
-                       Algorithms.QuadTree.QuadTree
-                       Algorithms.KDTree.KDTree
+                       Algorithms.GrahamScan
+                       Algorithms.PolygonIntersection
+                       Algorithms.QuadTree
+                       Algorithms.KDTree
                        Graphics.Diagram.Gif
                        Graphics.Diagram.Plotter
                        Graphics.Diagram.Types

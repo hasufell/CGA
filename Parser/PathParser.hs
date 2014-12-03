@@ -2,7 +2,7 @@
 
 module Parser.PathParser where
 
-import Algorithms.QuadTree.QuadTree (Quad(NW, NE, SW, SE), Orient(North, South, West, East))
+import Algorithms.QuadTree (Quad(NW, NE, SW, SE), Orient(North, South, West, East))
 import Control.Applicative
 import Data.Attoparsec.ByteString.Char8
 import qualified Data.ByteString.Char8 as B
