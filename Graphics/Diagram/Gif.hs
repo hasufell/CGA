@@ -2,14 +2,16 @@
 
 module Graphics.Diagram.Gif where
 
+import Algebra.Vector(PT)
 import Algorithms.GrahamScan
 import Codec.Picture.Gif
 import qualified Data.ByteString.Char8 as B
 import Data.Monoid
 import Diagrams.Backend.Cairo
 import Diagrams.Prelude hiding ((<>))
+import Graphics.Diagram.AlgoDiags
+import Graphics.Diagram.Core
 import Graphics.Diagram.Plotter
-import Graphics.Diagram.Types
 import Parser.Meshparser
 
 

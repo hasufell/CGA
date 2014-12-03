@@ -10,8 +10,8 @@ import Data.Maybe
 import Diagrams.Prelude
 import Diagrams.Backend.Cairo
 import Diagrams.Backend.Cairo.Internal
+import Graphics.Diagram.Core (DiagProp(..))
 import Graphics.Diagram.Gtk
-import Graphics.Diagram.Types
 import Graphics.UI.Gtk
 import Graphics.UI.Gtk.Glade
 import MyPrelude

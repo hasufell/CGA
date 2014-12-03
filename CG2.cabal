@@ -59,9 +59,10 @@ executable Gtk
                        Algorithms.PolygonIntersection
                        Algorithms.QuadTree
                        Algorithms.KDTree
+                       Graphics.Diagram.AlgoDiags
+                       Graphics.Diagram.Core
                        Graphics.Diagram.Gtk
                        Graphics.Diagram.Plotter
-                       Graphics.Diagram.Types
                        GUI.Gtk
                        MyPrelude
                        Parser.Meshparser
@@ -106,9 +107,10 @@ executable Gif
                        Algorithms.PolygonIntersection
                        Algorithms.QuadTree
                        Algorithms.KDTree
+                       Graphics.Diagram.AlgoDiags
+                       Graphics.Diagram.Core
                        Graphics.Diagram.Gif
                        Graphics.Diagram.Plotter
-                       Graphics.Diagram.Types
                        MyPrelude
                        Parser.Meshparser
                        Parser.PathParser

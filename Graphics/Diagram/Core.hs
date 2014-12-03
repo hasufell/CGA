@@ -1,14 +1,11 @@
 {-# OPTIONS_HADDOCK ignore-exports #-}
 
-module Graphics.Diagram.Types where
+module Graphics.Diagram.Core where
 
 import Algebra.Vector
 import Diagrams.Backend.Cairo
 import Diagrams.Prelude
 import MyPrelude
-
-
-type MeshString = String
 
 
 -- |Represents a Cairo Diagram. This allows us to create multiple
@@ -143,3 +140,36 @@ maybeDiag b d
 
 filterValidPT :: DiagProp -> [PT] -> [PT]
 filterValidPT p = filter (inRange (xDimension p, yDimension p))
+
+
+-- |Draw a list of points.
+drawP :: [PT]              -- ^ the points to draw
+      -> Double            -- ^ dot size
+      -> Diagram Cairo R2  -- ^ the resulting diagram
+drawP [] _  = mempty
+drawP vt ds =
+  position (zip vt (repeat dot))
+  where
+    dot = circle ds :: Diagram Cairo R2
+
+
+-- |Create a rectangle around a diagonal line, which has sw
+-- as startpoint and nw as endpoint.
+rectByDiagonal :: (Double, Double)  -- ^ sw point
+               -> (Double, Double)  -- ^ nw point
+               -> Diagram Cairo R2
+rectByDiagonal (xmin, xmax) (ymin, ymax) =
+  rect (xmax - xmin) (ymax - ymin)
+    # moveTo (p2 ((xmax + xmin) / 2, (ymax + ymin) / 2))
+
+
+-- |Creates a Diagram from a point that shows the coordinates
+-- in text format, such as "(1.0, 2.0)".
+pointToTextCoord :: PT -> Diagram Cairo R2
+pointToTextCoord pt =
+  text ("(" ++ (show . trim') x ++ ", " ++ (show . trim') y ++ ")") # scale 10
+  where
+    trim' :: Double -> Double
+    trim' x' = fromInteger . round $ x' * (10^(2 :: Int)) /
+                                          (10.0^^(2 :: Int))
+    (x, y) = unp2 pt

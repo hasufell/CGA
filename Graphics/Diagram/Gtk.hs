@@ -6,8 +6,9 @@ import qualified Data.ByteString.Char8 as B
 import Data.List(find)
 import Diagrams.Backend.Cairo
 import Diagrams.Prelude
+import Graphics.Diagram.AlgoDiags
+import Graphics.Diagram.Core
 import Graphics.Diagram.Plotter
-import Graphics.Diagram.Types
 import Parser.Meshparser
 
 
