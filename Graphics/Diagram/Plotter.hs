@@ -85,15 +85,12 @@ yAxis =
 whiteRectB :: Diag
 whiteRectB = Diag rect'
   where
-    rect' p _ = whiteRect (diagWidth p + (diagWidth p / 10))
-                          (diagHeight p + (diagHeight p / 10))
+    rect' p _ = rect (diagWidth p + (diagWidth p / 10))
+                     (diagHeight p + (diagHeight p / 10))
+                  # lwG 0.00
+                  # bg white
                   # moveTo (p2 (diagWidthOffset p, diagHeightOffset p))
       where
-
-
--- |Create a white rectangle with the given width and height.
-whiteRect :: Double -> Double -> Diagram Cairo R2
-whiteRect x y = rect x y # lwG 0.00 # bg white
 
 
 -- |Create a grid across the whole diagram with squares of the
