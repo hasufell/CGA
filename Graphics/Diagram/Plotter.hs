@@ -16,8 +16,6 @@ import Diagrams.TwoD.Layout.Tree
 import Graphics.Diagram.Types
 import Parser.PathParser
 
-import qualified Debug.Trace as D
-
 
 -- |Draw a list of points.
 drawP :: [PT]              -- ^ the points to draw
