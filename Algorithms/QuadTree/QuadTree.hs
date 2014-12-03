@@ -13,7 +13,7 @@ module Algorithms.QuadTree.QuadTree
     Orient(North,East,West,South),
     Quad(NW,NE,SW,SE),
     QuadTree,
-    Zipper)
+    QTZipper)
   where
 
 import Algebra.VectorTypes
@@ -42,17 +42,14 @@ data Quad = NW | NE
   deriving (Show)
 
 -- |A Crumb used for the QuadTree Zipper.
-data Crumb a = NWCrumb (QuadTree a) (QuadTree a) (QuadTree a)
+data QTCrumb a = NWCrumb (QuadTree a) (QuadTree a) (QuadTree a)
              | NECrumb (QuadTree a) (QuadTree a) (QuadTree a)
              | SWCrumb (QuadTree a) (QuadTree a) (QuadTree a)
              | SECrumb (QuadTree a) (QuadTree a) (QuadTree a)
   deriving (Show, Eq)
 
--- |A list of Crumbs.
-type Breadcrumbs a = [Crumb a]
-
 -- |Zipper for the QuadTree.
-type Zipper a = (QuadTree a, Breadcrumbs a)
+type QTZipper a = (QuadTree a, [QTCrumb a])
 
 -- |Orientation.
 data Orient = North | South | East | West
@@ -69,7 +66,7 @@ seSq ((xl, xu), (yl, yu)) = (,)  ((xl + xu) / 2, xu)  (yl, (yl + yu) / 2)
 
 -- |Check whether the current Node is an nw, ne, sw or se child of it's
 -- parent.
-isNWchild, isNEchild, isSWchild, isSEchild :: Zipper a -> Bool
+isNWchild, isNEchild, isSWchild, isSEchild :: QTZipper a -> Bool
 isNWchild (_, NWCrumb {}:_) = True
 isNWchild _                 = False
 isNEchild (_, NECrumb {}:_) = True
@@ -111,7 +108,7 @@ quadTreeSquares sq (TNode nw ne sw se) =
 
 -- |Get the current square of the zipper, relative to the given top
 -- square.
-getSquareByZipper :: Square -> Zipper a -> Square
+getSquareByZipper :: Square -> QTZipper a -> Square
 getSquareByZipper sq z = go sq (reverse . snd $ z)
   where
     go sq' []              = sq'
@@ -135,7 +132,7 @@ qtFoldr f sv qt = qtFoldl (\g b x -> g (f b x)) id qt sv
 
 
 -- |Go to nw, ne, sw or se from the current node, one level deeper.
-goNW, goNE, goSW, goSE :: Zipper a -> Maybe (Zipper a)
+goNW, goNE, goSW, goSE :: QTZipper a -> Maybe (QTZipper a)
 goNW (TNode nw ne sw se, bs) = Just (nw, NWCrumb ne sw se:bs)
 goNW _                       = Nothing
 goNE (TNode nw ne sw se, bs) = Just (ne, NECrumb nw sw se:bs)
@@ -147,7 +144,7 @@ goSE _                       = Nothing
 
 
 -- |Go to the given Quad from the current Node, one level deeper.
-goQuad :: Quad -> Zipper a -> Maybe (Zipper a)
+goQuad :: Quad -> QTZipper a -> Maybe (QTZipper a)
 goQuad q = case q of
   NW -> goNW
   NE -> goNE
@@ -156,7 +153,7 @@ goQuad q = case q of
 
 
 -- |Go up to the parent node, if any.
-goUp :: Zipper a -> Maybe (Zipper a)
+goUp :: QTZipper a -> Maybe (QTZipper a)
 goUp (qt, NWCrumb ne sw se:bs) = Just (TNode qt ne sw se, bs)
 goUp (qt, NECrumb nw sw se:bs) = Just (TNode nw qt sw se, bs)
 goUp (qt, SWCrumb nw ne se:bs) = Just (TNode nw ne qt se, bs)
@@ -165,18 +162,18 @@ goUp _                         = Nothing
 
 
 -- |Get the root node.
-rootNode :: Zipper a -> Zipper a
+rootNode :: QTZipper a -> QTZipper a
 rootNode (qt, []) = (qt, [])
 rootNode z        = rootNode . fromJust . goUp $ z
 
 
 -- |Look up a node by a given path of Quads.
-lookupByPath' :: [Quad] -> QuadTree a -> Maybe (Zipper a)
+lookupByPath' :: [Quad] -> QuadTree a -> Maybe (QTZipper a)
 lookupByPath' qs qt = foldlM (flip goQuad) (qt, []) qs
 
 
 -- |Find the north, south, east or west neighbor of a given node.
-findNeighbor :: Orient -> Zipper a -> Maybe (Zipper a)
+findNeighbor :: Orient -> QTZipper a -> Maybe (QTZipper a)
 findNeighbor ot zr = case ot of
   North -> go isSWchild isSEchild isNWchild goNW goNE goSW goSE zr
   South -> go isNWchild isNEchild isSWchild goSW goSE goNW goNE zr
@@ -200,11 +197,11 @@ findNeighbor ot zr = case ot of
         checkParent _         = Nothing
 
 
-lookupByNeighbors :: [Orient] -> Zipper a -> Maybe (Zipper a)
+lookupByNeighbors :: [Orient] -> QTZipper a -> Maybe (QTZipper a)
 lookupByNeighbors = flip (foldlM (flip findNeighbor))
 
 
-quadTreeToRoseTree :: Zipper PT -> Tree String
+quadTreeToRoseTree :: QTZipper PT -> Tree String
 quadTreeToRoseTree z' = go (rootNode z')
   where
     go z = case z of

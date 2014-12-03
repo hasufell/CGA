@@ -255,7 +255,7 @@ quadPathSquare = Diag f
       (uncurry rectByDiagonal # lw thin # lc red)
       (getSquare (stringToQuads (quadPath p)) (qt vt p, []))
       where
-        getSquare :: [Either Quad Orient] -> Zipper PT -> Square
+        getSquare :: [Either Quad Orient] -> QTZipper PT -> Square
         getSquare [] z = getSquareByZipper (xDimension p, yDimension p) z
         getSquare (q:qs) z = case q of
           Right x -> getSquare qs (fromMaybe z (findNeighbor x z))
@@ -272,7 +272,7 @@ gifQuadPath = GifDiag f
       (uncurry rectByDiagonal # lw thick # lc col)
       <$> getSquares (stringToQuads (quadPath p)) (qt vt p, [])
       where
-        getSquares :: [Either Quad Orient] -> Zipper PT -> [Square]
+        getSquares :: [Either Quad Orient] -> QTZipper PT -> [Square]
         getSquares [] z = [getSquareByZipper (xDimension p, yDimension p) z]
         getSquares (q:qs) z = case q of
           Right x -> getSquareByZipper (xDimension p, yDimension p) z :
@@ -293,7 +293,7 @@ treePretty = Diag f
                       . quadPath
                       $ p)
       where
-        getCurQT :: [Either Quad Orient] -> Zipper PT -> Zipper PT
+        getCurQT :: [Either Quad Orient] -> QTZipper PT -> QTZipper PT
         getCurQT [] z = z
         getCurQT (q:qs) z = case q of
           Right x -> getCurQT qs (fromMaybe z (findNeighbor x z))
