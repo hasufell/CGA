@@ -214,6 +214,7 @@ quadTreeToRoseTree z' = go (rootNode z')
                         , go (fromJust . goSE $ z)]
       where
         markAndPrintOrigin
+          -- HACK: in order to give specific nodes a specific color
           | z' == z   = "* " ++ printOrigin
           | otherwise = printOrigin
         printOrigin

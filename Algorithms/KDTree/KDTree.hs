@@ -138,6 +138,7 @@ rangeSearch kd' sq' = (goPt kd' sq', goTree kd' sq' True)
                      (goTree rn sq False)]
         where
           treeText
+            -- HACK: in order to give specific nodes a specific color
             | vis && inRange sq pt = "** " ++ (show . unp2 $ pt)
             | vis                  = "* " ++ (show . unp2 $ pt)
             | otherwise            = show . unp2 $ pt

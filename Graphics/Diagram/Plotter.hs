@@ -222,6 +222,7 @@ kdTreeDiag = Diag f
   where
     f _ (Object []) = mempty
     f p (Object vt) =
+      -- HACK: in order to give specific nodes a specific color
       renderTree (\n -> case n of
                    '*':'*':_ -> (text n # fontSizeL 5.0)
                                  <> rect 50.0 20.0 # fc green
@@ -300,6 +301,7 @@ treePretty = Diag f
           Left x  -> getCurQT qs (fromMaybe z (goQuad x z))
         prettyRoseTree :: Tree String -> Diagram Cairo R2
         prettyRoseTree tree =
+        -- HACK: in order to give specific nodes a specific color
           renderTree (\n -> case head n of
                        '*' -> (text n # fontSizeL 5.0)
                               <> rect 50.0 20.0 # fc red
