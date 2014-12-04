@@ -3,7 +3,6 @@
 module Graphics.Diagram.Plotter where
 
 import Data.Monoid
-import Diagrams.Backend.Cairo
 import Diagrams.Prelude hiding ((<>))
 import Graphics.Diagram.Core
 
