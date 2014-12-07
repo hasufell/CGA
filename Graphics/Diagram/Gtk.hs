@@ -31,7 +31,7 @@ diagAlgos =
   ,DiagAlgo 3 [polyIntersectionText, polyIntersection,
                  coordPoints, polyLines, plotterBG]
   ,DiagAlgo 4 [quadPathSquare, squares, coordPointsText,
-                 coordPoints, polyLines, plotterBG]
+                 coordPoints, plotterBG]
   ,DiagAlgo 5 [kdRange, kdSquares, coordPointsText, coordPoints, plotterBG]]
 
 
