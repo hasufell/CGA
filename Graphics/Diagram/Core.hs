@@ -122,7 +122,7 @@ diagWidthOffset p = diagXmin p + (diagWidth p / 2)
 -- |The offset on the y-axis to move the grid and the white rectangle
 -- to the right place.
 diagHeightOffset :: DiagProp -> Double
-diagHeightOffset p = diagYmin p + (diagWidth p / 2)
+diagHeightOffset p = diagYmin p + (diagHeight p / 2)
 
 
 -- |Returns the specified diagram if True is passed,
