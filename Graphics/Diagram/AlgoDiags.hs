@@ -21,8 +21,8 @@ import Parser.PathParser
 polyLines :: Diag
 polyLines = Diag pp
   where
-    pp _ (Objects []) = mempty
-    pp _ (Objects (x:y:_)) =
+    pp _ [] = mempty
+    pp _ (x:y:_) =
       strokePoly x <> strokePoly y
       where
         strokePoly x' = (strokeTrail . fromVertices $ x' ++ [head x'])
@@ -34,7 +34,7 @@ polyLines = Diag pp
 polyIntersection :: Diag
 polyIntersection = Diag pi'
   where
-    pi' p (Objects (x:y:_)) = drawP vtpi (dotSize p) # fc red # lc red
+    pi' p (x:y:_) = drawP vtpi (dotSize p) # fc red # lc red
       where
         vtpi = intersectionPoints . sortLexPolys $ (sortLexPoly x, sortLexPoly y)
     pi' _ _ = mempty
@@ -44,7 +44,7 @@ polyIntersection = Diag pi'
 polyIntersectionText :: Diag
 polyIntersectionText = Diag pit'
   where
-    pit' p (Objects (x:y:_))
+    pit' p (x:y:_)
       | showCoordText p = position . zip vtpi $ (pointToTextCoord # fc red <$> vtpi)
           # translate (r2 (0, 10))
       | otherwise = mempty
@@ -60,7 +60,7 @@ polyIntersectionText = Diag pit'
 convexHP :: Diag
 convexHP = Diag chp
   where
-    chp p (Object vt) = drawP (grahamCH vt) (dotSize p) # fc red # lc red
+    chp p [vt] = drawP (grahamCH vt) (dotSize p) # fc red # lc red
     chp _ _ = mempty
 
 
@@ -68,7 +68,7 @@ convexHP = Diag chp
 convexHPText :: Diag
 convexHPText = Diag chpt
   where
-    chpt p (Object vt)
+    chpt p [vt]
       | showCoordText p =
           position $ zip vtchf (pointToTextCoord <$> vtchf) # translate (r2 (0, 10))
       | otherwise = mempty
@@ -82,8 +82,7 @@ convexHPText = Diag chpt
 convexHLs :: Diag
 convexHLs = Diag chl
   where
-    chl _ (Object []) = mempty
-    chl _ (Object vt) =
+    chl _ [vt] =
       (strokeTrail . fromVertices . flip (++) [head $ grahamCH vt] . grahamCH $ vt)
         # moveTo (head $ grahamCH vt) # lc red
     chl _ _ = mempty
@@ -105,8 +104,7 @@ convexHStepsLs = GifDiag chs
 squares :: Diag
 squares = Diag f
   where
-    f _ (Object []) = mempty
-    f p (Object vt) =
+    f p [vt] =
       mconcat
       $ (uncurry rectByDiagonal # lw ultraThin)
         <$>
@@ -120,8 +118,7 @@ squares = Diag f
 kdSquares :: Diag
 kdSquares = Diag f
   where
-    f _ (Object []) = mempty
-    f p (Object vt) =
+    f p [vt] =
       mconcat
       . fmap (uncurry (~~))
       $ kdLines (kdTree vt Horizontal) (xDimension p, yDimension p)
@@ -151,8 +148,7 @@ kdSquares = Diag f
 kdRange :: Diag
 kdRange = Diag f
   where
-    f _ (Object []) = mempty
-    f p (Object vt) =
+    f p [vt] =
       (uncurry rectByDiagonal # lc red) (rangeSquare p)
         <> drawP ptsInRange (dotSize p) # fc red # lc red
       where
@@ -164,8 +160,7 @@ kdRange = Diag f
 kdTreeDiag :: Diag
 kdTreeDiag = Diag f
   where
-    f _ (Object []) = mempty
-    f p (Object vt) =
+    f p [vt] =
       -- HACK: in order to give specific nodes a specific color
       renderTree (\n -> case n of
                    '*':'*':_ -> (text n # fontSizeL 5.0)
@@ -195,8 +190,7 @@ qt vt p = quadTree vt (xDimension p, yDimension p)
 quadPathSquare :: Diag
 quadPathSquare = Diag f
   where
-    f _ (Object []) = mempty
-    f p (Object vt) =
+    f p [vt] =
       (uncurry rectByDiagonal # lw thin # lc red)
       (getSquare (stringToQuads (quadPath p)) (qt vt p, []))
       where
@@ -230,8 +224,7 @@ gifQuadPath = GifDiag f
 treePretty :: Diag
 treePretty = Diag f
   where
-    f _ (Object []) = mempty
-    f p (Object vt) =
+    f p [vt] =
       prettyRoseTree (quadTreeToRoseTree
                       . flip getCurQT (qt vt p, [])
                       . stringToQuads

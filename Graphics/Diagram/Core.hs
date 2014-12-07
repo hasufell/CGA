@@ -15,7 +15,7 @@ data Diag =
   Diag
   {
     mkDiag :: DiagProp
-           -> Object
+           -> [[PT]]
            -> Diagram Cairo R2
   }
   | GifDiag
@@ -27,10 +27,6 @@ data Diag =
               -> [Diagram Cairo R2]
   }
   | EmptyDiag (Diagram Cairo R2)
-
-
-data Object = Object [PT]
-            | Objects [[PT]]
 
 
 -- |Holds the properties for a Diagram, like thickness of 2d points etc.
@@ -68,10 +64,10 @@ instance Monoid Diag where
       g p obj = mkDiag d1 p obj <> mkDiag d2 p obj
   mappend d1@(GifDiag {}) d2@(Diag {}) = GifDiag g
     where
-      g p col f vt = mkGifDiag d1 p col f vt ++ [mkDiag d2 p (Object vt)]
+      g p col f vt = mkGifDiag d1 p col f vt ++ [mkDiag d2 p [vt]]
   mappend d1@(Diag {}) d2@(GifDiag {}) = GifDiag g
     where
-      g p col f vt = mkDiag d2 p (Object vt) : mkGifDiag d1 p col f vt
+      g p col f vt = mkDiag d2 p [vt] : mkGifDiag d1 p col f vt
   mappend d1@(GifDiag {}) d2@(GifDiag {}) = GifDiag g
     where
       g p col f vt = mkGifDiag d1 p col f vt ++ mkGifDiag d2 p col f vt

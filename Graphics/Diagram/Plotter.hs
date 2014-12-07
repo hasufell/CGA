@@ -13,16 +13,18 @@ import Graphics.Diagram.Core
 coordPoints :: Diag
 coordPoints = Diag cp
   where
-    cp p (Object vt) = drawP vt (dotSize p) # fc black # lc black
-    cp p (Objects vts) = drawP (concat vts) (dotSize p) # fc black # lc black
+    cp _ []   = mempty
+    cp p [vt] = drawP vt (dotSize p) # fc black # lc black
+    cp p vts  = drawP (concat vts) (dotSize p) # fc black # lc black
 
 
 -- |Show coordinates as text above all points.
 coordPointsText :: Diag
-coordPointsText = Diag cpt
+coordPointsText = Diag f
   where
-    cpt p (Object vt)   = drawT vt p
-    cpt p (Objects vts) = drawT (concat vts) p
+    f _ []   = mempty
+    f p [vt] = drawT vt p
+    f p vts  = drawT (concat vts) p
     drawT [] _ = mempty
     drawT vt p
       | showCoordText p = position $ zip vt (pointToTextCoord <$> vt)

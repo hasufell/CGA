@@ -22,14 +22,14 @@ gifDiag p xs =
    (upperHullList
      <> fmap (<> last upperHullList) lowerHullList
      <> [mkDiag (mconcat [convexHPText, convexHP, convexHLs])
-         p{ showCoordText = True } (Object xs)])
+         p{ showCoordText = True } [xs]])
   where
     upperHullList = mkGifDiag convexHStepsLs p purple grahamUHSteps xs
     lowerHullList = mkGifDiag convexHStepsLs p orange grahamLHSteps xs
     -- add the x-axis and the other default stuff
     nonChDiag =
       mconcat                               .
-        fmap (\x -> mkDiag x p (Object xs)) $
+        fmap (\x -> mkDiag x p [xs]) $
         [coordPoints, plotterBG]
 
 

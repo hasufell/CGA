@@ -2,6 +2,7 @@
 
 module Graphics.Diagram.Gtk where
 
+import Algebra.Vector(PT)
 import qualified Data.ByteString.Char8 as B
 import Data.List(find)
 import Diagrams.Backend.Cairo
@@ -43,8 +44,8 @@ diagTreAlgos =
 
 
 -- |Create the Diagram from the points.
-diag :: DiagProp -> [DiagAlgo] -> Object -> Diagram Cairo R2
-diag p das obj = maybe mempty (\x -> mkDiag x p obj)
+diag :: DiagProp -> [DiagAlgo] -> [[PT]] -> Diagram Cairo R2
+diag p das vts = maybe mempty (\x -> mkDiag x p vts)
                   $ mconcat
                       <$> getDiags
                       <$> find (\(DiagAlgo x _) -> x == algo p) das
@@ -55,11 +56,11 @@ diag p das obj = maybe mempty (\x -> mkDiag x p obj)
 diagS :: DiagProp -> B.ByteString -> Diagram Cairo R2
 diagS p mesh
   | algo p == 2 || algo p == 3 =
-      diag p diagAlgos . Objects . fmap (filterValidPT p) . facesToArr $ mesh
-  | otherwise = diag p diagAlgos . Object . filterValidPT p . meshToArr $ mesh
+      diag p diagAlgos . fmap (filterValidPT p) . facesToArr $ mesh
+  | otherwise = diag p diagAlgos . (: []) . filterValidPT p . meshToArr $ mesh
 
 
 -- |Create the tree diagram from a String which is supposed to be the contents
 -- of an obj file.
 diagTreeS :: DiagProp -> B.ByteString -> Diagram Cairo R2
-diagTreeS p = diag p diagTreAlgos . Object . filterValidPT p . meshToArr
+diagTreeS p = diag p diagTreAlgos . (: []) . filterValidPT p . meshToArr
