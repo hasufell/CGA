@@ -7,12 +7,14 @@ import Diagrams.Prelude hiding ((<>))
 import Graphics.Diagram.Core
 
 
+-- |All x coordinates separated by the squareSize on DiagProp.
 xAxisPoints :: DiagProp -> [Double]
 xAxisPoints p = takeWhile (< diagXmax p)
                   . iterate (+ squareSize p)
                   $ diagXmin p
 
 
+-- |All y coordinates separated by the squareSize on DiagProp.
 yAxisPoints :: DiagProp -> [Double]
 yAxisPoints p = takeWhile (< diagYmax p)
                   . iterate (+ squareSize p)
