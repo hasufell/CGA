@@ -121,7 +121,6 @@ rangeSearch kd' sq' = (goPt kd' sq', goTree kd' sq' True)
       ++ (if' ((cur' dir . unp2 $ pt) < p2' dir sq)
               (goPt rn sq)
               [])
-        where
     -- A pretty rose tree suitable for printing.
     goTree :: KDTree PT -> Square -> Bool -> Tree String
     goTree KTNil _ _ = Node "nil" []
