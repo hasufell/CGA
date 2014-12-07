@@ -15,26 +15,23 @@ import Diagrams.Prelude hiding ((<>))
 import Diagrams.TwoD.Layout.Tree
 import Graphics.Diagram.Core
 import Parser.PathParser
+import Safe
 
 
 -- |Draw the lines of the polygon.
 polyLines :: Diag
 polyLines = Diag f
   where
-    f _ [] = mempty
-    f _ (x:y:_) =
-      strokePoly x <> strokePoly y
+    f _ = foldl (\x y -> x <> strokePoly y) mempty
       where
-        strokePoly x' = (strokeTrail . fromVertices $ x' ++ [head x'])
-          # moveTo (head x') # lc black
-    f _ _  = mempty
+        strokePoly x' = fromVertices $ x' ++ (maybeToList . headMay $ x')
 
 
 -- |Show the intersection points of two polygons as red dots.
 polyIntersection :: Diag
 polyIntersection = Diag f
   where
-    f p (x:y:_) = drawP vtpi (dotSize p) # fc red # lc red
+    f p [x, y] = drawP vtpi (dotSize p) # fc red # lc red
       where
         vtpi = intersectionPoints . sortLexPolys $ (sortLexPoly x, sortLexPoly y)
     f _ _ = mempty
@@ -44,7 +41,7 @@ polyIntersection = Diag f
 polyIntersectionText :: Diag
 polyIntersectionText = Diag f
   where
-    f p (x:y:_)
+    f p [x, y]
       | showCoordText p = position . zip vtpi $ (pointToTextCoord # fc red <$> vtpi)
           # translate (r2 (0, 10))
       | otherwise = mempty
@@ -60,21 +57,20 @@ polyIntersectionText = Diag f
 convexHP :: Diag
 convexHP = Diag f
   where
-    f p [vt] = drawP (grahamCH vt) (dotSize p) # fc red # lc red
-    f _ _ = mempty
+    f p vts = drawP (grahamCH (concat vts)) (dotSize p) # fc red # lc red
 
 
 -- |Show coordinates as text above the convex hull points.
 convexHPText :: Diag
 convexHPText = Diag f
   where
-    f p [vt]
+    f p vts
       | showCoordText p =
-          position $ zip vtchf (pointToTextCoord <$> vtchf) # translate (r2 (0, 10))
+          (position . zip vtch $ (pointToTextCoord <$> vtch))
+            # translate (r2 (0, 10))
       | otherwise = mempty
       where
-        vtchf = grahamCH vt
-    f _ _ = mempty
+        vtch = grahamCH (concat vts)
 
 
 -- |Create a diagram which shows the lines along the convex hull
@@ -82,10 +78,14 @@ convexHPText = Diag f
 convexHLs :: Diag
 convexHLs = Diag f
   where
-    f _ [vt] =
-      (strokeTrail . fromVertices . flip (++) [head $ grahamCH vt] . grahamCH $ vt)
-        # moveTo (head $ grahamCH vt) # lc red
-    f _ _ = mempty
+    f _ vts =
+      (fromVertices
+        . flip (++) (maybeToList . headMay . grahamCH $ vt)
+        . grahamCH
+        $ vt
+      ) # lc red
+      where
+        vt = mconcat vts
 
 
 -- |Create list of diagrama which describe the lines along points of a half
@@ -94,9 +94,7 @@ convexHLs = Diag f
 convexHStepsLs :: Diag
 convexHStepsLs = GifDiag f
   where
-    f _ col g vt = fmap mkChDiag (g vt)
-      where
-        mkChDiag vt' = (strokeTrail . fromVertices $ vt') # moveTo (head vt') # lc col
+    f _ col g vt = fmap (\x -> fromVertices x # lc col) (g vt)
 
 
 -- |Create a diagram that shows all squares of the RangeSearch algorithm
@@ -104,24 +102,23 @@ convexHStepsLs = GifDiag f
 squares :: Diag
 squares = Diag f
   where
-    f p [vt] =
+    f p vts =
       mconcat
       $ (uncurry rectByDiagonal # lw ultraThin)
         <$>
         (quadTreeSquares (xDimension p, yDimension p)
-          . quadTree vt
+          . quadTree (mconcat vts)
           $ (xDimension p, yDimension p))
-    f _ _ = mempty
 
 
 -- |Draw the squares of the kd-tree.
 kdSquares :: Diag
 kdSquares = Diag f
   where
-    f p [vt] =
+    f p vts =
       mconcat
       . fmap (uncurry (~~))
-      $ kdLines (kdTree vt Horizontal) (xDimension p, yDimension p)
+      $ kdLines (kdTree (mconcat vts) Horizontal) (xDimension p, yDimension p)
       where
         -- Gets all lines that make up the kdSquares. Every line is
         -- described by two points, start and end respectively.
@@ -141,26 +138,26 @@ kdSquares = Diag f
             where
               (_, y') = unp2 pt
         kdLines _ _ = []
-    f _ _ = mempty
 
 
 -- |Draw the range rectangle and highlight the points inside that range.
 kdRange :: Diag
 kdRange = Diag f
   where
-    f p [vt] =
+    f p vts =
       (uncurry rectByDiagonal # lc red) (rangeSquare p)
         <> drawP ptsInRange (dotSize p) # fc red # lc red
       where
-        ptsInRange = fst . rangeSearch (kdTree vt Vertical) $ rangeSquare p
-    f _ _ = mempty
+        ptsInRange = fst
+                       . rangeSearch (kdTree (mconcat vts) Vertical)
+                       $ rangeSquare p
 
 
 -- |The kd-tree visualized as binary tree.
 kdTreeDiag :: Diag
 kdTreeDiag = Diag f
   where
-    f p [vt] =
+    f p vts =
       -- HACK: in order to give specific nodes a specific color
       renderTree (\n -> case n of
                    '*':'*':_ -> (text n # fontSizeL 5.0)
@@ -174,10 +171,9 @@ kdTreeDiag = Diag f
       # scale 2 # alignT # bg white
       where
         roseTree = snd
-                   . rangeSearch (kdTree vt Vertical)
+                   . rangeSearch (kdTree (mconcat vts) Vertical)
                    $ rangeSquare p
 
-    f _ _ = mempty
 
 
 -- |Get the quad tree corresponding to the given points and diagram properties.
@@ -190,16 +186,15 @@ qt vt p = quadTree vt (xDimension p, yDimension p)
 quadPathSquare :: Diag
 quadPathSquare = Diag f
   where
-    f p [vt] =
+    f p vts =
       (uncurry rectByDiagonal # lw thin # lc red)
-      (getSquare (stringToQuads (quadPath p)) (qt vt p, []))
+      (getSquare (stringToQuads (quadPath p)) (qt (mconcat vts) p, []))
       where
         getSquare :: [Either Quad Orient] -> QTZipper PT -> Square
         getSquare [] z = getSquareByZipper (xDimension p, yDimension p) z
         getSquare (q:qs) z = case q of
           Right x -> getSquare qs (fromMaybe z (findNeighbor x z))
           Left x  -> getSquare qs (fromMaybe z (goQuad x z))
-    f _ _  = mempty
 
 
 -- |Create a list of diagrams that show the walk along the given path
@@ -224,9 +219,9 @@ gifQuadPath = GifDiag f
 treePretty :: Diag
 treePretty = Diag f
   where
-    f p [vt] =
+    f p vts =
       prettyRoseTree (quadTreeToRoseTree
-                      . flip getCurQT (qt vt p, [])
+                      . flip getCurQT (qt (mconcat vts) p, [])
                       . stringToQuads
                       . quadPath
                       $ p)
@@ -247,4 +242,3 @@ treePretty = Diag f
                      (~~)
                      (symmLayout' (with & slHSep .~ 60 & slVSep .~ 40) tree)
           # scale 2 # alignT # bg white
-    f _ _  = mempty

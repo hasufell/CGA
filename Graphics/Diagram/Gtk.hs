@@ -54,13 +54,21 @@ diag p das vts = maybe mempty (\x -> mkDiag x p vts)
 -- |Create the Diagram from a String which is supposed to be the contents
 -- of an obj file.
 diagS :: DiagProp -> B.ByteString -> Diagram Cairo R2
-diagS p mesh
-  | algo p == 2 || algo p == 3 =
-      diag p diagAlgos . fmap (filterValidPT p) . facesToArr $ mesh
-  | otherwise = diag p diagAlgos . (: []) . filterValidPT p . meshToArr $ mesh
+diagS p mesh =
+  diag p diagAlgos
+    . fmap (filterValidPT p)
+    . (\x -> if null x then [meshToArr mesh] else x)
+    . facesToArr
+    $ mesh
 
 
 -- |Create the tree diagram from a String which is supposed to be the contents
 -- of an obj file.
 diagTreeS :: DiagProp -> B.ByteString -> Diagram Cairo R2
-diagTreeS p = diag p diagTreAlgos . (: []) . filterValidPT p . meshToArr
+diagTreeS p mesh =
+  diag p diagTreAlgos
+    . fmap (filterValidPT p)
+    . (\x -> if null x then [meshToArr mesh] else x)
+    . facesToArr
+    $ mesh
+

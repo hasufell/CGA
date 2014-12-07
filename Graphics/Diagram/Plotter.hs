@@ -13,8 +13,6 @@ import Graphics.Diagram.Core
 coordPoints :: Diag
 coordPoints = Diag f
   where
-    f _ []   = mempty
-    f p [vt] = drawP vt (dotSize p) # fc black # lc black
     f p vts  = drawP (concat vts) (dotSize p) # fc black # lc black
 
 
@@ -22,8 +20,6 @@ coordPoints = Diag f
 coordPointsText :: Diag
 coordPointsText = Diag f
   where
-    f _ []   = mempty
-    f p [vt] = drawT vt p
     f p vts  = drawT (concat vts) p
     drawT [] _ = mempty
     drawT vt p
