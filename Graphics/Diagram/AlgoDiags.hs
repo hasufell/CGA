@@ -19,32 +19,32 @@ import Parser.PathParser
 
 -- |Draw the lines of the polygon.
 polyLines :: Diag
-polyLines = Diag pp
+polyLines = Diag f
   where
-    pp _ [] = mempty
-    pp _ (x:y:_) =
+    f _ [] = mempty
+    f _ (x:y:_) =
       strokePoly x <> strokePoly y
       where
         strokePoly x' = (strokeTrail . fromVertices $ x' ++ [head x'])
           # moveTo (head x') # lc black
-    pp _ _  = mempty
+    f _ _  = mempty
 
 
 -- |Show the intersection points of two polygons as red dots.
 polyIntersection :: Diag
-polyIntersection = Diag pi'
+polyIntersection = Diag f
   where
-    pi' p (x:y:_) = drawP vtpi (dotSize p) # fc red # lc red
+    f p (x:y:_) = drawP vtpi (dotSize p) # fc red # lc red
       where
         vtpi = intersectionPoints . sortLexPolys $ (sortLexPoly x, sortLexPoly y)
-    pi' _ _ = mempty
+    f _ _ = mempty
 
 
 -- |Show the coordinate text of the intersection points of two polygons.
 polyIntersectionText :: Diag
-polyIntersectionText = Diag pit'
+polyIntersectionText = Diag f
   where
-    pit' p (x:y:_)
+    f p (x:y:_)
       | showCoordText p = position . zip vtpi $ (pointToTextCoord # fc red <$> vtpi)
           # translate (r2 (0, 10))
       | otherwise = mempty
@@ -53,48 +53,48 @@ polyIntersectionText = Diag pit'
                 . sortLexPolys
                 $ (sortLexPoly x,
                    sortLexPoly y)
-    pit' _ _ = mempty
+    f _ _ = mempty
 
 
 -- |Create a diagram which shows the points of the convex hull.
 convexHP :: Diag
-convexHP = Diag chp
+convexHP = Diag f
   where
-    chp p [vt] = drawP (grahamCH vt) (dotSize p) # fc red # lc red
-    chp _ _ = mempty
+    f p [vt] = drawP (grahamCH vt) (dotSize p) # fc red # lc red
+    f _ _ = mempty
 
 
 -- |Show coordinates as text above the convex hull points.
 convexHPText :: Diag
-convexHPText = Diag chpt
+convexHPText = Diag f
   where
-    chpt p [vt]
+    f p [vt]
       | showCoordText p =
           position $ zip vtchf (pointToTextCoord <$> vtchf) # translate (r2 (0, 10))
       | otherwise = mempty
       where
         vtchf = grahamCH vt
-    chpt _ _ = mempty
+    f _ _ = mempty
 
 
 -- |Create a diagram which shows the lines along the convex hull
 -- points.
 convexHLs :: Diag
-convexHLs = Diag chl
+convexHLs = Diag f
   where
-    chl _ [vt] =
+    f _ [vt] =
       (strokeTrail . fromVertices . flip (++) [head $ grahamCH vt] . grahamCH $ vt)
         # moveTo (head $ grahamCH vt) # lc red
-    chl _ _ = mempty
+    f _ _ = mempty
 
 
 -- |Create list of diagrama which describe the lines along points of a half
 -- convex hull, for each iteration of the algorithm. Which half is chosen
 -- depends on the input.
 convexHStepsLs :: Diag
-convexHStepsLs = GifDiag chs
+convexHStepsLs = GifDiag f
   where
-    chs _ col f vt = fmap mkChDiag (f vt)
+    f _ col g vt = fmap mkChDiag (g vt)
       where
         mkChDiag vt' = (strokeTrail . fromVertices $ vt') # moveTo (head vt') # lc col
 

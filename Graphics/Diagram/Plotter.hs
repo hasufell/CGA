@@ -11,11 +11,11 @@ import Graphics.Diagram.Core
 -- as dots. The points and thickness of the dots can be controlled
 -- via DiagProp.
 coordPoints :: Diag
-coordPoints = Diag cp
+coordPoints = Diag f
   where
-    cp _ []   = mempty
-    cp p [vt] = drawP vt (dotSize p) # fc black # lc black
-    cp p vts  = drawP (concat vts) (dotSize p) # fc black # lc black
+    f _ []   = mempty
+    f p [vt] = drawP vt (dotSize p) # fc black # lc black
+    f p vts  = drawP (concat vts) (dotSize p) # fc black # lc black
 
 
 -- |Show coordinates as text above all points.
