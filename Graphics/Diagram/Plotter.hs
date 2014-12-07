@@ -7,13 +7,26 @@ import Diagrams.Prelude hiding ((<>))
 import Graphics.Diagram.Core
 
 
+xAxisPoints :: DiagProp -> [Double]
+xAxisPoints p = takeWhile (< diagXmax p)
+                  . iterate (+ squareSize p)
+                  $ diagXmin p
+
+
+yAxisPoints :: DiagProp -> [Double]
+yAxisPoints p = takeWhile (< diagYmax p)
+                  . iterate (+ squareSize p)
+                  $ diagYmin p
+
+
 -- |Creates a Diagram that shows the coordinates from the points
 -- as dots. The points and thickness of the dots can be controlled
 -- via DiagProp.
 coordPoints :: Diag
 coordPoints = Diag f
   where
-    f p vts  = drawP (concat vts) (dotSize p) # fc black # lc black
+    f p vts  = drawP (concat vts) (relDotSize p) # fc black # lc black
+    relDotSize p = dotSize p / 500 * ((diagWidth p + diagHeight p) / 2)
 
 
 -- |Show coordinates as text above all points.
@@ -36,20 +49,27 @@ xAxis =
   <> Diag segments
   <> Diag labels
   where
-    hRule p _ = arrowAt (p2 (diagXmin p, if diagYmin p <= 0 then 0 else diagYmin p))
-                        (r2 (diagWidth p, 0))
-    segments p _ =  hcat' (with & sep .~ squareSize p)
-                          (replicate (floor . (/) (diagWidth p) $ squareSize p)
-                                     (vrule 10))
-      # moveTo (p2 (diagXmin p, if diagYmin p <= 0 then 0 else diagYmin p))
-    labels p _ = position . zip (mkPoint <$> xs)
-                                $ ((\x -> (text . show $ x) # scale 10) <$> xs)
+    hRule p _ =
+      arrowAt (p2 (diagXmin p, diagYminPos p))
+              (r2 (diagWidth p, 0))
+    segments p _ =
+      mconcat
+        . fmap (\x -> p2 (x, diagYminPos p - segY)
+                   ~~ p2 (x, diagYminPos p + segY))
+        $ xAxisPoints p
       where
-        xs :: [Int]
-        xs = take (floor . (/) (diagWidth p) $ squareSize p)
-                  (iterate (+(floor . squareSize $ p)) (floor . diagXmin $ p))
-        mkPoint x = p2 (fromIntegral x,
-                        -15 + (if diagYmin p <= 0 then 0 else diagYmin p))
+        segY = diagWidth p / 100
+    labels p _ =
+      position
+        . zip (mkPoint <$> xAxisPoints p)
+        $ ((\x -> (text . show . floor $ x) # scale labelScale)
+             <$> xAxisPoints p)
+        where
+          mkPoint x =
+            p2 (x, labelOffset + diagYminPos p)
+          labelScale = diagWidth p / 50
+          labelOffset = negate (diagWidth p / 50 * 2)
+    diagYminPos p = if diagYmin p <= 0 then 0 else diagYmin p
 
 
 -- |Creates a Diagram that shows an YAxis which is bound
@@ -60,22 +80,27 @@ yAxis =
   <> Diag segments
   <> Diag labels
   where
-    vRule p _ = arrowAt (p2 (if diagXmin p <= 0 then 0 else diagXmin p, diagYmin p))
-                        (r2 (0, diagHeight p))
-    segments p _ = vcat' (with & sep .~ squareSize p)
-                         (replicate (floor . (/) (diagHeight p) $ squareSize p)
-                                    (hrule 10))
-      # alignB
-      # moveTo (p2 (if diagXmin p <= 0 then 0 else diagXmin p, diagYmin p))
-    labels p _ = position . zip (mkPoint <$> ys)
-                                $ ((\x -> (text . show $ x) # scale 10) <$> ys)
+    vRule p _ =
+      arrowAt (p2 (diagXminPos p, diagYmin p))
+              (r2 (0, diagHeight p))
+    segments p _ =
+      mconcat
+        . fmap (\y -> p2 (diagXminPos p - segX, y)
+                   ~~ p2 (diagXminPos p + segX, y))
+        $ yAxisPoints p
+      where
+        segX = diagHeight p / 100
+    labels p _ =
+      position
+        . zip (mkPoint <$> yAxisPoints p)
+        $ ((\x -> (text . show . floor $ x) # scale labelScale)
+             <$> yAxisPoints p)
         where
-          ys :: [Int]
-          ys = take (floor . (/) (diagHeight p) $ squareSize p)
-                    (iterate (+(floor . squareSize $ p)) (floor . diagYmin $ p))
-          mkPoint y = p2 (-15 + (if diagXmin p <= 0 then 0 else diagXmin p),
-                          fromIntegral y)
-
+          mkPoint y =
+            p2 (labelOffset + diagXminPos p, y)
+          labelScale = diagHeight p / 50
+          labelOffset = negate (diagHeight p / 50 * 2)
+    diagXminPos p = if diagXmin p <= 0 then 0 else diagXmin p
 
 -- |Creates a Diagram that shows a white rectangle which is a little
 -- bit bigger than both X and Y axis dimensions from DiagProp.
@@ -87,7 +112,6 @@ whiteRectB = Diag rect'
                   # lwG 0.00
                   # bg white
                   # moveTo (p2 (diagWidthOffset p, diagHeightOffset p))
-      where
 
 
 -- |Create a grid across the whole diagram with squares of the
@@ -96,16 +120,18 @@ grid :: Diag
 grid = Diag xGrid <> Diag yGrid
   where
     yGrid p _
-      | haveGrid p = hcat' (with & sep .~ squareSize p)
-                           (replicate (floor . (/) (diagWidth p) $ squareSize p)
-                                      (vrule $ diagHeight p))
-          # moveTo (p2 (diagXmin p, diagHeightOffset p)) # lw ultraThin
+      | haveGrid p =
+          mconcat
+            . fmap (\x -> p2 (x, diagYmin p)
+                       ~~ p2 (x, diagYmax p) # lw ultraThin)
+            $ xAxisPoints p
       | otherwise = mempty
     xGrid p _
-      | haveGrid p = vcat' (with & sep .~ squareSize p)
-                           (replicate (floor . (/) (diagHeight p) $ squareSize p)
-                                      (hrule $ diagWidth p))
-          # alignB # moveTo (p2 (diagWidthOffset p, diagYmin p)) # lw ultraThin
+      | haveGrid p =
+          mconcat
+            . fmap (\y -> p2 (diagXmin p, y)
+                       ~~ p2 (diagXmax p, y) # lw ultraThin)
+            $ yAxisPoints p
       | otherwise = mempty
 
 
