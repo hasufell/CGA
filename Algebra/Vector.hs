@@ -3,6 +3,7 @@
 module Algebra.Vector where
 
 import Control.Applicative
+import Control.Arrow ((***))
 import Data.List (sortBy)
 import Diagrams.TwoD.Types
 import Graphics.Gloss.Geometry.Line
@@ -96,8 +97,8 @@ intersectSeg' (a, b) (c, d) =
                                 (ptToGloss c)
                                 (ptToGloss d)
   where
-    ptToGloss = (\(x, y) -> (double2Float x, double2Float y)) <$> unp2
-    glossToPt = p2 . (\(x, y) -> (float2Double x, float2Double y))
+    ptToGloss = (double2Float *** double2Float) <$> unp2
+    glossToPt = p2 . (float2Double *** float2Double)
 
 
 -- |Get the orientation of 3 points which can either be
