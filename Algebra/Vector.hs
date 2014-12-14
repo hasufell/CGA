@@ -143,7 +143,7 @@ sortedY xs =
 
 
 -- |Apply a function on the coordinates of a point.
-onPT :: ((Double, Double) -> (Double, Double)) -> PT -> PT
+onPT :: (Coord -> Coord) -> PT -> PT
 onPT f = p2 . f . unp2
 
 
