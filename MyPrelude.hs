@@ -48,7 +48,7 @@ getLastX a xs
 
 
 -- |Get a list with it's head and last element cut. If there are less
--- than 2 elements in the list, return an empty list.
+-- than 3 elements in the list, return an empty list.
 tailInit :: [a] -> [a]
 tailInit xs
   | length xs > 2 = tail . init $ xs
