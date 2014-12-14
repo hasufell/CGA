@@ -2,6 +2,7 @@
 
 module MyPrelude where
 
+import Control.Arrow ((***))
 import Data.List
 
 
@@ -64,7 +65,7 @@ rmdups =
 
 -- |Apply a function to the first element of a tuple.
 first :: (a -> b) -> (a,c) -> (b,c)
-first f (x,y) = (f x, y)
+first = (*** id)
 
 
 -- |Sequentialize a list, such as:
