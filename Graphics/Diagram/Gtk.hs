@@ -15,40 +15,43 @@ import Parser.Meshparser
 
 -- |Data structure that holds an algorithm identifier and it's
 -- corresponding list of diagrams.
-data DiagAlgo = DiagAlgo {
-  algoNum :: Int,    -- the identifier for the algorithm
-  getDiags :: [Diag] -- the diagrams making up this algorithm
-}
+newtype DiagAlgo = DiagAlgo { getDiagAlgo ::
+                     (Int      -- the identifier for the algorithm
+                     , [Diag]) -- the diagrams making up this algorithm
+                   }
 
 
 -- |Introspective data structure holding all algorithms for the
 -- coordinate system.
 diagAlgos :: [DiagAlgo]
 diagAlgos =
-  [DiagAlgo 0 [coordPointsText, coordPoints, plotterBG]
-  ,DiagAlgo 1 [convexHPText, convexHP, convexHLs, coordPoints, plotterBG]
-  ,DiagAlgo 2 [polyLines, coordPointsText, coordPoints, plotterBG]
-  ,DiagAlgo 3 [polyIntersectionText, polyIntersection,
-                 coordPoints, polyLines, plotterBG]
-  ,DiagAlgo 4 [quadPathSquare, squares, coordPointsText,
-                 coordPoints, plotterBG]
-  ,DiagAlgo 5 [kdRange, kdSquares, coordPointsText, coordPoints, plotterBG]]
+  [DiagAlgo (0, [coordPointsText, coordPoints, plotterBG])
+  ,DiagAlgo (1, [convexHPText, convexHP, convexHLs, coordPoints, plotterBG])
+  ,DiagAlgo (2, [polyLines, coordPointsText, coordPoints, plotterBG])
+  ,DiagAlgo (3, [polyIntersectionText, polyIntersection,
+                 coordPoints, polyLines, plotterBG])
+  ,DiagAlgo (4, [quadPathSquare, squares, coordPointsText,
+                 coordPoints, plotterBG])
+  ,DiagAlgo (5, [kdRange, kdSquares, coordPointsText, coordPoints, plotterBG])]
 
 
 -- |Introspective data structure holding all algorithms for the
 -- tree view.
 diagTreAlgos :: [DiagAlgo]
 diagTreAlgos =
-  [DiagAlgo 4 [treePretty]
-  ,DiagAlgo 5 [kdTreeDiag]]
+  [DiagAlgo (4, [treePretty])
+  ,DiagAlgo (5, [kdTreeDiag])]
 
 
 -- |Create the Diagram from the points.
 diag :: DiagProp -> [DiagAlgo] -> [[PT]] -> Diagram Cairo R2
 diag p das vts = maybe mempty (\x -> mkDiag x p vts)
                   $ mconcat
-                      <$> getDiags
-                      <$> find (\(DiagAlgo x _) -> x == algo p) das
+                      -- get the actual [Diag] array
+                      <$> (snd . getDiagAlgo)
+                      -- find the correct element from the [DiagAlgo] list
+                      -- which corresponds to the algorithm from DiagProp
+                      <$> find ((==) (algo p) . fst . getDiagAlgo) das
 
 
 -- |Create the Diagram from a String which is supposed to be the contents
