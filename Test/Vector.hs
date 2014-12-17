@@ -7,6 +7,8 @@ import Algebra.Vector
 import Control.Applicative
 import Control.Arrow
 {- import Control.Monad -}
+import Diagrams.Coordinates
+import Diagrams.Points
 import Diagrams.TwoD.Types
 import Test.QuickCheck
 
@@ -24,6 +26,14 @@ newtype RoundR2 = RoundR2 { getRR2 :: R2 }
 
 
 newtype PosRoundR2 = PosRoundR2 { getPRR2 :: R2 }
+  deriving (Eq, Ord, Show, Read)
+
+
+newtype RoundP2 = RoundP2 { getRP2 :: P2 }
+  deriving (Eq, Ord, Show, Read)
+
+
+newtype PosRoundP2 = PosRoundP2 { getPRP2 :: P2 }
   deriving (Eq, Ord, Show, Read)
 
 
@@ -46,6 +56,18 @@ instance Arbitrary RoundR2 where
 
 instance Arbitrary PosRoundR2 where
   arbitrary = curry (PosRoundR2 . r2 . (getPRD *** getPRD))
+                <$> (arbitrary :: Gen PosRoundDouble)
+                <*> (arbitrary :: Gen PosRoundDouble)
+
+
+instance Arbitrary RoundP2 where
+  arbitrary = curry (RoundP2 . p2 . (getRD *** getRD))
+                <$> (arbitrary :: Gen RoundDouble)
+                <*> (arbitrary :: Gen RoundDouble)
+
+
+instance Arbitrary PosRoundP2 where
+  arbitrary = curry (PosRoundP2 . p2 . (getPRD *** getPRD))
                 <$> (arbitrary :: Gen PosRoundDouble)
                 <*> (arbitrary :: Gen PosRoundDouble)
 
@@ -182,3 +204,60 @@ scalarProdProp4 (RoundDouble s1) (RoundDouble s2) (RoundR2 v1) (RoundR2 v2)
 scalarProdProp5 :: Positive Vec -> Positive Vec -> Bool
 scalarProdProp5 (Positive (R2 x1 _)) (Positive (R2 _ y2))
   = scalarProd (R2 x1 0) (R2 0 y2) == 0
+
+
+-- this is almost the same as the function definition
+dimToSquareProp1 :: (Double, Double) -> (Double, Double) -> Bool
+dimToSquareProp1 (x1, x2) (y1, y2) =
+  ((x1, y1), (x2, y2)) == dimToSquare (x1, x2) (y1, y2)
+
+
+-- multiply scalar with result of vecLength or with the vector itself...
+-- both results must be the same. We can't check against 0
+-- because of sqrt in vecLength.
+vecLengthProp1 :: PosRoundDouble -> Vec -> Bool
+vecLengthProp1 (PosRoundDouble r) v
+  = abs (vecLength v * r - vecLength (scalarMul r v)) < 0.0001
+
+
+-- convert to vector and back again
+pt2VecProp1 :: PT -> Bool
+pt2VecProp1 pt = (vec2Pt . pt2Vec $ pt) == pt
+
+
+-- unbox coordinates and check if equal
+pt2VecProp2 :: PT -> Bool
+pt2VecProp2 pt = (unr2 . pt2Vec $ pt) == unp2 pt
+
+
+-- convert to point and back again
+vec2PtProp1 :: Vec -> Bool
+vec2PtProp1 v = (pt2Vec . vec2Pt $ v) == v
+
+
+-- unbox coordinates and check if equal
+vec2PtProp2 :: Vec -> Bool
+vec2PtProp2 v = (unp2 . vec2Pt $ v) == unr2 v
+
+
+-- vector from a to b must not be the same as b to a
+vp2Prop1 :: PT -> PT -> Bool
+vp2Prop1 p1' p2'
+  | p1' == origin && p2' == origin = True
+  | otherwise = vp2 p1' p2' /= vp2 p2' p1'
+
+
+-- negating vector from a to be must be the same as vector b to a
+vp2Prop2 :: PT -> PT -> Bool
+vp2Prop2 p1' p2'
+  | p1' == origin && p2' == origin = True
+  | otherwise = vp2 p1' p2' == (\(R2 x y) -> negate x ^& negate y)
+                                 (vp2 p2' p1')
+                &&
+                vp2 p2' p1' == (\(R2 x y) -> negate x ^& negate y)
+                                 (vp2 p1' p2')
+
+
+-- determinant of the 3 same points is always 0
+detProp1 :: PT -> Bool
+detProp1 pt' = det pt' pt' pt' == 0
