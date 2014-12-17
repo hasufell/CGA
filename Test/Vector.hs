@@ -142,6 +142,13 @@ getAngleProp6 (Positive v1) (Positive v2)
   = getAngle v1 v2 == getAngle v2 v1
 
 
+-- Angle between two identical vectors. We can't check against 0
+-- because of sqrt in vecLength.
+getAngleProp7 :: PosRoundR2 -> Bool
+getAngleProp7 (PosRoundR2 v)
+  = getAngle v v < 0.0001 || isNaN (getAngle v v)
+
+
 -- commutative
 scalarProdProp1 :: Vec -> Vec -> Bool
 scalarProdProp1 v1 v2 = v1 `scalarProd` v2 == v2 `scalarProd` v1
