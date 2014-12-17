@@ -31,3 +31,5 @@ main = do
   deepCheck scalarProdProp1
   deepCheck scalarProdProp2
   deepCheck scalarProdProp3
+  deepCheck scalarProdProp4
+  deepCheck scalarProdProp5

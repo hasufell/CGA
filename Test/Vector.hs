@@ -108,3 +108,20 @@ scalarProdProp3 r v1 v2 v3 =
     [v1', v2', v3'] = fmap (r2 . (fromIntegral *** fromIntegral)) [v1, v2, v3]
     r'  = fromIntegral r
 
+
+-- scalar multiplication
+scalarProdProp4 :: Int -> Int -> (Int, Int) -> (Int, Int) -> Bool
+scalarProdProp4 s1 s2 v1 v2
+  = scalarMul s1' v1' `scalarProd` scalarMul s2' v2'
+    ==
+    s1' * s2' * (v1' `scalarProd` v2')
+    where
+      [v1', v2'] = fmap (r2 . (fromIntegral *** fromIntegral)) [v1, v2]
+      s1' = fromIntegral s1
+      s2' = fromIntegral s2
+
+
+-- orthogonal
+scalarProdProp5 :: Positive Vec -> Positive Vec -> Bool
+scalarProdProp5 (Positive (R2 x1 _)) (Positive (R2 _ y2))
+  = scalarProd (R2 x1 0) (R2 0 y2) == 0
