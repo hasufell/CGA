@@ -2,6 +2,7 @@
 
 module GUI.Gtk (makeGUI) where
 
+import Algebra.Vector (dimToSquare)
 import Control.Applicative
 import Control.Monad(unless)
 import Control.Monad.IO.Class
@@ -308,8 +309,9 @@ saveAndDrawDiag fp fps mygui =
                 haveGrid      = gridActive,
                 showCoordText = coordTextActive,
                 quadPath      = quadPathEntry',
-                rangeSquare   = (fromMaybe (0, 500) rxDim,
-                                 fromMaybe (0, 500) ryDim)
+                rangeSquare   = case (rxDim, ryDim) of
+                  (Just xd', Just yd') -> dimToSquare xd' yd'
+                  _                    -> ((0, 0), (500, 500))
                 })
               mesh)
         (s, r)  = renderDiag daW daH diagS

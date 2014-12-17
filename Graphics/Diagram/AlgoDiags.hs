@@ -2,7 +2,7 @@
 
 module Graphics.Diagram.AlgoDiags where
 
-import Algebra.Vector(PT,Square)
+import Algebra.Vector(PT,Square,dimToSquare)
 import Algorithms.GrahamScan
 import Algorithms.QuadTree
 import Algorithms.KDTree
@@ -106,9 +106,9 @@ squares = Diag f
       mconcat
       $ (uncurry rectByDiagonal # lw ultraThin)
         <$>
-        (quadTreeSquares (xDimension p, yDimension p)
+        (quadTreeSquares (diagDimSquare p)
           . quadTree (mconcat vts)
-          $ (xDimension p, yDimension p))
+          $ diagDimSquare p)
 
 
 -- |Draw the squares of the kd-tree.
@@ -118,23 +118,24 @@ kdSquares = Diag f
     f p vts =
       mconcat
       . fmap (uncurry (~~))
-      $ kdLines (kdTree (mconcat vts) Horizontal) (xDimension p, yDimension p)
+      $ kdLines (kdTree (mconcat vts) Horizontal)
+                (diagDimSquare p)
       where
         -- Gets all lines that make up the kdSquares. Every line is
         -- described by two points, start and end respectively.
         kdLines :: KDTree PT -> Square -> [(PT, PT)]
-        kdLines (KTNode ln pt Horizontal rn) ((xmin, xmax), (ymin, ymax)) =
+        kdLines (KTNode ln pt Horizontal rn) ((xmin, ymin), (xmax, ymax)) =
           (\(x, _) -> [(p2 (x, ymin), p2 (x, ymax))])
             (unp2 pt)
-          ++ kdLines ln ((xmin, x'), (ymin, ymax))
-          ++ kdLines rn ((x', xmax), (ymin, ymax))
+          ++ kdLines ln ((xmin, ymin), (x', ymax))
+          ++ kdLines rn ((x', ymin), (xmax, ymax))
             where
               (x', _) = unp2 pt
-        kdLines (KTNode ln pt Vertical rn) ((xmin, xmax), (ymin, ymax)) =
+        kdLines (KTNode ln pt Vertical rn) ((xmin, ymin), (xmax, ymax)) =
           (\(_, y) -> [(p2 (xmin, y), p2 (xmax, y))])
             (unp2 pt)
-          ++ kdLines ln ((xmin, xmax), (ymin, y'))
-          ++ kdLines rn ((xmin, xmax), (y', ymax))
+          ++ kdLines ln ((xmin, ymin), (xmax, y'))
+          ++ kdLines rn ((xmin, y'), (xmax, ymax))
             where
               (_, y') = unp2 pt
         kdLines _ _ = []
@@ -178,7 +179,7 @@ kdTreeDiag = Diag f
 
 -- |Get the quad tree corresponding to the given points and diagram properties.
 qt :: [PT] -> DiagProp -> QuadTree PT
-qt vt p = quadTree vt (xDimension p, yDimension p)
+qt vt p = quadTree vt (diagDimSquare p)
 
 
 -- |Create a diagram that shows a single square of the RangeSearch algorithm
@@ -191,7 +192,7 @@ quadPathSquare = Diag f
       (getSquare (stringToQuads (quadPath p)) (qt (mconcat vts) p, []))
       where
         getSquare :: [Either Quad Orient] -> QTZipper PT -> Square
-        getSquare [] z = getSquareByZipper (xDimension p, yDimension p) z
+        getSquare [] z = getSquareByZipper (diagDimSquare p) z
         getSquare (q:qs) z = case q of
           Right x -> getSquare qs (fromMaybe z (findNeighbor x z))
           Left x  -> getSquare qs (fromMaybe z (goQuad x z))
@@ -207,11 +208,11 @@ gifQuadPath = GifDiag f
       <$> getSquares (stringToQuads (quadPath p)) (qt vt p, [])
       where
         getSquares :: [Either Quad Orient] -> QTZipper PT -> [Square]
-        getSquares [] z = [getSquareByZipper (xDimension p, yDimension p) z]
+        getSquares [] z = [getSquareByZipper (diagDimSquare p) z]
         getSquares (q:qs) z = case q of
-          Right x -> getSquareByZipper (xDimension p, yDimension p) z :
+          Right x -> getSquareByZipper (diagDimSquare p) z :
                        getSquares qs (fromMaybe z (findNeighbor x z))
-          Left x  -> getSquareByZipper (xDimension p, yDimension p) z :
+          Left x  -> getSquareByZipper (diagDimSquare p) z :
                        getSquares qs (fromMaybe z (goQuad x z))
 
 

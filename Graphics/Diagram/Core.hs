@@ -35,9 +35,9 @@ data DiagProp = MkProp {
   -- |The thickness of the dots.
   dotSize :: Double,
   -- |The dimensions of the x-axis.
-  xDimension :: Coord,
+  xDimension :: (Double, Double),
   -- |The dimensions of the y-axis.
-  yDimension :: Coord,
+  yDimension :: (Double, Double),
   -- |Algorithm to use.
   algo :: Int,
   -- |If we want to show the grid.
@@ -135,7 +135,14 @@ maybeDiag b d
 
 
 filterValidPT :: DiagProp -> [PT] -> [PT]
-filterValidPT p = filter (inRange (xDimension p, yDimension p))
+filterValidPT =
+  filter
+  . inRange
+  . diagDimSquare
+
+
+diagDimSquare :: DiagProp -> Square
+diagDimSquare p = dimToSquare (xDimension p) $ yDimension p
 
 
 -- |Draw a list of points.
@@ -154,9 +161,13 @@ drawP vt ds =
 rectByDiagonal :: (Double, Double)  -- ^ sw point
                -> (Double, Double)  -- ^ nw point
                -> Diagram Cairo R2
-rectByDiagonal (xmin, xmax) (ymin, ymax) =
-  rect (xmax - xmin) (ymax - ymin)
-    # moveTo (p2 ((xmax + xmin) / 2, (ymax + ymin) / 2))
+rectByDiagonal (xmin, ymin) (xmax, ymax) =
+  fromVertices [p2 (xmin, ymin)
+                , p2 (xmax, ymin)
+                , p2 (xmax, ymax)
+                , p2 (xmin, ymax)
+                , p2 (xmin, ymin)
+               ]
 
 
 -- |Creates a Diagram from a point that shows the coordinates

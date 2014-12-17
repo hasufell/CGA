@@ -24,12 +24,24 @@ data Alignment = CW
   deriving (Eq)
 
 
--- |Checks whether the Point is in a given dimension.
-inRange :: Square -- ^ the square: ((xmin, xmax), (ymin, ymax))
+-- |Convert two dimensions such as (xmin, xmax) and (ymin, ymax)
+-- to proper square coordinates, as in:
+-- ((xmin, ymin), (xmax, ymax))
+dimToSquare :: (Double, Double) -- ^ x dimension
+            -> (Double, Double) -- ^ y dimension
+            -> Square           -- ^ square describing those dimensions
+dimToSquare (x1, x2) (y1, y2) = ((x1, y1), (x2, y2))
+
+
+-- |Checks whether the Point is in a given Square.
+inRange :: Square -- ^ the square: ((xmin, ymin), (xmax, ymax))
         -> PT     -- ^ Coordinate
         -> Bool   -- ^ result
-inRange ((xmin, xmax), (ymin, ymax)) p =
-  x <= xmax && x >= xmin && y <= ymax && y >= ymin
+inRange ((xmin, ymin), (xmax, ymax)) p
+  = x >= min xmin xmax
+    && x <= max xmin xmax
+    && y >= min ymin ymax
+    && y <= max ymin ymax
   where
     (x, y) = unp2 p
 

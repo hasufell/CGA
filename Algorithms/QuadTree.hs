@@ -57,10 +57,10 @@ data Orient = North | South | East | West
 
 -- |Get a sub-square of the current square, e.g. nw, ne, sw or se.
 nwSq, neSq, swSq, seSq :: Square -> Square
-nwSq ((xl, xu), (yl, yu)) = (,)  (xl, (xl + xu) / 2)  ((yl + yu) / 2, yu)
-neSq ((xl, xu), (yl, yu)) = (,)  ((xl + xu) / 2, xu)  ((yl + yu) / 2, yu)
-swSq ((xl, xu), (yl, yu)) = (,)  (xl, (xl + xu) / 2)  (yl, (yl + yu) / 2)
-seSq ((xl, xu), (yl, yu)) = (,)  ((xl + xu) / 2, xu)  (yl, (yl + yu) / 2)
+nwSq ((xl, yl), (xu, yu)) = (,)  (xl, (yl + yu) / 2)  ((xl + xu) / 2, yu)
+neSq ((xl, yl), (xu, yu)) = (,)  ((xl + xu) / 2, (yl + yu) / 2)  (xu, yu)
+swSq ((xl, yl), (xu, yu)) = (,)  (xl, yl)  ((xl + xu) / 2, (yl + yu) / 2)
+seSq ((xl, yl), (xu, yu)) = (,)  ((xl + xu) / 2, yl)  (xu, (yl + yu) / 2)
 
 
 -- |Check whether the current Node is an nw, ne, sw or se child of it's

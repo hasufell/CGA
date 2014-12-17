@@ -104,9 +104,9 @@ rangeSearch :: KDTree PT -> Square -> ([PT], Tree String)
 rangeSearch kd' sq' = (goPt kd' sq', goTree kd' sq' True)
   where
     -- either y1 or x1 depending on the orientation
-    p1'  dir ((x1, _), (y1, _)) = if' (dir == Vertical) y1 x1
+    p1'  dir ((x1, y1), (_, _)) = if' (dir == Vertical) y1 x1
     -- either y2 or x2 depending on the orientation
-    p2'  dir ((_, x2), (_, y2)) = if' (dir == Vertical) y2 x2
+    p2'  dir ((_, _), (x2, y2)) = if' (dir == Vertical) y2 x2
     -- either the second or first of the tuple, depending on the orientation
     cur' dir = if' (dir == Vertical) snd fst
     -- All points in the range.
