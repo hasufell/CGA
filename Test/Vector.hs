@@ -97,9 +97,10 @@ getAngleProp5 (Positive (R2 x1 _)) (Positive (R2 _ y2))
   = getAngle (R2 x1 0) (R2 0 y2) == pi / 2
 
 
+-- commutative
 getAngleProp6 :: Positive Vec -> Positive Vec -> Bool
-getAngleProp6 (Positive (R2 _ y1)) (Positive (R2 x2 _))
-  = getAngle (R2 0 y1) (R2 x2 0) == pi / 2
+getAngleProp6 (Positive v1) (Positive v2)
+  = getAngle v1 v2 == getAngle v2 v1
 
 
 -- commutative
