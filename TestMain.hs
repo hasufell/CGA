@@ -27,3 +27,7 @@ main = do
   deepCheck getAngleProp4
   deepCheck getAngleProp5
   deepCheck getAngleProp6
+  putStrLn "testing scalarProd:"
+  deepCheck scalarProdProp1
+  deepCheck scalarProdProp2
+  deepCheck scalarProdProp3

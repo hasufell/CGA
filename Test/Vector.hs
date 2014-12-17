@@ -5,6 +5,7 @@ module Test.Vector where
 
 import Algebra.Vector
 import Control.Applicative
+import Control.Arrow
 {- import Control.Monad -}
 import Diagrams.TwoD.Types
 import Test.QuickCheck
@@ -80,3 +81,36 @@ getAngleProp5 (Positive (R2 x1 _)) (Positive (R2 _ y2))
 getAngleProp6 :: Positive Vec -> Positive Vec -> Bool
 getAngleProp6 (Positive (R2 _ y1)) (Positive (R2 x2 _))
   = getAngle (R2 0 y1) (R2 x2 0) == pi / 2
+
+
+-- commutative
+scalarProdProp1 :: Vec -> Vec -> Bool
+scalarProdProp1 v1 v2 = v1 `scalarProd` v2 == v2 `scalarProd` v1
+
+
+-- distributive, avoid doubles as we get messed up precision
+scalarProdProp2 :: (Int, Int) -> (Int, Int) -> (Int, Int) -> Bool
+scalarProdProp2 v1 v2 v3 =
+  v1' `scalarProd` (v2' + v3')
+  ==
+  (v1' `scalarProd` v2') + (v1' `scalarProd` v3')
+  where
+    v1' = r2 . (fromIntegral *** fromIntegral) $ v1
+    v2' = r2 . (fromIntegral *** fromIntegral) $ v2
+    v3' = r2 . (fromIntegral *** fromIntegral) $ v3
+
+
+-- bilinear, avoid doubles as we get messed up precision
+scalarProdProp3 :: Int -> (Int, Int) -> (Int, Int) -> (Int, Int) -> Bool
+scalarProdProp3 r v1 v2 v3 =
+  v1' `scalarProd` (scalarMul r' v2' + v3')
+  ==
+  r' * (v1' `scalarProd` v2') + (v1' `scalarProd` v3')
+  where
+    scalarMul :: Double -> Vec -> Vec
+    scalarMul d (R2 a b) = R2 (a * d) (b * d)
+    v1' = r2 . (fromIntegral *** fromIntegral) $ v1
+    v2' = r2 . (fromIntegral *** fromIntegral) $ v2
+    v3' = r2 . (fromIntegral *** fromIntegral) $ v3
+    r'  = fromIntegral r
+
