@@ -64,10 +64,7 @@ vecLength v = sqrt (x^(2 :: Int) + y^(2 :: Int))
 
 -- |Compute the scalar product of two vectors.
 scalarProd :: Vec -> Vec -> Double
-scalarProd v1 v2 = a1 * b1 + a2 * b2
-  where
-    (a1, a2) = unr2 v1
-    (b1, b2) = unr2 v2
+scalarProd (R2 a1 a2) (R2 b1 b2) = a1 * b1 + a2 * b2
 
 
 -- |Construct a vector that points to a point from the origin.
