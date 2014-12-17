@@ -95,9 +95,7 @@ scalarProdProp2 v1 v2 v3 =
   ==
   (v1' `scalarProd` v2') + (v1' `scalarProd` v3')
   where
-    v1' = r2 . (fromIntegral *** fromIntegral) $ v1
-    v2' = r2 . (fromIntegral *** fromIntegral) $ v2
-    v3' = r2 . (fromIntegral *** fromIntegral) $ v3
+    [v1', v2', v3'] = fmap (r2 . (fromIntegral *** fromIntegral)) [v1, v2, v3]
 
 
 -- bilinear, avoid doubles as we get messed up precision
@@ -107,8 +105,6 @@ scalarProdProp3 r v1 v2 v3 =
   ==
   r' * (v1' `scalarProd` v2') + (v1' `scalarProd` v3')
   where
-    v1' = r2 . (fromIntegral *** fromIntegral) $ v1
-    v2' = r2 . (fromIntegral *** fromIntegral) $ v2
-    v3' = r2 . (fromIntegral *** fromIntegral) $ v3
+    [v1', v2', v3'] = fmap (r2 . (fromIntegral *** fromIntegral)) [v1, v2, v3]
     r'  = fromIntegral r
 
