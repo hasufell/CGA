@@ -49,10 +49,10 @@ inRange ((xmin, ymin), (xmax, ymax)) (coords -> x :& y)
 -- |Get the angle between two vectors.
 getAngle :: Vec -> Vec -> Double
 getAngle a b =
-  acos                                   .
-    flip (/) (vecLength a * vecLength b) .
-    scalarProd a                         $
-    b
+  acos
+    . flip (/) (vecLength a * vecLength b)
+    . scalarProd a
+    $ b
 
 
 -- |Get the length of a vector.
