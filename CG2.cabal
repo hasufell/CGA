@@ -140,3 +140,50 @@ executable Gif
 
   -- Base language which the package is written in.
   default-language:    Haskell2010
+
+
+executable Test
+  -- .hs or .lhs file containing the Main module.
+  main-is:             TestMain.hs
+
+  -- Modules included in this executable, other than Main.
+  other-modules:       Algebra.Vector
+                       Algorithms.GrahamScan
+                       Algorithms.PolygonIntersection
+                       Algorithms.QuadTree
+                       Algorithms.KDTree
+                       Graphics.Diagram.AlgoDiags
+                       Graphics.Diagram.Core
+                       Graphics.Diagram.Gif
+                       Graphics.Diagram.Plotter
+                       MyPrelude
+                       Parser.Meshparser
+                       Parser.PathParser
+                       QueueEx
+                       Test.Vector
+
+
+  -- LANGUAGE extensions used by modules in this package.
+  -- other-extensions:
+
+  -- Other library packages from which modules are imported.
+  build-depends:       attoparsec >= 0.12.1.1,
+                       base >=4.6 && <4.8,
+                       bytestring >= 0.10.4.0,
+                       containers >= 0.5.0.0,
+                       dequeue >= 0.1.5,
+                       diagrams-lib >=1.2 && <1.3,
+                       diagrams-cairo >=1.2 && <1.3,
+                       diagrams-contrib >= 1.1.2.1,
+                       gloss >= 1.2.0.1,
+                       JuicyPixels >= 3.1.7.1,
+                       multiset-comb >= 0.2.1,
+                       QuickCheck >= 2.4.2,
+                       transformers >=0.4 && <0.5,
+                       safe >= 0.3.8
+
+  -- Directories containing source files.
+  -- hs-source-dirs:
+
+  -- Base language which the package is written in.
+  default-language:    Haskell2010
