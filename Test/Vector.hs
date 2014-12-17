@@ -11,6 +11,45 @@ import Diagrams.TwoD.Types
 import Test.QuickCheck
 
 
+newtype RoundDouble = RoundDouble { getRD :: Double }
+  deriving (Eq, Ord, Show, Read)
+
+
+newtype PosRoundDouble = PosRoundDouble { getPRD :: Double }
+  deriving (Eq, Ord, Show, Read)
+
+
+newtype RoundR2 = RoundR2 { getRR2 :: R2 }
+  deriving (Eq, Ord, Show, Read)
+
+
+newtype PosRoundR2 = PosRoundR2 { getPRR2 :: R2 }
+  deriving (Eq, Ord, Show, Read)
+
+
+instance Arbitrary RoundDouble where
+  arbitrary = RoundDouble <$> fromIntegral <$> (arbitrary :: Gen Int)
+
+
+instance Arbitrary PosRoundDouble where
+  arbitrary = PosRoundDouble
+                <$> fromIntegral
+                -- (maxBound :: Int) instead of 100000 generates doubles
+                <$> (choose (1, 10000) :: Gen Int)
+
+
+instance Arbitrary RoundR2 where
+  arbitrary = curry (RoundR2 . r2 . (getRD *** getRD))
+                <$> (arbitrary :: Gen RoundDouble)
+                <*> (arbitrary :: Gen RoundDouble)
+
+
+instance Arbitrary PosRoundR2 where
+  arbitrary = curry (PosRoundR2 . r2 . (getPRD *** getPRD))
+                <$> (arbitrary :: Gen PosRoundDouble)
+                <*> (arbitrary :: Gen PosRoundDouble)
+
+
 instance Arbitrary R2 where
   arbitrary = curry r2 <$> arbitrary <*> arbitrary
 
@@ -109,36 +148,27 @@ scalarProdProp1 v1 v2 = v1 `scalarProd` v2 == v2 `scalarProd` v1
 
 
 -- distributive, avoid doubles as we get messed up precision
-scalarProdProp2 :: (Int, Int) -> (Int, Int) -> (Int, Int) -> Bool
-scalarProdProp2 v1 v2 v3 =
-  v1' `scalarProd` (v2' + v3')
+scalarProdProp2 :: RoundR2 -> RoundR2 -> RoundR2 -> Bool
+scalarProdProp2 (RoundR2 v1) (RoundR2 v2) (RoundR2 v3) =
+  v1 `scalarProd` (v2 + v3)
   ==
-  (v1' `scalarProd` v2') + (v1' `scalarProd` v3')
-  where
-    [v1', v2', v3'] = fmap (r2 . (fromIntegral *** fromIntegral)) [v1, v2, v3]
+  (v1 `scalarProd` v2) + (v1 `scalarProd` v3)
 
 
 -- bilinear, avoid doubles as we get messed up precision
-scalarProdProp3 :: Int -> (Int, Int) -> (Int, Int) -> (Int, Int) -> Bool
-scalarProdProp3 r v1 v2 v3 =
-  v1' `scalarProd` (scalarMul r' v2' + v3')
+scalarProdProp3 :: RoundDouble -> RoundR2 -> RoundR2 -> RoundR2 -> Bool
+scalarProdProp3 (RoundDouble r) (RoundR2 v1) (RoundR2 v2) (RoundR2 v3) =
+  v1 `scalarProd` (scalarMul r v2 + v3)
   ==
-  r' * (v1' `scalarProd` v2') + (v1' `scalarProd` v3')
-  where
-    [v1', v2', v3'] = fmap (r2 . (fromIntegral *** fromIntegral)) [v1, v2, v3]
-    r'  = fromIntegral r
+  r * (v1 `scalarProd` v2) + (v1 `scalarProd` v3)
 
 
 -- scalar multiplication
-scalarProdProp4 :: Int -> Int -> (Int, Int) -> (Int, Int) -> Bool
-scalarProdProp4 s1 s2 v1 v2
-  = scalarMul s1' v1' `scalarProd` scalarMul s2' v2'
+scalarProdProp4 :: RoundDouble -> RoundDouble -> RoundR2 -> RoundR2 -> Bool
+scalarProdProp4 (RoundDouble s1) (RoundDouble s2) (RoundR2 v1) (RoundR2 v2)
+  = scalarMul s1 v1 `scalarProd` scalarMul s2 v2
     ==
-    s1' * s2' * (v1' `scalarProd` v2')
-    where
-      [v1', v2'] = fmap (r2 . (fromIntegral *** fromIntegral)) [v1, v2]
-      s1' = fromIntegral s1
-      s2' = fromIntegral s2
+    s1 * s2 * (v1 `scalarProd` v2)
 
 
 -- orthogonal
