@@ -1,10 +1,12 @@
 {-# OPTIONS_HADDOCK ignore-exports #-}
+{-# LANGUAGE ViewPatterns #-}
 
 module Algebra.Vector where
 
 import Control.Applicative
 import Control.Arrow ((***))
 import Data.List (sortBy)
+import Diagrams.Coordinates
 import Diagrams.TwoD.Types
 import Graphics.Gloss.Geometry.Line
 import GHC.Float
@@ -37,13 +39,11 @@ dimToSquare (x1, x2) (y1, y2) = ((x1, y1), (x2, y2))
 inRange :: Square -- ^ the square: ((xmin, ymin), (xmax, ymax))
         -> PT     -- ^ Coordinate
         -> Bool   -- ^ result
-inRange ((xmin, ymin), (xmax, ymax)) p
+inRange ((xmin, ymin), (xmax, ymax)) (coords -> x :& y)
   = x >= min xmin xmax
     && x <= max xmin xmax
     && y >= min ymin ymax
     && y <= max ymin ymax
-  where
-    (x, y) = unp2 p
 
 
 -- |Get the angle between two vectors.
@@ -92,15 +92,8 @@ vp2 a b = pt2Vec b - pt2Vec a
 
 -- |Computes the determinant of 3 points.
 det :: PT -> PT -> PT -> Double
-det a b c =
-  (bx - ax) *
-    (cy - ay) -
-    (by - ay) *
-    (cx - ax)
-  where
-    (ax, ay) = unp2 a
-    (bx, by) = unp2 b
-    (cx, cy) = unp2 c
+det (coords -> ax :& ay) (coords -> bx :& by) (coords -> cx :& cy) =
+  (bx - ax) * (cy - ay) - (by - ay) * (cx - ax)
 
 
 -- |Get the point where two lines intesect, if any.
@@ -163,12 +156,14 @@ onPT f = p2 . f . unp2
 
 -- |Compare the y-coordinate of two points.
 ptCmpY :: PT -> PT -> Ordering
-ptCmpY p1' p2' = compare ((snd . unp2) p1') ((snd . unp2) p2')
+ptCmpY (coords -> _ :& y1) (coords -> _ :& y2) =
+  compare y1 y2
 
 
 -- |Compare the x-coordinate of two points.
 ptCmpX :: PT -> PT -> Ordering
-ptCmpX p1' p2' = compare ((fst . unp2) p1') ((fst . unp2) p2')
+ptCmpX (coords -> x1 :& _) (coords -> x2 :& _) =
+  compare x1 x2
 
 
 posInfPT :: PT
