@@ -67,6 +67,11 @@ scalarProd :: Vec -> Vec -> Double
 scalarProd (R2 a1 a2) (R2 b1 b2) = a1 * b1 + a2 * b2
 
 
+-- |Multiply a scalar with a vector.
+scalarMul :: Double -> Vec -> Vec
+scalarMul d (R2 a b) = R2 (a * d) (b * d)
+
+
 -- |Construct a vector that points to a point from the origin.
 pt2Vec :: PT -> Vec
 pt2Vec = r2 . unp2

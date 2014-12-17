@@ -107,8 +107,6 @@ scalarProdProp3 r v1 v2 v3 =
   ==
   r' * (v1' `scalarProd` v2') + (v1' `scalarProd` v3')
   where
-    scalarMul :: Double -> Vec -> Vec
-    scalarMul d (R2 a b) = R2 (a * d) (b * d)
     v1' = r2 . (fromIntegral *** fromIntegral) $ v1
     v2' = r2 . (fromIntegral *** fromIntegral) $ v2
     v3' = r2 . (fromIntegral *** fromIntegral) $ v3
