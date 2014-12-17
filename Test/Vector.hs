@@ -38,9 +38,9 @@ inRangeProp4 sq@((_, y1), (x2, _)) =
   inRange sq (p2 (x2, y1))
 
 
-inRangeProp5 :: Square -> Bool
-inRangeProp5 sq@((x1, y1), (x2, y2)) =
-  inRange sq (p2 (x1 + ((x2 - x1) / 2), y1 + ((y2 - y1) / 2)))
+inRangeProp5 :: Square -> Positive Double -> Positive Double -> Bool
+inRangeProp5 sq@((x1, y1), (x2, y2)) (Positive a) (Positive b) =
+  inRange sq (p2 (x1 + ((x2 - x1) / (a + 1)), y1 + ((y2 - y1) / (b + 1))))
 
 
 onPTProp1 :: PT -> Bool
