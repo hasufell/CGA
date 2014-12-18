@@ -114,6 +114,17 @@ inRangeProp5 sq@((x1, y1), (x2, y2)) (Positive a) (Positive b) =
   inRange sq (p2 (x1 + ((x2 - x1) / (a + 1)), y1 + ((y2 - y1) / (b + 1))))
 
 
+-- generating random points outside of the square
+inRangeProp6 :: Square -> Positive Double -> Positive Double -> Bool
+inRangeProp6 sq@((x1, y1), (x2, y2)) (Positive a) (Positive b) =
+  (not . inRange sq $ p2 (max x1 x2 + (a + 1), max y1 y2 + (b + 1)))
+  && (not . inRange sq $ p2 (max x1 x2 + (a + 1), max y1 y2 - (b + 1)))
+  && (not . inRange sq $ p2 (max x1 x2 - (a + 1), max y1 y2 + (b + 1)))
+  && (not . inRange sq $ p2 (min x1 x2 - (a + 1), min y1 y2 - (b + 1)))
+  && (not . inRange sq $ p2 (min x1 x2 + (a + 1), min y1 y2 - (b + 1)))
+  && (not . inRange sq $ p2 (min x1 x2 - (a + 1), min y1 y2 + (b + 1)))
+
+
 -- apply id function on the point
 onPTProp1 :: PT -> Bool
 onPTProp1 pt = onPT id pt == pt

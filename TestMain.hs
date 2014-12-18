@@ -17,6 +17,7 @@ main = do
   deepCheck inRangeProp3
   deepCheck inRangeProp4
   deepCheck inRangeProp5
+  deepCheck inRangeProp6
   putStrLn "testing onPT:"
   deepCheck onPTProp1
   deepCheck onPTProp2
