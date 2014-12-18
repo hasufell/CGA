@@ -51,7 +51,6 @@ main = do
   deepCheck vp2Prop2
   putStrLn "testing det:"
   deepCheck detProp1
-  deepCheck detProp2
   putStrLn "testing splitBy"
   deepCheck splitByProp1
   deepCheck splitByProp2
