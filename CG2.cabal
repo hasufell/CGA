@@ -160,6 +160,7 @@ executable Test
                        Parser.Meshparser
                        Parser.PathParser
                        QueueEx
+                       Test.MyPrelude
                        Test.Vector
 
 

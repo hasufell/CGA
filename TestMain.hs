@@ -2,6 +2,7 @@
 
 
 import Test.QuickCheck
+import Test.MyPrelude
 import Test.Vector
 
 
@@ -51,3 +52,7 @@ main = do
   putStrLn "testing det:"
   deepCheck detProp1
   deepCheck detProp2
+  putStrLn "testing splitBy"
+  deepCheck splitByProp1
+  deepCheck splitByProp2
+  deepCheck splitByProp3
