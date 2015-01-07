@@ -57,6 +57,7 @@ executable Gtk
   other-modules:       Algebra.Vector
                        Algorithms.GrahamScan
                        Algorithms.PolygonIntersection
+                       Algorithms.PolygonTriangulation
                        Algorithms.QuadTree
                        Algorithms.KDTree
                        Graphics.Diagram.AlgoDiags
@@ -105,6 +106,7 @@ executable Gif
   other-modules:       Algebra.Vector
                        Algorithms.GrahamScan
                        Algorithms.PolygonIntersection
+                       Algorithms.PolygonTriangulation
                        Algorithms.QuadTree
                        Algorithms.KDTree
                        Graphics.Diagram.AlgoDiags
@@ -150,6 +152,7 @@ executable Test
   other-modules:       Algebra.Vector
                        Algorithms.GrahamScan
                        Algorithms.PolygonIntersection
+                       Algorithms.PolygonTriangulation
                        Algorithms.QuadTree
                        Algorithms.KDTree
                        Graphics.Diagram.AlgoDiags

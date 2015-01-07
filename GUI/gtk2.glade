@@ -1063,7 +1063,8 @@ Show convex hull
 Show polygons
 Show polygons intersection
 Show quad tree squares
-Show kd tree squares</property>
+Show kd tree squares
+Polygon Triangulation</property>
           </widget>
           <packing>
             <property name="expand">False</property>

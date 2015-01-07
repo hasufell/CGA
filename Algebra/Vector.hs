@@ -128,6 +128,13 @@ notcw a b c = case getOrient a b c of
   _  -> True
 
 
+--- |Checks if 3 points a,b,c do build a clockwise triangle by
+--- connecting a-b-c. This is done by computing the determinant and
+--- checking the algebraic sign.
+cw :: PT -> PT -> PT -> Bool
+cw a b c = not . notcw a b $ c
+
+
 -- |Sort X and Y coordinates lexicographically.
 sortedXY :: [PT] -> [PT]
 sortedXY = fmap p2 . sortLex . fmap unp2

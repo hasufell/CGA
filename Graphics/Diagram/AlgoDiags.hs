@@ -7,6 +7,7 @@ import Algorithms.GrahamScan
 import Algorithms.QuadTree
 import Algorithms.KDTree
 import Algorithms.PolygonIntersection
+import Algorithms.PolygonTriangulation
 import Data.Maybe
 import Data.Monoid
 import Data.Tree
@@ -243,3 +244,23 @@ treePretty = Diag f
                      (~~)
                      (symmLayout' (with & slHSep .~ 60 & slVSep .~ 40) tree)
           # scale 2 # alignT # bg white
+
+
+-- |Show the points for polygon triangulation in different colors.
+polyTriCategorizedPoints :: Diag
+polyTriCategorizedPoints = Diag f
+  where
+    f p vts =
+      foldl (\diag' (x, y) ->
+               diag' <> (drawP [x] (dotSize p) # lc (vcatToCol y))
+                                               # fc (vcatToCol y))
+        mempty
+        (classifyList . concat $ vts)
+    -- category to color mapping
+    vcatToCol :: VCategory -> Colour Double
+    vcatToCol VStart   = green
+    vcatToCol VSplit   = blue
+    vcatToCol VEnd     = red
+    vcatToCol VMerge   = pink
+    vcatToCol VRegular = yellow
+
