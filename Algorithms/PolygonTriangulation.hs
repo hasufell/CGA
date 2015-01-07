@@ -12,7 +12,7 @@ data VCategory = VStart
                | VRegular
                | VSplit
                | VMerge
-  deriving (Show)
+  deriving (Show, Eq)
 
 
 -- |Classify all vertices on a polygon into five categories (see VCategory).
@@ -108,3 +108,12 @@ above :: PT  -- ^ is this one above the other?
       -> PT
       -> Bool
 above = flip below
+
+
+-- |Check if polygon is y-monotone.
+isYmonotone :: [PT] -> Bool
+isYmonotone poly =
+  not
+  . any (\x -> x == VSplit || x == VMerge)
+  . fmap snd
+  $ classifyList poly
