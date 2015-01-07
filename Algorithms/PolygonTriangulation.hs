@@ -41,51 +41,51 @@ classify prev v next
   | otherwise            = (v, VRegular)
 
 
--- |Whether the vertex, given it's next and previous vertex
+-- |Whether the vertex, given it's next and previous vertex,
 -- is a start vertex.
-isVStart :: PT  -- ^ previous vertice
+isVStart :: PT  -- ^ previous vertex
          -> PT  -- ^ vertice to check
-         -> PT  -- ^ next vertice
+         -> PT  -- ^ next vertex
          -> Bool
 isVStart prev v next =
   (ptCmpY next v == LT) && (ptCmpY prev v == LT) && (cw next v prev)
 
 
--- |Whether the vertex, given it's next and previous vertex
+-- |Whether the vertex, given it's next and previous vertex,
 -- is a split vertex.
-isVSplit :: PT  -- ^ previous vertice
+isVSplit :: PT  -- ^ previous vertex
          -> PT  -- ^ vertice to check
-         -> PT  -- ^ next vertice
+         -> PT  -- ^ next vertex
          -> Bool
 isVSplit prev v next =
   (ptCmpY prev v == LT) && (ptCmpY next v == LT) && (cw prev v next)
 
 
--- |Whether the vertex, given it's next and previous vertex
+-- |Whether the vertex, given it's next and previous vertex,
 -- is an end vertex.
-isVEnd :: PT  -- ^ previous vertice
+isVEnd :: PT  -- ^ previous vertex
        -> PT  -- ^ vertice to check
-       -> PT  -- ^ next vertice
+       -> PT  -- ^ next vertex
        -> Bool
 isVEnd prev v next =
   (ptCmpY prev v == GT) && (ptCmpY next v == GT) && (cw next v prev)
 
 
--- |Whether the vertex, given it's next and previous vertex
+-- |Whether the vertex, given it's next and previous vertex,
 -- is a merge vertex.
-isVMerge :: PT  -- ^ previous vertice
+isVMerge :: PT  -- ^ previous vertex
          -> PT  -- ^ vertice to check
-         -> PT  -- ^ next vertice
+         -> PT  -- ^ next vertex
          -> Bool
 isVMerge prev v next =
   (ptCmpY next v == GT) && (ptCmpY prev v == GT) && (cw prev v next)
 
 
--- |Whether the vertex, given it's next and previous vertex
+-- |Whether the vertex, given it's next and previous vertex,
 -- is a regular vertex.
-isVRegular :: PT  -- ^ previous vertice
+isVRegular :: PT  -- ^ previous vertex
            -> PT  -- ^ vertice to check
-           -> PT  -- ^ next vertice
+           -> PT  -- ^ next vertex
            -> Bool
 isVRegular prev v next =
      (not . isVStart prev v $ next)
