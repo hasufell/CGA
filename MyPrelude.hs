@@ -93,6 +93,12 @@ shiftM 0 xs = xs
 shiftM n xs = drop n xs ++ take n xs
 
 
+-- |Shift a list.
+-- E.g.: shiftM' (== 5)
+shiftM' :: Eq a => a -> [a] -> [a]
+shiftM' s xs = dropWhile (/= s) xs ++ takeWhile (/= s) xs
+
+
 -- |Get the pivot of a list.
 pivot :: [a] -> Maybe a
 pivot [] = Nothing
