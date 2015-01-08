@@ -140,6 +140,11 @@ sortedXY :: [PT] -> [PT]
 sortedXY = fmap p2 . sortLex . fmap unp2
 
 
+-- |Sort Y and X coordinates lexicographically.
+sortedYX :: [PT] -> [PT]
+sortedYX = fmap p2 . sortLexSwapped . fmap unp2
+
+
 -- |Sort all points according to their X-coordinates only.
 sortedX :: [PT] -> [PT]
 sortedX xs =
