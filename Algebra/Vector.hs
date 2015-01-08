@@ -108,6 +108,14 @@ intersectSeg' (a, b) (c, d) =
     glossToPt = p2 . (float2Double *** float2Double)
 
 
+-- |Get the point where two lines intesect, if any. Excludes the
+-- case of end-points intersecting.
+intersectSeg'' :: Segment -> Segment -> Maybe PT
+intersectSeg'' (a, b) (c, d) = case intersectSeg' (a, b) (c, d) of
+  Just x  -> if x `notElem` [a,b,c,d] then Just a else Nothing
+  Nothing -> Nothing
+
+
 -- |Get the orientation of 3 points which can either be
 -- * clock-wise
 -- * counter-clock-wise
