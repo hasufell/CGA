@@ -54,7 +54,8 @@ executable Gtk
   main-is:             GtkMain.hs
 
   -- Modules included in this executable, other than Main.
-  other-modules:       Algebra.Vector
+  other-modules:       Algebra.Polygon
+                       Algebra.Vector
                        Algorithms.GrahamScan
                        Algorithms.PolygonIntersection
                        Algorithms.PolygonTriangulation
@@ -103,7 +104,8 @@ executable Gif
   main-is:             GifMain.hs
 
   -- Modules included in this executable, other than Main.
-  other-modules:       Algebra.Vector
+  other-modules:       Algebra.Polygon
+                       Algebra.Vector
                        Algorithms.GrahamScan
                        Algorithms.PolygonIntersection
                        Algorithms.PolygonTriangulation
@@ -149,7 +151,8 @@ executable Test
   main-is:             TestMain.hs
 
   -- Modules included in this executable, other than Main.
-  other-modules:       Algebra.Vector
+  other-modules:       Algebra.Polygon
+                       Algebra.Vector
                        Algorithms.GrahamScan
                        Algorithms.PolygonIntersection
                        Algorithms.PolygonTriangulation
