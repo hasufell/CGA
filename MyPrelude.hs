@@ -40,6 +40,14 @@ sortLex =
            x  -> x)
 
 
+-- |Sort a list of tuples lexicographically, but start with second elem.
+sortLexSwapped :: (Ord a) => [(a, a)] -> [(a, a)]
+sortLexSwapped =
+  sortBy (\(x1, y1) (x2, y2) -> case compare y1 y2 of
+           EQ -> compare x1 x2
+           y  -> y)
+
+
 -- |Get the last x elements of a list.
 getLastX :: Int -> [a] -> [a]
 getLastX a xs
