@@ -94,21 +94,6 @@ isVRegular prev v next =
   && (not . isVMerge prev v $ next)
 
 
--- A point u is below of v ( u < v ),
--- if u_y < v_y or u_y = v_y and u_x > v_x.
-below :: PT  -- ^ is this one below the other?
-      -> PT
-      -> Bool
-below (coords -> ux :& uy) (coords -> vx :& vy) =
-  (uy <= vy ) && (ux > vx)
-
-
--- A point u is above of v , if v < u.
-above :: PT  -- ^ is this one above the other?
-      -> PT
-      -> Bool
-above = flip below
-
 
 -- |Check if polygon is y-monotone.
 isYmonotone :: [PT] -> Bool
