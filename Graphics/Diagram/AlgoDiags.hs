@@ -2,7 +2,7 @@
 
 module Graphics.Diagram.AlgoDiags where
 
-import Algebra.Vector(PT,Square,dimToSquare)
+import Algebra.Vector(PT,Square)
 import Algorithms.GrahamScan
 import Algorithms.QuadTree
 import Algorithms.KDTree
