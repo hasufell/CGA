@@ -3,8 +3,12 @@
 
 module Algorithms.PolygonTriangulation where
 
+import Algebra.Polygon
 import Algebra.Vector
+import Data.List
+import Data.Maybe
 import Diagrams.Coordinates
+import MyPrelude
 
 
 data VCategory = VStart
@@ -102,3 +106,37 @@ isYmonotone poly =
   . any (\x -> x == VSplit || x == VMerge)
   . fmap snd
   $ classifyList poly
+
+
+monotonize :: [PT] -> [[PT]]
+monotonize pts
+  | isYmonotone pts = [pts]
+  | and . fmap isYmonotone $ maybeMonotone = maybeMonotone
+  | otherwise = (\(x, y) -> x ++ (concat . fmap monotonize $ y))
+                  (partition isYmonotone maybeMonotone)
+  where
+    go (x:xs) = splitPoly pts x ++ go xs
+    go _      = []
+    maybeMonotone = go (monotoneDiagonals pts)
+
+
+
+monotoneDiagonals :: [PT] -> [(PT, PT)]
+monotoneDiagonals pts = catMaybes . go $ classifyList pts
+  where
+    go (x:xs) = case snd x of
+      VMerge -> getSeg (belowS (fst x) pts) (fst x) pts : go xs
+      VSplit -> getSeg (aboveS (fst x) pts) (fst x) pts : go xs
+      _      -> [] ++ go xs
+    go [] = []
+    getSeg [] _ _ = Nothing
+    getSeg (z:zs) pt pts'
+      | null
+        . catMaybes
+        . fmap (intersectSeg'' (z, pt))
+        $ polySegments pts
+        = Just (z, pt)
+      | otherwise = getSeg zs pt pts'
+    aboveS pt pts' = tail . dropWhile (/= pt) $ sortedYX pts'
+    belowS pt pts' = reverse . takeWhile (/= pt) $ sortedYX pts'
+

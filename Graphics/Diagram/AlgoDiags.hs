@@ -264,3 +264,12 @@ polyTriCategorizedPoints = Diag f
     vcatToCol VMerge   = pink
     vcatToCol VRegular = yellow
 
+
+
+monotonePolys :: Diag
+monotonePolys = Diag f
+  where
+    f _ vts = foldl (\x y -> x <> strokePoly y) mempty
+               $ monotonize (concat vts)
+      where
+        strokePoly x' = fromVertices $ x' ++ (maybeToList . headMay $ x')
