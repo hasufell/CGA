@@ -32,7 +32,7 @@ removeItem :: (Eq a) => a -> [a] -> [a]
 removeItem x = foldr (\x' y -> if x' == x then y else x':y) []
 
 
--- |Sort a liste of tuples lexicographically.
+-- |Sort a list of tuples lexicographically.
 sortLex :: (Ord a) => [(a, a)] -> [(a, a)]
 sortLex =
   sortBy (\(x1, y1) (x2, y2) -> case compare x1 x2 of
