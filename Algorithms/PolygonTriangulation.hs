@@ -139,8 +139,7 @@ monotoneDiagonals pts = catMaybes . go $ classifyList pts
     belowS pt pts' = reverse . takeWhile (/= pt) $ sortedYX pts'
 
 
--- |A simple polygon with n vertices can be partitioned into y-monotone pieces
--- in O(n log n).
+-- |Triangulate a y-monotone polygon.
 triangulate :: [PT] -> [[PT]]
 triangulate pts =
   go pts . A.first reverse . splitAt 3 . reverse . sortedYX $ pts
