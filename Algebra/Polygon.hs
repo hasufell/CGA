@@ -5,7 +5,6 @@ module Algebra.Polygon where
 import Algebra.Vector
 import Data.Maybe
 import MyPrelude
-{- import Diagrams.Coordinates -}
 
 
 splitPoly :: [PT]

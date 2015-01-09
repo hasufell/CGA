@@ -1,5 +1,4 @@
 {-# OPTIONS_HADDOCK ignore-exports #-}
-{-# LANGUAGE ViewPatterns #-}
 
 module Algorithms.PolygonTriangulation where
 
@@ -9,8 +8,6 @@ import qualified Control.Arrow as A
 import Data.List
 import Data.Maybe
 import Safe
-import Diagrams.Coordinates
-import MyPrelude
 
 
 data VCategory = VStart
