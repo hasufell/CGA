@@ -131,11 +131,7 @@ monotoneDiagonals pts = catMaybes . go $ classifyList pts
     go [] = []
     getSeg [] _ _ = Nothing
     getSeg (z:zs) pt pts'
-      | null
-        . catMaybes
-        . fmap (intersectSeg'' (z, pt))
-        $ polySegments pts
-        = Just (z, pt)
+      | isInsidePoly pts (z, pt) = Just (z, pt)
       | otherwise = getSeg zs pt pts'
     aboveS pt pts' = tail . dropWhile (/= pt) $ sortedYX pts'
     belowS pt pts' = reverse . takeWhile (/= pt) $ sortedYX pts'

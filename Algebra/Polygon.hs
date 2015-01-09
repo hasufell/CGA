@@ -24,3 +24,12 @@ polySegments p@(x':_:_:_) = go p ++ [(last p, x')]
     go (x:y:xs) = (x, y) : go (y:xs)
     go _        = []
 polySegments _ = []
+
+
+isInsidePoly :: [PT] -> Segment -> Bool
+isInsidePoly pts seg =
+  null
+    . catMaybes
+    . fmap (intersectSeg'' seg)
+    $ polySegments pts
+
