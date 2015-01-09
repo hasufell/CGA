@@ -98,7 +98,7 @@ isVRegular prev v next =
 
 
 
--- |Check if polygon is y-monotone.
+-- |A polygon P is y-monotone, if it has no split and merge vertices.
 isYmonotone :: [PT] -> Bool
 isYmonotone poly =
   not
@@ -107,6 +107,7 @@ isYmonotone poly =
   $ classifyList poly
 
 
+-- |Partition P in y-monotone pieces.
 monotonePartitioning :: [PT] -> [[PT]]
 monotonePartitioning pts
   | isYmonotone pts = [pts]
@@ -119,6 +120,9 @@ monotonePartitioning pts
                           (monotoneDiagonals pts)
 
 
+-- |Try to eliminate the merge and split vertices by computing the
+-- diagonals we have to use for splitting the polygon. This doesn't
+-- necessarily make our polygon y-monotone yet.
 monotoneDiagonals :: [PT] -> [(PT, PT)]
 monotoneDiagonals pts = catMaybes . go $ classifyList pts
   where
@@ -135,6 +139,8 @@ monotoneDiagonals pts = catMaybes . go $ classifyList pts
     belowS pt pts' = reverse . takeWhile (/= pt) $ sortedYX pts'
 
 
+-- |A simple polygon with n vertices can be partitioned into y-monotone pieces
+-- in O(n log n).
 triangulate :: [PT] -> [[PT]]
 triangulate pts =
   go pts . A.first reverse . splitAt 3 . reverse . sortedYX $ pts
