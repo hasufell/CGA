@@ -5,8 +5,10 @@ module Algorithms.PolygonTriangulation where
 
 import Algebra.Polygon
 import Algebra.Vector
+import qualified Control.Arrow as A
 import Data.List
 import Data.Maybe
+import Safe
 import Diagrams.Coordinates
 import MyPrelude
 
@@ -110,8 +112,9 @@ isYmonotone poly =
 
 monotonize :: [PT] -> [[PT]]
 monotonize pts
-  | isYmonotone pts = [pts]
-  | and . fmap isYmonotone $ maybeMonotone = maybeMonotone
+  | isYmonotone pts = partitionPoly pts
+  | and . fmap isYmonotone $ maybeMonotone =
+      concat . fmap partitionPoly $ maybeMonotone
   | otherwise = (\(x, y) -> x ++ (concat . fmap monotonize $ y))
                   (partition isYmonotone maybeMonotone)
   where
@@ -136,3 +139,32 @@ monotoneDiagonals pts = catMaybes . go $ classifyList pts
     aboveS pt pts' = tail . dropWhile (/= pt) $ sortedYX pts'
     belowS pt pts' = reverse . takeWhile (/= pt) $ sortedYX pts'
 
+
+partitionPoly :: [PT] -> [[PT]]
+partitionPoly pts =
+  go pts . A.first reverse . splitAt 3 . reverse . sortedYX $ pts
+  where
+    go xs (p@[_, _], r:rs) = go xs (r:p, rs)
+    go xs (p@(u:vi:vi1:ys), rs)
+      -- case 1 and 3
+      | adjacent u (last p) xs =
+          splitPoly xs (u, (last . init) p)
+          ++ go (fromMaybe []
+                  . headMay
+                  . nonTriangleOnly
+                  . splitPoly xs
+                  $ (u, (last . init) p))
+                (init p, rs)
+      -- case 2
+      | adjacent u vi xs && (not . null) rs =
+          if getAngle (vp2 vi u) (vp2 vi vi1) < pi / 2
+          then splitPoly xs (u, vi1)
+                ++ go (fromMaybe []
+                        . headMay
+                        . nonTriangleOnly
+                        . splitPoly xs
+                        $ (u, vi1))
+                      (u:vi1:ys, rs)
+          else go xs (head rs:p, tail rs)
+      | otherwise = [[]]
+    go _ _ = [[]]

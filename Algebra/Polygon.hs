@@ -3,6 +3,7 @@
 module Algebra.Polygon where
 
 import Algebra.Vector
+import Data.Maybe
 import MyPrelude
 {- import Diagrams.Coordinates -}
 
@@ -33,3 +34,19 @@ isInsidePoly pts seg =
     . fmap (intersectSeg'' seg)
     $ polySegments pts
 
+
+adjacent :: PT -> PT -> [PT] -> Bool
+adjacent u v = any (\x -> x == (u, v) || x == (v, u)) . polySegments
+
+
+isTrianglePoly :: [PT] -> Bool
+isTrianglePoly [_, _, _] = True
+isTrianglePoly _         = False
+
+
+triangleOnly :: [[PT]] -> [[PT]]
+triangleOnly = filter isTrianglePoly
+
+
+nonTriangleOnly :: [[PT]] -> [[PT]]
+nonTriangleOnly = filter (not . isTrianglePoly)
