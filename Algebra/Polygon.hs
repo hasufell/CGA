@@ -7,6 +7,8 @@ import Data.Maybe
 import MyPrelude
 
 
+-- |Split a polygon by a given segment which must be vertices of the
+-- polygon (returns empty array otherwise).
 splitPoly :: [PT]
           -> Segment
           -> [[PT]]
@@ -18,6 +20,7 @@ splitPoly pts (a, b)
       shiftedPoly = shiftM' a pts
 
 
+-- |Get all edges of a polygon.
 polySegments :: [PT] -> [Segment]
 polySegments p@(x':_:_:_) = go p ++ [(last p, x')]
   where
@@ -26,6 +29,9 @@ polySegments p@(x':_:_:_) = go p ++ [(last p, x')]
 polySegments _ = []
 
 
+-- |Check whether the given segment is inside the polygon.
+-- This doesn't check for segments that are completely outside
+-- of the polygon yet.
 isInsidePoly :: [PT] -> Segment -> Bool
 isInsidePoly pts seg =
   null
@@ -34,18 +40,22 @@ isInsidePoly pts seg =
     $ polySegments pts
 
 
+-- |Check whether two points are adjacent vertices of a polygon.
 adjacent :: PT -> PT -> [PT] -> Bool
 adjacent u v = any (\x -> x == (u, v) || x == (v, u)) . polySegments
 
 
+-- |Check whether the polygon is a triangle polygon.
 isTrianglePoly :: [PT] -> Bool
 isTrianglePoly [_, _, _] = True
 isTrianglePoly _         = False
 
 
+-- |Get all triangle polygons.
 triangleOnly :: [[PT]] -> [[PT]]
 triangleOnly = filter isTrianglePoly
 
 
+-- |Get all non-triangle polygons.
 nonTriangleOnly :: [[PT]] -> [[PT]]
 nonTriangleOnly = filter (not . isTrianglePoly)
