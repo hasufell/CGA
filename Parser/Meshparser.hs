@@ -13,10 +13,9 @@ import Diagrams.TwoD.Types
 -- |Convert a text String with multiple vertices and faces into
 -- a list of vertices, ordered by the faces specification.
 facesToArr :: B.ByteString -> [[PT]]
-facesToArr str = fmap (fmap (\y -> meshs str !! (fromIntegral y - 1)))
+facesToArr str = fmap (fmap (\y -> meshToArr str !! (fromIntegral y - 1)))
                       (faces str)
   where
-    meshs = meshToArr
     faces = rights . fmap (parseOnly parseFace) . B.lines
 
 
