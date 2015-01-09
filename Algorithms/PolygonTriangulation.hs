@@ -107,18 +107,16 @@ isYmonotone poly =
   $ classifyList poly
 
 
-monotonize :: [PT] -> [[PT]]
-monotonize pts
-  | isYmonotone pts = partitionPoly pts
-  | and . fmap isYmonotone $ maybeMonotone =
-      concat . fmap partitionPoly $ maybeMonotone
-  | otherwise = (\(x, y) -> x ++ (concat . fmap monotonize $ y))
+monotonePartitioning :: [PT] -> [[PT]]
+monotonePartitioning pts
+  | isYmonotone pts = [pts]
+  | and . fmap isYmonotone $ maybeMonotone = maybeMonotone
+  | otherwise = (\(x, y) -> x ++ (concat . fmap monotonePartitioning $ y))
                   (partition isYmonotone maybeMonotone)
   where
-    go (x:xs) = splitPoly pts x ++ go xs
-    go _      = []
-    maybeMonotone = go (monotoneDiagonals pts)
-
+    maybeMonotone = foldr (\x y -> splitPoly pts x ++ y)
+                          []
+                          (monotoneDiagonals pts)
 
 
 monotoneDiagonals :: [PT] -> [(PT, PT)]
@@ -137,8 +135,8 @@ monotoneDiagonals pts = catMaybes . go $ classifyList pts
     belowS pt pts' = reverse . takeWhile (/= pt) $ sortedYX pts'
 
 
-partitionPoly :: [PT] -> [[PT]]
-partitionPoly pts =
+triangulate :: [PT] -> [[PT]]
+triangulate pts =
   go pts . A.first reverse . splitAt 3 . reverse . sortedYX $ pts
   where
     go xs (p@[_, _], r:rs) = go xs (r:p, rs)

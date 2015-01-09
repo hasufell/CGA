@@ -270,6 +270,9 @@ monotonePolys :: Diag
 monotonePolys = Diag f
   where
     f _ vts = foldl (\x y -> x <> strokePoly y) mempty
-               $ monotonize (concat vts)
+                    (concat
+                      . fmap triangulate
+                      . monotonePartitioning
+                      $ concat vts)
       where
         strokePoly x' = fromVertices $ x' ++ (maybeToList . headMay $ x')
