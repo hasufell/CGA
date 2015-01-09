@@ -28,9 +28,9 @@ gifDiag p xs =
     lowerHullList = mkGifDiag convexHStepsLs p orange grahamLHSteps xs
     -- add the x-axis and the other default stuff
     nonChDiag =
-      mconcat                               .
-        fmap (\x -> mkDiag x p [xs]) $
-        [coordPoints, plotterBG]
+      mconcat
+        . fmap (\x -> mkDiag x p [xs])
+        $ [coordPoints, plotterBG]
 
 
 -- |Same as gifDiag, except that it takes a string containing the
