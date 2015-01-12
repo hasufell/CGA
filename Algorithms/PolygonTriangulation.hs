@@ -113,14 +113,13 @@ monotonePartitioning pts
   | otherwise = go (monotoneDiagonals pts) pts
   where
     go :: [Segment] -> [PT] -> [[PT]]
-    go [] _ = [[]]
-    go _ [] = [[]]
-    go (x:xs) pts'
+    go (x:xs) pts'@(_:_)
       | isYmonotone a && isYmonotone b = [a, b]
       | isYmonotone b = b : go xs a
       | otherwise = a : go xs b
       where
         [a, b] = splitPoly pts' x
+    go _ _ = [[]]
 
 
 -- |Try to eliminate the merge and split vertices by computing the
