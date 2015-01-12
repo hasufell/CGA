@@ -126,10 +126,10 @@ monotonePartitioning pts
 -- |Try to eliminate the merge and split vertices by computing the
 -- diagonals we have to use for splitting the polygon. This doesn't
 -- necessarily make our polygon y-monotone yet.
-monotoneDiagonals :: [PT] -> [(PT, PT)]
+monotoneDiagonals :: [PT] -> [Segment]
 monotoneDiagonals pts = catMaybes . go $ classifyList pts
   where
-    go :: [(PT, VCategory)] -> [Maybe (PT, PT)]
+    go :: [(PT, VCategory)] -> [Maybe Segment]
     go (x:xs) = case snd x of
       VMerge -> getSeg (belowS . fst $ x) (fst x) : go xs
       VSplit -> getSeg (aboveS . fst $ x) (fst x) : go xs
@@ -137,7 +137,7 @@ monotoneDiagonals pts = catMaybes . go $ classifyList pts
     go [] = []
     getSeg :: [PT] -- all points above/below the current point
            -> PT   -- current point
-           -> Maybe (PT, PT)
+           -> Maybe Segment
     getSeg [] _ = Nothing
     getSeg (z:zs) pt
       | isInsidePoly pts (z, pt) = Just (z, pt)
