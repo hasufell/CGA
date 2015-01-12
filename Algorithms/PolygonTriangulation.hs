@@ -129,16 +129,16 @@ monotoneDiagonals :: [PT] -> [(PT, PT)]
 monotoneDiagonals pts = catMaybes . go $ classifyList pts
   where
     go (x:xs) = case snd x of
-      VMerge -> getSeg (belowS (fst x) pts) (fst x) pts : go xs
-      VSplit -> getSeg (aboveS (fst x) pts) (fst x) pts : go xs
+      VMerge -> getSeg (belowS . fst $ x) (fst x) : go xs
+      VSplit -> getSeg (aboveS . fst $ x) (fst x) : go xs
       _      -> [] ++ go xs
     go [] = []
-    getSeg [] _ _ = Nothing
-    getSeg (z:zs) pt pts'
+    getSeg [] _ = Nothing
+    getSeg (z:zs) pt
       | isInsidePoly pts (z, pt) = Just (z, pt)
-      | otherwise = getSeg zs pt pts'
-    aboveS pt pts' = tail . dropWhile (/= pt) $ sortedYX pts'
-    belowS pt pts' = reverse . takeWhile (/= pt) $ sortedYX pts'
+      | otherwise = getSeg zs pt
+    aboveS pt = tail . dropWhile (/= pt) $ sortedYX pts
+    belowS pt = reverse . takeWhile (/= pt) $ sortedYX pts
 
 
 -- |Triangulate a y-monotone polygon.
