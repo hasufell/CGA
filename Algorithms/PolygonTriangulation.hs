@@ -112,6 +112,7 @@ monotonePartitioning pts
   | isYmonotone pts = [pts]
   | otherwise = go (monotoneDiagonals pts) pts
   where
+    go :: [Segment] -> [PT] -> [[PT]]
     go [] _ = [[]]
     go _ [] = [[]]
     go (x:xs) pts'
@@ -128,16 +129,22 @@ monotonePartitioning pts
 monotoneDiagonals :: [PT] -> [(PT, PT)]
 monotoneDiagonals pts = catMaybes . go $ classifyList pts
   where
+    go :: [(PT, VCategory)] -> [Maybe (PT, PT)]
     go (x:xs) = case snd x of
       VMerge -> getSeg (belowS . fst $ x) (fst x) : go xs
       VSplit -> getSeg (aboveS . fst $ x) (fst x) : go xs
       _      -> [] ++ go xs
     go [] = []
+    getSeg :: [PT] -- all points above/below the current point
+           -> PT   -- current point
+           -> Maybe (PT, PT)
     getSeg [] _ = Nothing
     getSeg (z:zs) pt
       | isInsidePoly pts (z, pt) = Just (z, pt)
       | otherwise = getSeg zs pt
+    aboveS :: PT -> [PT]
     aboveS pt = tail . dropWhile (/= pt) $ sortedYX pts
+    belowS :: PT -> [PT]
     belowS pt = reverse . takeWhile (/= pt) $ sortedYX pts
 
 
@@ -146,6 +153,10 @@ triangulate :: [PT] -> [[PT]]
 triangulate pts =
   go pts . A.first reverse . splitAt 3 . reverse . sortedYX $ pts
   where
+    go :: [PT]          -- current polygon
+       -> ([PT], [PT])  -- (stack of visited vertices, rest)
+                        --  sorted by Y-coordinate
+       -> [[PT]]
     go xs (p@[_, _], r:rs) = go xs (r:p, rs)
     go xs (p@(u:vi:vi1:ys), rs)
       -- case 1 and 3
