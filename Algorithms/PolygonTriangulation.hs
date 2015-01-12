@@ -106,7 +106,7 @@ isYmonotone poly =
   $ classifyList poly
 
 
--- |Partition P in y-monotone pieces.
+-- |Partition P into y-monotone pieces.
 monotonePartitioning :: [PT] -> [[PT]]
 monotonePartitioning pts
   | isYmonotone pts = [pts]
