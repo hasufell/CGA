@@ -123,8 +123,7 @@ monotonePartitioning pts
 
 
 -- |Try to eliminate the merge and split vertices by computing the
--- diagonals we have to use for splitting the polygon. This doesn't
--- necessarily make our polygon y-monotone yet.
+-- diagonals we have to use for splitting the polygon.
 monotoneDiagonals :: [PT] -> [Segment]
 monotoneDiagonals pts = catMaybes . go $ classifyList pts
   where
