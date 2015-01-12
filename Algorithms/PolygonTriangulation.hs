@@ -5,7 +5,6 @@ module Algorithms.PolygonTriangulation where
 import Algebra.Polygon
 import Algebra.Vector
 import qualified Control.Arrow as A
-import Data.List
 import Data.Maybe
 import Safe
 
@@ -111,13 +110,16 @@ isYmonotone poly =
 monotonePartitioning :: [PT] -> [[PT]]
 monotonePartitioning pts
   | isYmonotone pts = [pts]
-  | and . fmap isYmonotone $ maybeMonotone = maybeMonotone
-  | otherwise = (\(x, y) -> x ++ (concat . fmap monotonePartitioning $ y))
-                  (partition isYmonotone maybeMonotone)
+  | otherwise = go (monotoneDiagonals pts) pts
   where
-    maybeMonotone = foldr (\x y -> splitPoly pts x ++ y)
-                          []
-                          (monotoneDiagonals pts)
+    go [] _ = [[]]
+    go _ [] = [[]]
+    go (x:xs) pts'
+      | isYmonotone a && isYmonotone b = [a, b]
+      | isYmonotone b = b : go xs a
+      | otherwise = a : go xs b
+      where
+        [a, b] = splitPoly pts' x
 
 
 -- |Try to eliminate the merge and split vertices by computing the
