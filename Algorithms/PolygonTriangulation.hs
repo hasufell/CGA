@@ -119,7 +119,7 @@ monotonePartitioning pts
       | otherwise = a : go xs b
       where
         [a, b] = splitPoly pts' x
-    go _ _ = [[]]
+    go _ _ = []
 
 
 -- |Try to eliminate the merge and split vertices by computing the
@@ -159,7 +159,7 @@ triangulate pts =
     go xs (p@(u:vi:vi1:ys), rs)
       -- case 1 and 3
       | adjacent u (last p) xs =
-          splitPoly xs (u, (last . init) p)
+          (triangleOnly . splitPoly xs $ (u, (last . init) p))
           ++ go (fromMaybe []
                   . headMay
                   . nonTriangleOnly
@@ -169,7 +169,7 @@ triangulate pts =
       -- case 2
       | adjacent u vi xs && (not . null) rs =
           if getAngle (vp2 vi u) (vp2 vi vi1) < pi / 2
-          then splitPoly xs (u, vi1)
+          then (triangleOnly . splitPoly xs $ (u, vi1))
                 ++ go (fromMaybe []
                         . headMay
                         . nonTriangleOnly
@@ -177,5 +177,5 @@ triangulate pts =
                         $ (u, vi1))
                       (u:vi1:ys, rs)
           else go xs (head rs:p, tail rs)
-      | otherwise = [[]]
-    go _ _ = [[]]
+      | otherwise = []
+    go _ _ = []
