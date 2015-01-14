@@ -136,15 +136,3 @@ intersectionPoints xs' = rmdups . go $ xs'
     combinations :: [a] -> [a] -> [[a]]
     combinations xs ys = concat . fmap (\y -> fmap (\x -> [y, x]) xs) $ ys
 
-
-testArr :: ([PT], [PT])
-testArr = ([p2 (200.0, 500.0),
-            p2 (0.0, 200.0),
-            p2 (200.0, 100.0),
-            p2 (400.0, 300.0)],
-
-           [p2 (350.0, 450.0),
-            p2 (275.0, 225.0),
-            p2 (350.0, 50.0),
-            p2 (500.0, 0.0),
-            p2 (450.0, 400.0)])
