@@ -6,6 +6,7 @@ import Algebra.Polygon
 import Algebra.Vector
 import qualified Control.Arrow as A
 import Data.Maybe
+import Diagrams.TwoD.Types
 import Safe
 
 
@@ -18,12 +19,12 @@ data VCategory = VStart
 
 
 -- |Classify all vertices on a polygon into five categories (see VCategory).
-classifyList :: [PT] -> [(PT, VCategory)]
+classifyList :: [P2] -> [(P2, VCategory)]
 classifyList p@(x:y:_:_) =
   -- need to handle the first and last element separately
   [classify (last p) x y] ++ go p ++ [classify (last . init $ p) (last p) x]
   where
-    go :: [PT] -> [(PT, VCategory)]
+    go :: [P2] -> [(P2, VCategory)]
     go (x':y':z':xs) = classify x' y' z' : go (y':z':xs)
     go _          = []
 classifyList _ = []
@@ -31,10 +32,10 @@ classifyList _ = []
 
 -- |Classify a vertex on a polygon given it's next and previous vertex
 -- into five categories (see VCategory).
-classify :: PT  -- ^ prev vertex
-         -> PT  -- ^ classify this one
-         -> PT  -- ^ next vertex
-         -> (PT, VCategory)
+classify :: P2  -- ^ prev vertex
+         -> P2  -- ^ classify this one
+         -> P2  -- ^ next vertex
+         -> (P2, VCategory)
 classify prev v next
   | isVStart prev v next = (v, VStart)
   | isVSplit prev v next = (v, VSplit)
@@ -45,9 +46,9 @@ classify prev v next
 
 -- |Whether the vertex, given it's next and previous vertex,
 -- is a start vertex.
-isVStart :: PT  -- ^ previous vertex
-         -> PT  -- ^ vertice to check
-         -> PT  -- ^ next vertex
+isVStart :: P2  -- ^ previous vertex
+         -> P2  -- ^ vertice to check
+         -> P2  -- ^ next vertex
          -> Bool
 isVStart prev v next =
   ptCmpY next v == LT && ptCmpY prev v == LT && cw next v prev
@@ -55,9 +56,9 @@ isVStart prev v next =
 
 -- |Whether the vertex, given it's next and previous vertex,
 -- is a split vertex.
-isVSplit :: PT  -- ^ previous vertex
-         -> PT  -- ^ vertice to check
-         -> PT  -- ^ next vertex
+isVSplit :: P2  -- ^ previous vertex
+         -> P2  -- ^ vertice to check
+         -> P2  -- ^ next vertex
          -> Bool
 isVSplit prev v next =
   ptCmpY prev v == LT && ptCmpY next v == LT && cw prev v next
@@ -65,9 +66,9 @@ isVSplit prev v next =
 
 -- |Whether the vertex, given it's next and previous vertex,
 -- is an end vertex.
-isVEnd :: PT  -- ^ previous vertex
-       -> PT  -- ^ vertice to check
-       -> PT  -- ^ next vertex
+isVEnd :: P2  -- ^ previous vertex
+       -> P2  -- ^ vertice to check
+       -> P2  -- ^ next vertex
        -> Bool
 isVEnd prev v next =
   ptCmpY prev v == GT && ptCmpY next v == GT && cw next v prev
@@ -75,9 +76,9 @@ isVEnd prev v next =
 
 -- |Whether the vertex, given it's next and previous vertex,
 -- is a merge vertex.
-isVMerge :: PT  -- ^ previous vertex
-         -> PT  -- ^ vertice to check
-         -> PT  -- ^ next vertex
+isVMerge :: P2  -- ^ previous vertex
+         -> P2  -- ^ vertice to check
+         -> P2  -- ^ next vertex
          -> Bool
 isVMerge prev v next =
   ptCmpY next v == GT && ptCmpY prev v == GT && cw prev v next
@@ -85,9 +86,9 @@ isVMerge prev v next =
 
 -- |Whether the vertex, given it's next and previous vertex,
 -- is a regular vertex.
-isVRegular :: PT  -- ^ previous vertex
-           -> PT  -- ^ vertice to check
-           -> PT  -- ^ next vertex
+isVRegular :: P2  -- ^ previous vertex
+           -> P2  -- ^ vertice to check
+           -> P2  -- ^ next vertex
            -> Bool
 isVRegular prev v next =
      (not . isVStart prev v $ next)
@@ -98,7 +99,7 @@ isVRegular prev v next =
 
 
 -- |A polygon P is y-monotone, if it has no split and merge vertices.
-isYmonotone :: [PT] -> Bool
+isYmonotone :: [P2] -> Bool
 isYmonotone poly =
   not
   . any (\x -> x == VSplit || x == VMerge)
@@ -107,12 +108,12 @@ isYmonotone poly =
 
 
 -- |Partition P into y-monotone pieces.
-monotonePartitioning :: [PT] -> [[PT]]
+monotonePartitioning :: [P2] -> [[P2]]
 monotonePartitioning pts
   | isYmonotone pts = [pts]
   | otherwise = go (monotoneDiagonals pts) pts
   where
-    go :: [Segment] -> [PT] -> [[PT]]
+    go :: [(P2, P2)] -> [P2] -> [[P2]]
     go (x:xs) pts'@(_:_)
       | isYmonotone a && isYmonotone b = [a, b]
       | isYmonotone b = b : go xs a
@@ -124,37 +125,37 @@ monotonePartitioning pts
 
 -- |Try to eliminate the merge and split vertices by computing the
 -- diagonals we have to use for splitting the polygon.
-monotoneDiagonals :: [PT] -> [Segment]
+monotoneDiagonals :: [P2] -> [(P2, P2)]
 monotoneDiagonals pts = catMaybes . go $ classifyList pts
   where
-    go :: [(PT, VCategory)] -> [Maybe Segment]
+    go :: [(P2, VCategory)] -> [Maybe (P2, P2)]
     go (x:xs) = case snd x of
       VMerge -> getSeg (belowS . fst $ x) (fst x) : go xs
       VSplit -> getSeg (aboveS . fst $ x) (fst x) : go xs
       _      -> [] ++ go xs
     go [] = []
-    getSeg :: [PT] -- all points above/below the current point
-           -> PT   -- current point
-           -> Maybe Segment
+    getSeg :: [P2] -- all points above/below the current point
+           -> P2   -- current point
+           -> Maybe (P2, P2)
     getSeg [] _ = Nothing
     getSeg (z:zs) pt
       | isInsidePoly pts (z, pt) = Just (z, pt)
       | otherwise = getSeg zs pt
-    aboveS :: PT -> [PT]
+    aboveS :: P2 -> [P2]
     aboveS pt = tail . dropWhile (/= pt) $ sortedYX pts
-    belowS :: PT -> [PT]
+    belowS :: P2 -> [P2]
     belowS pt = reverse . takeWhile (/= pt) $ sortedYX pts
 
 
 -- |Triangulate a y-monotone polygon.
-triangulate :: [PT] -> [[PT]]
+triangulate :: [P2] -> [[P2]]
 triangulate pts =
   go pts . A.first reverse . splitAt 3 . reverse . sortedYX $ pts
   where
-    go :: [PT]          -- current polygon
-       -> ([PT], [PT])  -- (stack of visited vertices, rest)
+    go :: [P2]          -- current polygon
+       -> ([P2], [P2])  -- (stack of visited vertices, rest)
                         --  sorted by Y-coordinate
-       -> [[PT]]
+       -> [[P2]]
     go xs (p@[_, _], r:rs) = go xs (r:p, rs)
     go xs (p@(u:vi:vi1:ys), rs)
       -- case 1 and 3

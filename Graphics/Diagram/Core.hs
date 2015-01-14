@@ -15,15 +15,15 @@ data Diag =
   Diag
   {
     mkDiag :: DiagProp
-           -> [[PT]]
+           -> [[P2]]
            -> Diagram Cairo R2
   }
   | GifDiag
   {
     mkGifDiag :: DiagProp
               -> Colour Double
-              -> ([PT] -> [[PT]])
-              -> [PT]
+              -> ([P2] -> [[P2]])
+              -> [P2]
               -> [Diagram Cairo R2]
   }
   | EmptyDiag (Diagram Cairo R2)
@@ -49,7 +49,7 @@ data DiagProp = MkProp {
   -- |The path to a quad in the quad tree.
   quadPath :: String,
   -- |The square for the kd-tree range search.
-  rangeSquare :: Square
+  rangeSquare :: ((Double, Double), (Double, Double))
 }
 
 
@@ -134,19 +134,19 @@ maybeDiag b d
   | otherwise = mempty
 
 
-filterValidPT :: DiagProp -> [PT] -> [PT]
+filterValidPT :: DiagProp -> [P2] -> [P2]
 filterValidPT =
   filter
   . inRange
   . diagDimSquare
 
 
-diagDimSquare :: DiagProp -> Square
+diagDimSquare :: DiagProp -> ((Double, Double), (Double, Double))
 diagDimSquare p = dimToSquare (xDimension p) $ yDimension p
 
 
 -- |Draw a list of points.
-drawP :: [PT]              -- ^ the points to draw
+drawP :: [P2]              -- ^ the points to draw
       -> Double            -- ^ dot size
       -> Diagram Cairo R2  -- ^ the resulting diagram
 drawP [] _  = mempty
@@ -172,7 +172,7 @@ rectByDiagonal (xmin, ymin) (xmax, ymax) =
 
 -- |Creates a Diagram from a point that shows the coordinates
 -- in text format, such as "(1.0, 2.0)".
-pointToTextCoord :: PT -> Diagram Cairo R2
+pointToTextCoord :: P2 -> Diagram Cairo R2
 pointToTextCoord pt =
   text ("(" ++ (show . trim') x ++ ", " ++ (show . trim') y ++ ")") # scale 10
   where

@@ -2,7 +2,6 @@
 
 module Parser.Meshparser (meshToArr, facesToArr) where
 
-import Algebra.Vector(PT)
 import Control.Applicative
 import Data.Attoparsec.ByteString.Char8
 import Data.Either
@@ -12,7 +11,7 @@ import Diagrams.TwoD.Types
 
 -- |Convert a text String with multiple vertices and faces into
 -- a list of vertices, ordered by the faces specification.
-facesToArr :: B.ByteString -> [[PT]]
+facesToArr :: B.ByteString -> [[P2]]
 facesToArr str = fmap (fmap (\y -> meshToArr str !! (fromIntegral y - 1)))
                       (faces str)
   where
@@ -22,7 +21,7 @@ facesToArr str = fmap (fmap (\y -> meshToArr str !! (fromIntegral y - 1)))
 -- |Convert a text String with multiple vertices into
 -- an array of float tuples.
 meshToArr :: B.ByteString -- ^ the string to convert
-          -> [PT]         -- ^ the resulting vertice table
+          -> [P2]         -- ^ the resulting vertice table
 meshToArr =
   fmap p2
     . rights

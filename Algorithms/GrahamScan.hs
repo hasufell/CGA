@@ -3,6 +3,7 @@
 module Algorithms.GrahamScan where
 
 import Algebra.Vector
+import Diagrams.TwoD.Types
 import MyPrelude
 
 
@@ -74,18 +75,18 @@ ys = []
 return [(100, 100), (400, 200)]
 =========================================================
 --}
-grahamCH :: [PT] -> [PT]
+grahamCH :: [P2] -> [P2]
 grahamCH vs = grahamUCH vs ++ (tailInit . grahamLCH $ vs)
 
 
 -- |Get the lower part of the convex hull.
-grahamLCH :: [PT] -> [PT]
+grahamLCH :: [P2] -> [P2]
 grahamLCH vs = uncurry (\x y -> last . scanH x $ y)
                        (first reverse . splitAt 3 . sortedXY $ vs)
 
 
 -- |Get the upper part of the convex hull.
-grahamUCH :: [PT] -> [PT]
+grahamUCH :: [P2] -> [P2]
 grahamUCH vs = uncurry (\x y -> last . scanH x $ y)
                        (first reverse . splitAt 3 . reverse . sortedXY $ vs)
 
@@ -95,9 +96,9 @@ grahamUCH vs = uncurry (\x y -> last . scanH x $ y)
 -- If it's the upper or lower half depends on the input.
 -- Also, the first list is expected to be reversed since we only care
 -- about the last 3 elements and want to stay efficient.
-scanH :: [PT]   -- ^ the first 3 starting points in reversed order
-      -> [PT]   -- ^ the rest of the points
-      -> [[PT]] -- ^ all convex hull points iterations for the half
+scanH :: [P2]   -- ^ the first 3 starting points in reversed order
+      -> [P2]   -- ^ the rest of the points
+      -> [[P2]] -- ^ all convex hull points iterations for the half
 scanH hs@(x:y:z:xs) (r':rs')
   |	notcw z y x       = hs : scanH (r':hs) rs'
   | otherwise         = hs : scanH (x:z:xs) (r':rs')
@@ -111,12 +112,12 @@ scanH hs _            = [hs]
 -- |Compute all steps of the graham scan algorithm to allow
 -- visualizing it.
 -- Whether the upper or lower hull is computed depends on the input.
-grahamCHSteps :: Int -> [PT] -> [PT] -> [[PT]]
+grahamCHSteps :: Int -> [P2] -> [P2] -> [[P2]]
 grahamCHSteps c xs' ys' = take c . scanH xs' $ ys'
 
 
 -- |Get all iterations of the upper hull of the graham scan algorithm.
-grahamUHSteps :: [PT] -> [[PT]]
+grahamUHSteps :: [P2] -> [[P2]]
 grahamUHSteps vs =
   (++) [getLastX 2 . sortedXY $ vs]
   . rmdups
@@ -127,7 +128,7 @@ grahamUHSteps vs =
 
 
 -- |Get all iterations of the lower hull of the graham scan algorithm.
-grahamLHSteps :: [PT] -> [[PT]]
+grahamLHSteps :: [P2] -> [[P2]]
 grahamLHSteps vs =
   (++) [take 2 . sortedXY $ vs]
   . rmdups
