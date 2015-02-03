@@ -13,9 +13,7 @@ import Diagrams.TwoD.Types
 -- a list of vertices, ordered by the faces specification.
 facesToArr :: B.ByteString -> [[P2]]
 facesToArr str = fmap (fmap (\y -> meshToArr str !! (fromIntegral y - 1)))
-                      (faces str)
-  where
-    faces = rights . fmap (parseOnly parseFace) . B.lines
+                      (meshFaces str)
 
 
 -- |Convert a text String with multiple vertices into
@@ -39,3 +37,10 @@ parseVertice =
 
 parseFace :: Parser [Integer]
 parseFace = char 'f' *> many1' (many' space *> decimal)
+
+
+meshFaces :: B.ByteString -> [[Int]]
+meshFaces
+  = rights
+    . fmap (parseOnly parseFace)
+    . B.lines
