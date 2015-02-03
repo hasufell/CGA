@@ -78,21 +78,21 @@ executable Gtk
   -- Other library packages from which modules are imported.
   build-depends:       attoparsec >= 0.12.1.1,
                        array >= 0.5.0.0,
-                       base >=4.6 && <4.8,
+                       base >=4.6,
                        bytestring >= 0.10.4.0,
                        containers >= 0.5.0.0,
                        dequeue >= 0.1.5,
-                       diagrams-lib >=1.2 && <1.3,
-                       diagrams-cairo >=1.2 && <1.3,
+                       diagrams-lib >=1.2,
+                       diagrams-cairo >=1.2,
                        diagrams-contrib >= 1.1.2.1,
-                       directory >=1.2 && <1.3,
+                       directory >=1.2,
                        filepath >= 1.3.0.2,
-                       glade >=0.12 && <0.13,
+                       glade >=0.12,
                        gloss >= 1.2.0.1,
-                       gtk >=0.12 && <0.13,
+                       gtk >=0.12,
                        multiset-comb >= 0.2.1,
                        safe >= 0.3.8,
-                       transformers >=0.4 && <0.5
+                       transformers >=0.4
 
   -- Directories containing source files.
   -- hs-source-dirs:
@@ -130,17 +130,17 @@ executable Gif
   -- Other library packages from which modules are imported.
   build-depends:       attoparsec >= 0.12.1.1,
                        array >= 0.5.0.0,
-                       base >=4.6 && <4.8,
+                       base >=4.6,
                        bytestring >= 0.10.4.0,
                        containers >= 0.5.0.0,
                        dequeue >= 0.1.5,
-                       diagrams-lib >=1.2 && <1.3,
-                       diagrams-cairo >=1.2 && <1.3,
+                       diagrams-lib >=1.2,
+                       diagrams-cairo >=1.2,
                        diagrams-contrib >= 1.1.2.1,
                        gloss >= 1.2.0.1,
                        JuicyPixels >= 3.1.7.1,
                        multiset-comb >= 0.2.1,
-                       transformers >=0.4 && <0.5,
+                       transformers >=0.4,
                        safe >= 0.3.8
 
   -- Directories containing source files.
@@ -181,18 +181,18 @@ executable Test
   -- Other library packages from which modules are imported.
   build-depends:       attoparsec >= 0.12.1.1,
                        array >= 0.5.0.0,
-                       base >=4.6 && <4.8,
+                       base >=4.6,
                        bytestring >= 0.10.4.0,
                        containers >= 0.5.0.0,
                        dequeue >= 0.1.5,
-                       diagrams-lib >=1.2 && <1.3,
-                       diagrams-cairo >=1.2 && <1.3,
+                       diagrams-lib >=1.2,
+                       diagrams-cairo >=1.2,
                        diagrams-contrib >= 1.1.2.1,
                        gloss >= 1.2.0.1,
                        JuicyPixels >= 3.1.7.1,
                        multiset-comb >= 0.2.1,
                        QuickCheck >= 2.4.2,
-                       transformers >=0.4 && <0.5,
+                       transformers >=0.4,
                        safe >= 0.3.8
 
   -- Directories containing source files.
