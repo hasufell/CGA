@@ -36,4 +36,4 @@ gifDiag p xs =
 -- |Same as gifDiag, except that it takes a string containing the
 -- mesh file content instead of the the points.
 gifDiagS :: DiagProp -> B.ByteString -> [(Diagram Cairo R2, GifDelay)]
-gifDiagS p = gifDiag p . filterValidPT p . meshToArr
+gifDiagS p = gifDiag p . filterValidPT p . meshVertices

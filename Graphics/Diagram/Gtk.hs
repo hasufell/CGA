@@ -61,8 +61,8 @@ diagS :: DiagProp -> B.ByteString -> Diagram Cairo R2
 diagS p mesh =
   diag p diagAlgos
     . fmap (filterValidPT p)
-    . (\x -> if null x then [meshToArr mesh] else x)
-    . facesToArr
+    . (\x -> if null x then [meshVertices mesh] else x)
+    . meshFaceVertices
     $ mesh
 
 
@@ -72,7 +72,7 @@ diagTreeS :: DiagProp -> B.ByteString -> Diagram Cairo R2
 diagTreeS p mesh =
   diag p diagTreAlgos
     . fmap (filterValidPT p)
-    . (\x -> if null x then [meshToArr mesh] else x)
-    . facesToArr
+    . (\x -> if null x then [meshVertices mesh] else x)
+    . meshFaceVertices
     $ mesh
 
