@@ -1,6 +1,6 @@
 {-# OPTIONS_HADDOCK ignore-exports #-}
 
-module Parser.Meshparser (meshToArr, facesToArr) where
+module Parser.Meshparser where
 
 import Control.Applicative
 import Data.Attoparsec.ByteString.Char8
