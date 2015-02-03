@@ -11,3 +11,6 @@ dist/
 # cabal
 .cabal-sandbox/
 cabal.sandbox.config
+
+# profiling
+*.prof
