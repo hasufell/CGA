@@ -4,15 +4,14 @@ module Algebra.Polygon where
 
 import Algebra.Vector
 import Data.Maybe
-import Diagrams.TwoD.Types
 import MyPrelude
 
 
 -- |Split a polygon by a given segment which must be vertices of the
 -- polygon (returns empty array otherwise).
-splitPoly :: [P2]
-          -> (P2, P2)
-          -> [[P2]]
+splitPoly :: [PT]
+          -> Segment
+          -> [[PT]]
 splitPoly pts (a, b)
   | elem a pts && elem b pts =
     [b : takeWhile (/= b) shiftedPoly, a : dropWhile (/= b) shiftedPoly]
@@ -22,7 +21,7 @@ splitPoly pts (a, b)
 
 
 -- |Get all edges of a polygon.
-polySegments :: [P2] -> [(P2, P2)]
+polySegments :: [PT] -> [Segment]
 polySegments p@(x':_:_:_) = go p ++ [(last p, x')]
   where
     go (x:y:xs) = (x, y) : go (y:xs)
@@ -33,7 +32,7 @@ polySegments _ = []
 -- |Check whether the given segment is inside the polygon.
 -- This doesn't check for segments that are completely outside
 -- of the polygon yet.
-isInsidePoly :: [P2] -> (P2, P2) -> Bool
+isInsidePoly :: [PT] -> Segment -> Bool
 isInsidePoly pts seg =
   null
     . catMaybes
@@ -42,21 +41,21 @@ isInsidePoly pts seg =
 
 
 -- |Check whether two points are adjacent vertices of a polygon.
-adjacent :: P2 -> P2 -> [P2] -> Bool
+adjacent :: PT -> PT -> [PT] -> Bool
 adjacent u v = any (\x -> x == (u, v) || x == (v, u)) . polySegments
 
 
 -- |Check whether the polygon is a triangle polygon.
-isTrianglePoly :: [P2] -> Bool
+isTrianglePoly :: [PT] -> Bool
 isTrianglePoly [_, _, _] = True
 isTrianglePoly _         = False
 
 
 -- |Get all triangle polygons.
-triangleOnly :: [[P2]] -> [[P2]]
+triangleOnly :: [[PT]] -> [[PT]]
 triangleOnly = filter isTrianglePoly
 
 
 -- |Get all non-triangle polygons.
-nonTriangleOnly :: [[P2]] -> [[P2]]
+nonTriangleOnly :: [[PT]] -> [[PT]]
 nonTriangleOnly = filter (not . isTrianglePoly)

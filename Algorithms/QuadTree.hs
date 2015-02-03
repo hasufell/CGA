@@ -56,8 +56,7 @@ data Orient = North | South | East | West
 
 
 -- |Get a sub-square of the current square, e.g. nw, ne, sw or se.
-nwSq, neSq, swSq, seSq :: ((Double, Double), (Double, Double)) -- ^ current square
-                       -> ((Double, Double), (Double, Double)) -- ^ sub-square
+nwSq, neSq, swSq, seSq :: Square -> Square
 nwSq ((xl, yl), (xu, yu)) = (,)  (xl, (yl + yu) / 2)  ((xl + xu) / 2, yu)
 neSq ((xl, yl), (xu, yu)) = (,)  ((xl + xu) / 2, (yl + yu) / 2)  (xu, yu)
 swSq ((xl, yl), (xu, yu)) = (,)  (xl, yl)  ((xl + xu) / 2, (yl + yu) / 2)
@@ -80,9 +79,9 @@ isSEchild _                 = False
 -- |Builds a quadtree of a list of points which recursively divides up 2D
 -- space into quadrants, so that every leaf-quadrant stores either zero or one
 -- point.
-quadTree :: [P2]                                 -- ^ the points to divide
-         -> ((Double, Double), (Double, Double)) -- ^ the initial square around the points
-         -> QuadTree P2                          -- ^ the quad tree
+quadTree :: [PT]        -- ^ the points to divide
+         -> Square      -- ^ the initial square around the points
+         -> QuadTree PT -- ^ the quad tree
 quadTree []   _ = TNil
 quadTree [pt] _ = TLeaf pt
 quadTree pts sq = TNode (quadTree nWPT . nwSq $ sq) (quadTree nEPT . neSq $ sq)
@@ -96,9 +95,9 @@ quadTree pts sq = TNode (quadTree nWPT . nwSq $ sq) (quadTree nEPT . neSq $ sq)
 
 
 -- |Get all squares of a quad tree.
-quadTreeSquares :: ((Double, Double), (Double, Double))  -- ^ the initial square around the points
-                -> QuadTree P2                            -- ^ the quad tree
-                -> [((Double, Double), (Double, Double))] -- ^ all squares of the quad tree
+quadTreeSquares :: Square      -- ^ the initial square around the points
+                -> QuadTree PT -- ^ the quad tree
+                -> [Square]    -- ^ all squares of the quad tree
 quadTreeSquares sq (TNil)              = [sq]
 quadTreeSquares sq (TLeaf _)           = [sq]
 quadTreeSquares sq (TNode nw ne sw se) =
@@ -108,9 +107,7 @@ quadTreeSquares sq (TNode nw ne sw se) =
 
 -- |Get the current square of the zipper, relative to the given top
 -- square.
-getSquareByZipper :: ((Double, Double), (Double, Double)) -- ^ top square
-                  -> QTZipper a
-                  -> ((Double, Double), (Double, Double)) -- ^ current square
+getSquareByZipper :: Square -> QTZipper a -> Square
 getSquareByZipper sq z = go sq (reverse . snd $ z)
   where
     go sq' []              = sq'
@@ -203,7 +200,7 @@ lookupByNeighbors :: [Orient] -> QTZipper a -> Maybe (QTZipper a)
 lookupByNeighbors = flip (foldlM (flip findNeighbor))
 
 
-quadTreeToRoseTree :: QTZipper P2 -> Tree String
+quadTreeToRoseTree :: QTZipper PT -> Tree String
 quadTreeToRoseTree z' = go (rootNode z')
   where
     go z = case z of

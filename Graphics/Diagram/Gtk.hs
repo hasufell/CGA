@@ -2,6 +2,7 @@
 
 module Graphics.Diagram.Gtk where
 
+import Algebra.Vector(PT)
 import qualified Data.ByteString.Char8 as B
 import Data.List(find)
 import Diagrams.Backend.Cairo
@@ -45,7 +46,7 @@ diagTreAlgos =
 
 
 -- |Create the Diagram from the points.
-diag :: DiagProp -> [DiagAlgo] -> [[P2]] -> Diagram Cairo R2
+diag :: DiagProp -> [DiagAlgo] -> [[PT]] -> Diagram Cairo R2
 diag p das vts = maybe mempty (\x -> mkDiag x p vts)
                   $ mconcat
                       -- get the actual [Diag] array

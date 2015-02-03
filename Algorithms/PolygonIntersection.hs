@@ -18,14 +18,14 @@ import           QueueEx
 -- successor are saved for convenience.
 data PolyPT =
   PolyA {
-    id'   :: P2
-    , pre :: P2
-    , suc :: P2
+    id'   :: PT
+    , pre :: PT
+    , suc :: PT
     }
   | PolyB {
-    id'   :: P2
-    , pre :: P2
-    , suc :: P2
+    id'   :: PT
+    , pre :: PT
+    , suc :: PT
     }
   deriving (Show, Eq)
 
@@ -42,7 +42,7 @@ isPolyB = not . isPolyA
 -- |Shift a list of sorted convex hull points of a polygon so that
 -- the first element in the list is the one with the highest y-coordinate.
 -- This is done in O(n).
-sortLexPoly :: [P2] -> [P2]
+sortLexPoly :: [PT] -> [PT]
 sortLexPoly ps = maybe [] (`shiftM` ps) (elemIndex (yMax ps) ps)
   where
     yMax       = foldl1 (\x y -> if ptCmpY x y == GT then x else y)
@@ -50,8 +50,8 @@ sortLexPoly ps = maybe [] (`shiftM` ps) (elemIndex (yMax ps) ps)
 
 -- |Make a PolyPT list out of a regular list of points, so
 -- the predecessor and successors are all saved.
-mkPolyPTList :: (P2 -> P2 -> P2 -> PolyPT) -- ^ PolyA or PolyB function
-             -> [P2]                       -- ^ polygon points
+mkPolyPTList :: (PT -> PT -> PT -> PolyPT) -- ^ PolyA or PolyB function
+             -> [PT]                       -- ^ polygon points
              -> [PolyPT]
 mkPolyPTList f' pts@(x':y':_:_) =
   f' x' (last pts) y' : go f' pts
@@ -64,7 +64,7 @@ mkPolyPTList _ _ = []
 
 -- |Sort the points of two polygons according to their y-coordinates,
 -- while saving the origin of that point. This is done in O(n).
-sortLexPolys :: ([P2], [P2]) -> [PolyPT]
+sortLexPolys :: ([PT], [PT]) -> [PolyPT]
 sortLexPolys (pA'@(_:_), pB'@(_:_)) =
   queueToList $ go (Q.fromList . mkPolyPTList PolyA . sortLexPoly $ pA')
                    (Q.fromList . mkPolyPTList PolyB . sortLexPoly $ pB')
@@ -104,7 +104,7 @@ sortLexPolys _ = []
 
 -- |Get all points that intersect between both polygons. This is done
 -- in O(n).
-intersectionPoints :: [PolyPT] -> [P2]
+intersectionPoints :: [PolyPT] -> [PT]
 intersectionPoints xs' = rmdups . go $ xs'
   where
     go [] = []
@@ -113,7 +113,7 @@ intersectionPoints xs' = rmdups . go $ xs'
 
     -- Get the scan line or in other words the
     -- Segment pairs we are going to check for intersection.
-    scanLine :: [PolyPT] -> ([(P2, P2)], [(P2, P2)])
+    scanLine :: [PolyPT] -> ([Segment], [Segment])
     scanLine sp@(_:_) = (,) (getSegment isPolyA) (getSegment isPolyB)
       where
         getSegment f = fromMaybe []
@@ -124,7 +124,7 @@ intersectionPoints xs' = rmdups . go $ xs'
     -- Gets the actual intersections between the segments of
     -- both polygons we currently examine. This is done in O(1)
     -- since we have max 4 segments.
-    segIntersections :: ([(P2, P2)], [(P2, P2)]) -> [P2]
+    segIntersections :: ([Segment], [Segment]) -> [PT]
     segIntersections (a@(_:_), b@(_:_)) =
       catMaybes
       . fmap (\[x, y] -> intersectSeg' x y)

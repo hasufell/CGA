@@ -2,6 +2,7 @@
 
 module Graphics.Diagram.AlgoDiags where
 
+import Algebra.Vector(PT,Square)
 import Algorithms.GrahamScan
 import Algorithms.QuadTree
 import Algorithms.KDTree
@@ -123,9 +124,7 @@ kdSquares = Diag f
       where
         -- Gets all lines that make up the kdSquares. Every line is
         -- described by two points, start and end respectively.
-        kdLines :: KDTree P2
-                -> ((Double, Double), (Double, Double)) -- ^ square
-                -> [(P2, P2)]
+        kdLines :: KDTree PT -> Square -> [(PT, PT)]
         kdLines (KTNode ln pt Horizontal rn) ((xmin, ymin), (xmax, ymax)) =
           (\(x, _) -> [(p2 (x, ymin), p2 (x, ymax))])
             (unp2 pt)
@@ -180,7 +179,7 @@ kdTreeDiag = Diag f
 
 
 -- |Get the quad tree corresponding to the given points and diagram properties.
-qt :: [P2] -> DiagProp -> QuadTree P2
+qt :: [PT] -> DiagProp -> QuadTree PT
 qt vt p = quadTree vt (diagDimSquare p)
 
 
@@ -193,9 +192,7 @@ quadPathSquare = Diag f
       (uncurry rectByDiagonal # lw thin # lc red)
       (getSquare (stringToQuads (quadPath p)) (qt (mconcat vts) p, []))
       where
-        getSquare :: [Either Quad Orient]
-                  -> QTZipper P2
-                  -> ((Double, Double), (Double, Double))
+        getSquare :: [Either Quad Orient] -> QTZipper PT -> Square
         getSquare [] z = getSquareByZipper (diagDimSquare p) z
         getSquare (q:qs) z = case q of
           Right x -> getSquare qs (fromMaybe z (findNeighbor x z))
@@ -211,9 +208,7 @@ gifQuadPath = GifDiag f
       (uncurry rectByDiagonal # lw thick # lc col)
       <$> getSquares (stringToQuads (quadPath p)) (qt vt p, [])
       where
-        getSquares :: [Either Quad Orient]
-                   -> QTZipper P2
-                   -> [((Double, Double), (Double, Double))]
+        getSquares :: [Either Quad Orient] -> QTZipper PT -> [Square]
         getSquares [] z = [getSquareByZipper (diagDimSquare p) z]
         getSquares (q:qs) z = case q of
           Right x -> getSquareByZipper (diagDimSquare p) z :
@@ -233,7 +228,7 @@ treePretty = Diag f
                       . quadPath
                       $ p)
       where
-        getCurQT :: [Either Quad Orient] -> QTZipper P2 -> QTZipper P2
+        getCurQT :: [Either Quad Orient] -> QTZipper PT -> QTZipper PT
         getCurQT [] z = z
         getCurQT (q:qs) z = case q of
           Right x -> getCurQT qs (fromMaybe z (findNeighbor x z))
