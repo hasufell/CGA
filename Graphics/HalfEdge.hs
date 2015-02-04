@@ -2,7 +2,7 @@
 
 -- |This module provides methods to build a cyclic half-edge data structure
 -- from an already parsed obj mesh file. As such, it depends on details
--- of the parsed data structures.
+-- of the parsed data.
 --
 -- In particular, 'indirectHeFaces', 'indirectHeVerts' and 'indirectToDirect'
 -- assume specific structure of some input lists. Check their respective
