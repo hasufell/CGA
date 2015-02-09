@@ -10,7 +10,7 @@
 --
 -- As the data structure has a lot of cross-references and the knots are
 -- not really known at compile-time, we have to use helper data structures
--- such as arrays, lists or vectors under the hood and tie the knots through
+-- such as lists and maps under the hood and tie the knots through
 -- index lookups.
 --
 -- For an explanation of the abstract concept of the half-edge data structure,
