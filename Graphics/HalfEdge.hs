@@ -24,9 +24,11 @@ module Graphics.HalfEdge (
 ) where
 
 import Algebra.Vector
+import Control.Applicative
+import Control.Monad
 import qualified Data.ByteString.Char8 as B
-import Data.Functor
 import qualified Data.IntMap.Lazy as Map
+import Data.Maybe
 import Parser.Meshparser
 import Safe
 
@@ -35,21 +37,21 @@ import Safe
 data HeVert a = HeVert {
     vcoord  :: a        -- the coordinates of the vertex
   , emedge  :: HeEdge a -- one of the half-edges emanating from the vertex
+} | NoVert
 
-}
 
 -- |The face data structure for the half-edge.
 data HeFace a = HeFace {
   bordedge :: HeEdge a -- one of the half-edges bordering the face
-}
+} | NoFace
 
 -- |The actual half-edge data structure.
 data HeEdge a = HeEdge {
-    startvert :: HeVert a         -- start-vertex of the half-edge
-  , oppedge   :: Maybe (HeEdge a) -- oppositely oriented adjacent half-edge
-  , edgeface  :: HeFace a         -- face the half-edge borders
-  , nextedge  :: HeEdge a         -- next half-edge around the face
-}
+    startvert :: HeVert a  -- start-vertex of the half-edge
+  , oppedge   :: HeEdge a  -- oppositely oriented adjacent half-edge
+  , edgeface  :: HeFace a  -- face the half-edge borders
+  , nextedge  :: HeEdge a  -- next half-edge around the face
+} | NoEdge
 
 -- This is a helper data structure of half-edge edges
 -- for tying the knots in 'indirectToDirect'.
@@ -132,8 +134,7 @@ indirectHeVerts hes' = go hes' Map.empty 0
 -- |Tie the knots!
 -- It is assumed that the list of points is indexed in order of their
 -- appearance in the obj mesh file.
--- TODO: make this function safe.
-indirectToDirect :: [a]                      -- ^ list of points
+indirectToDirect :: [a]                       -- ^ list of points
                  -> [IndirectHeEdge]
                  -> [IndirectHeFace]
                  -> Map.IntMap IndirectHeVert -- ^ assumed to start at index 1
@@ -142,22 +143,32 @@ indirectToDirect pts pe@(e:_) fs vertarr
   = thisEdge e
   where
     thisEdge (IndirectHeEdge ei sv _ fi off)
-      = HeEdge (thisVert (vertarr Map.! sv) sv)
-               (getOppEdge sv fi)
-               (thisFace (fs !! fi))
-               (thisEdge . (!!) pe $ (ei + off))
+      = case (fs `atMay` fi, pe `atMay` (ei + off), Map.lookup sv vertarr) of
+          (Just x, Just y, Just z) -> HeEdge (thisVert z sv)
+                                             (getOppEdge sv fi)
+                                             (thisFace x)
+                                             (thisEdge y)
+          _                        -> NoEdge
     thisFace (IndirectHeFace (_, vi:_))
-      = HeFace (thisEdge (pe !! vi))
+      = case pe `atMay` vi of
+          Just x  -> HeFace (thisEdge x)
+          Nothing -> NoFace
+    thisFace (IndirectHeFace _) = NoFace
     thisVert (IndirectHeVert eedg _) coordi
-      = HeVert (pts !! (coordi - 1))
-               (thisEdge (pe !! (eedg - 1)))
+      = case (pts `atMay` (coordi - 1), pe `atMay` (eedg - 1)) of
+          (Just x, Just y) -> HeVert x (thisEdge y)
+          _                -> NoVert
     getOppEdge sv fi
-      = (\x -> thisEdge (pe !! x))
-        <$>
-        (headMay
-          . filter (\x -> (/=) fi . indexf $ (pe !! x))
-          . edgelist
-          $ (vertarr Map.! sv))
+      = case join
+               $ headMay
+               . filter ((/=) fi . indexf)
+               . catMaybes
+               . fmap (pe `atMay`)
+               . edgelist
+               <$> Map.lookup sv vertarr of
+        Just x  -> thisEdge x
+        Nothing -> NoEdge
+indirectToDirect _ _ _ _ = NoEdge
 
 
 -- |Build the half-edge data structure from a list of points
