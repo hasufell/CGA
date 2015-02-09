@@ -24,11 +24,9 @@ module Graphics.HalfEdge (
 ) where
 
 import Algebra.Vector
-import Control.Monad.ST
-import Data.Array.Unboxed
-import Data.Array.ST
 import qualified Data.ByteString.Char8 as B
 import Data.Functor
+import qualified Data.IntMap.Lazy as Map
 import Parser.Meshparser
 import Safe
 
@@ -115,22 +113,20 @@ indirectHeEdges = concat . fmap indirectHeEdge
 -- |Construct the indirect data structure for half-edge vertices.
 -- It is assumed that the list of points is indexed in order of their
 -- appearance in the obj mesh file.
-indirectHeVerts :: [a]                      -- ^ list of points
-                -> [IndirectHeEdge]         -- ^ list of indirect edges
-                -> Array Int IndirectHeVert -- ^ output list, starts at index 1
-indirectHeVerts pts hes'
-  = runSTArray $ do
-    arr <- newArray (1, length pts) (IndirectHeVert 0 [])
-      :: ST s (STArray s Int IndirectHeVert)
-    -- build the array
-    let go [] _ = return ()
-        go (IndirectHeEdge _ _ nv _ offset:hes) i
-          = do
-            (IndirectHeVert _ xs) <- readArray arr nv
-            writeArray arr nv (IndirectHeVert (i + offset) (i:xs))
-            go hes (i + 1)
-    go hes' 0
-    return arr
+indirectHeVerts :: [IndirectHeEdge]          -- ^ list of indirect edges
+                -> Map.IntMap IndirectHeVert -- ^ output map, starts at index 1
+indirectHeVerts hes' = go hes' Map.empty 0
+  where
+    go [] map' _ = map'
+    go (IndirectHeEdge _ _ nv _ offset:hes) map' i
+      = go hes
+           (Map.alter updateMap nv map')
+           (i + 1)
+      where
+        updateMap (Just (IndirectHeVert _ xs))
+          = Just (IndirectHeVert (i + offset) (i:xs))
+        updateMap Nothing
+          = Just (IndirectHeVert (i + offset) [i])
 
 
 -- |Tie the knots!
@@ -140,13 +136,13 @@ indirectHeVerts pts hes'
 indirectToDirect :: [a]                      -- ^ list of points
                  -> [IndirectHeEdge]
                  -> [IndirectHeFace]
-                 -> Array Int IndirectHeVert -- ^ assumed to start at index 1
+                 -> Map.IntMap IndirectHeVert -- ^ assumed to start at index 1
                  -> HeEdge a
 indirectToDirect pts pe@(e:_) fs vertarr
   = thisEdge e
   where
     thisEdge (IndirectHeEdge ei sv _ fi off)
-      = HeEdge (thisVert (vertarr ! sv) sv)
+      = HeEdge (thisVert (vertarr Map.! sv) sv)
                (getOppEdge sv fi)
                (thisFace (fs !! fi))
                (thisEdge . (!!) pe $ (ei + off))
@@ -161,7 +157,7 @@ indirectToDirect pts pe@(e:_) fs vertarr
         (headMay
           . filter (\x -> (/=) fi . indexf $ (pe !! x))
           . edgelist
-          $ (vertarr ! sv))
+          $ (vertarr Map.! sv))
 
 
 -- |Build the half-edge data structure from a list of points
@@ -185,7 +181,7 @@ buildHeEdge _ []   = Nothing
 buildHeEdge pts fs
   = let faces' = indirectHeFaces fs
         edges' = indirectHeEdges faces'
-        verts' = indirectHeVerts pts edges'
+        verts' = indirectHeVerts edges'
     in Just $ indirectToDirect pts edges' faces' verts'
 
 
@@ -196,6 +192,6 @@ buildHeEdgeFromStr bmesh =
   let pts    = meshVertices bmesh
       faces' = indirectHeFaces . meshFaces $ bmesh
       edges  = indirectHeEdges faces'
-      verts  = indirectHeVerts pts edges
+      verts  = indirectHeVerts edges
   in  indirectToDirect pts edges faces' verts
 
