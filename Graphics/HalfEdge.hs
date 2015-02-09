@@ -166,25 +166,27 @@ indirectToDirect :: [a]                       -- ^ list of points
                  -> [IndirectHeFace]
                  -> Map.IntMap IndirectHeVert -- ^ assumed to start at index 1
                  -> HeEdge a
-indirectToDirect pts pe@(e:_) fs vertarr
+indirectToDirect pts pe@(e:_) fs vertmap
   = thisEdge e
   where
     thisEdge (IndirectHeEdge ei sv _ fi off)
-      = case (fs `atMay` fi, pe `atMay` (ei + off), Map.lookup sv vertarr) of
-          (Just x, Just y, Just z) -> HeEdge (thisVert z sv)
-                                             (getOppEdge sv fi)
-                                             (thisFace x)
-                                             (thisEdge y)
-          _                        -> NoEdge
+      = case (fs `atMay` fi, pe `atMay` (ei + off), Map.lookup sv vertmap) of
+          (Just face,
+           Just edge,
+           Just vert) -> HeEdge (thisVert vert sv)
+                                (getOppEdge sv fi)
+                                (thisFace face)
+                                (thisEdge edge)
+          _           -> NoEdge
     thisFace (IndirectHeFace (_, vi:_))
       = case pe `atMay` vi of
-          Just x  -> HeFace (thisEdge x)
-          Nothing -> NoFace
+          Just edge -> HeFace (thisEdge edge)
+          Nothing   -> NoFace
     thisFace (IndirectHeFace _) = NoFace
     thisVert (IndirectHeVert eedg _) coordi
       = case (pts `atMay` (coordi - 1), pe `atMay` (eedg - 1)) of
-          (Just x, Just y) -> HeVert x (thisEdge y)
-          _                -> NoVert
+          (Just vert, Just edge) -> HeVert vert $ thisEdge edge
+          _                      -> NoVert
     getOppEdge sv fi
       = case join
                $ headMay
@@ -192,9 +194,9 @@ indirectToDirect pts pe@(e:_) fs vertarr
                . catMaybes
                . fmap (pe `atMay`)
                . edgelist
-               <$> Map.lookup sv vertarr of
-        Just x  -> thisEdge x
-        Nothing -> NoEdge
+               <$> Map.lookup sv vertmap
+        of Just x  -> thisEdge x
+           Nothing -> NoEdge
 indirectToDirect _ _ _ _ = NoEdge
 
 
