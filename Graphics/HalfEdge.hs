@@ -191,8 +191,11 @@ buildHeEdge pts fs
 
 -- |Build the HeEdge data structure from the .obj mesh file contents.
 buildHeEdgeFromStr :: B.ByteString -- ^ contents of an .obj mesh file
-                   -> Maybe (HeEdge PT)
+                   -> HeEdge PT
 buildHeEdgeFromStr bmesh =
   let pts    = meshVertices bmesh
-      fs     = meshFaces bmesh
-  in  buildHeEdge pts fs
+      faces' = indirectHeFaces . meshFaces $ bmesh
+      edges  = indirectHeEdges faces'
+      verts  = indirectHeVerts pts edges
+  in  indirectToDirect pts edges faces' verts
+
