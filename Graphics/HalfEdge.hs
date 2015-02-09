@@ -134,6 +134,33 @@ indirectHeVerts hes' = go hes' Map.empty 0
 -- |Tie the knots!
 -- It is assumed that the list of points is indexed in order of their
 -- appearance in the obj mesh file.
+--
+-- pseudo-code:
+--
+-- @
+-- indirectToDirect :: [a] -> [IndirectHeEdge] -> [IndirectHeFace]
+--                  -> Map.IntMap IndirectHeVert -> HeEdge a
+-- indirectToDirect points edgelist facelist vertmap
+--   = thisEdge (head edgelist)
+--   where
+--     thisEdge edge
+--       = HeEdge (thisVert (vertmap ! svindex edge) $ svindex edge)
+--                (getOppEdge (svindex edge) $ indexf edge)
+--                (thisFace $ facelist !! indexf edge)
+--                (thisEdge $ edgelist !! (edgeindex edge + offsetedge edge))
+--     thisFace face = HeFace $ thisEdge (edgelist !! (snd . head $ face))
+--     thisVert vertice coordindex
+--       = HeVert (points !! (coordindex - 1))
+--                (thisEdge $ points !! (emedgeindex vertice - 1))
+--     getOppEdge startverticeindex faceindex
+--       = case headMay
+--                . filter ((/=) faceindex . indexf)
+--                . fmap (edgelist !!)
+--                . edgelist
+--                $ vertmap ! startverticeindex
+--         of Just x  -> thisEdge x
+--            Nothing -> NoEdge
+-- @
 indirectToDirect :: [a]                       -- ^ list of points
                  -> [IndirectHeEdge]
                  -> [IndirectHeFace]
