@@ -61,19 +61,20 @@ data IndirectHeEdge = IndirectHeEdge {
   , nvindex    :: Int  -- index of next-vertice
   , indexf     :: Int  -- index of face
   , offsetedge :: Int  -- offset to get the next edge
-}
+} deriving (Show)
 
 -- This is a helper data structure of half-edge vertices
 -- for tying the knots in 'indirectToDirect'.
 data IndirectHeVert = IndirectHeVert {
     emedgeindex  :: Int    -- emanating edge index (starts at 1)
   , edgelist     :: [Int]  -- index of edge that points to this vertice
-}
+} deriving (Show)
 
 -- This is a helper data structure of half-edge faces
 -- for tying the knots in 'indirectToDirect'.
 data IndirectHeFace =
   IndirectHeFace (Int, [Int]) -- (faceIndex, [verticeindex])
+  deriving (Show)
 
 
 -- |Construct the indirect data structure for half-edge faces.
