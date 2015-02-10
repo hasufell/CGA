@@ -138,26 +138,29 @@ indirectHeVerts hes' = go hes' Map.empty 0
 -- pseudo-code:
 --
 -- @
--- indirectToDirect :: [a] -> [IndirectHeEdge] -> [IndirectHeFace]
---                  -> Map.IntMap IndirectHeVert -> HeEdge a
--- indirectToDirect points edgelist facelist vertmap
---   = thisEdge (head edgelist)
+-- indirectToDirect :: [a] -- parsed vertices, e.g. 2d points (Double, Double)
+--                  -> [IndirectHeEdge]
+--                  -> [IndirectHeFace]
+--                  -> [IndirectHeVert]
+--                  -> HeEdge a
+-- indirectToDirect points edges faces vertices
+--   = thisEdge (head edges)
 --   where
 --     thisEdge edge
---       = HeEdge (thisVert (vertmap ! svindex edge) $ svindex edge)
---                (getOppEdge (svindex edge) $ indexf edge)
---                (thisFace $ facelist !! indexf edge)
---                (thisEdge $ edgelist !! (edgeindex edge + offsetedge edge))
---     thisFace face = HeFace $ thisEdge (edgelist !! (snd . head $ face))
+--       = HeEdge (thisVert (vertices !! svindex edge) $ svindex edge)
+--                (thisOppEdge (svindex edge) $ indexf edge)
+--                (thisFace $ faces !! indexf edge)
+--                (thisEdge $ edges !! (edgeindex edge + offsetedge edge))
+--     thisFace face = HeFace $ thisEdge (edges !! (head . snd $ face))
 --     thisVert vertice coordindex
 --       = HeVert (points !! (coordindex - 1))
 --                (thisEdge $ points !! (emedgeindex vertice - 1))
---     getOppEdge startverticeindex faceindex
+--     thisOppEdge startverticeindex faceindex
 --       = case headMay
---                . filter ((/=) faceindex . indexf)
---                . fmap (edgelist !!)
---                . edgelist
---                $ vertmap ! startverticeindex
+--           . filter ((/=) faceindex . indexf)
+--           . fmap (edges !!)
+--           . edgelist         -- getter
+--           $ vertices !! startverticeindex
 --         of Just x  -> thisEdge x
 --            Nothing -> NoEdge
 -- @
