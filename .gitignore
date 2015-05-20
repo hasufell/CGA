@@ -14,3 +14,7 @@ cabal.sandbox.config
 
 # profiling
 *.prof
+
+_darcs/
+
+.liquid/
