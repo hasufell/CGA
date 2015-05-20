@@ -233,7 +233,7 @@ treePretty = Diag f
         getCurQT (q:qs) z = case q of
           Right x -> getCurQT qs (fromMaybe z (findNeighbor x z))
           Left x  -> getCurQT qs (fromMaybe z (goQuad x z))
-        prettyRoseTree :: Tree String -> Diagram Cairo R2
+        prettyRoseTree :: Tree String -> Diagram Cairo
         prettyRoseTree tree =
         -- HACK: in order to give specific nodes a specific color
           renderTree (\n -> case head n of

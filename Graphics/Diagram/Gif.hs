@@ -16,7 +16,7 @@ import Parser.Meshparser
 
 
 -- |Return a list of tuples used by 'gifMain' to generate an animated gif.
-gifDiag :: DiagProp -> [PT] -> [(Diagram Cairo R2, GifDelay)]
+gifDiag :: DiagProp -> [PT] -> [(Diagram Cairo, GifDelay)]
 gifDiag p xs =
   fmap ((\x -> (x, 50)) . (<> nonChDiag))
    (upperHullList
@@ -35,5 +35,5 @@ gifDiag p xs =
 
 -- |Same as gifDiag, except that it takes a string containing the
 -- mesh file content instead of the the points.
-gifDiagS :: DiagProp -> B.ByteString -> [(Diagram Cairo R2, GifDelay)]
+gifDiagS :: DiagProp -> B.ByteString -> [(Diagram Cairo, GifDelay)]
 gifDiagS p = gifDiag p . filterValidPT p . meshVertices

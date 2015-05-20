@@ -13,8 +13,8 @@ import GHC.Float
 import MyPrelude
 
 
-type Vec     = R2
-type PT      = P2
+type Vec     = V2 Double
+type PT      = P2 Double
 type Coord   = (Double, Double)
 type Segment = (PT, PT)
 type Square  = (Coord, Coord)
@@ -64,12 +64,12 @@ vecLength v = sqrt (x^(2 :: Int) + y^(2 :: Int))
 
 -- |Compute the scalar product of two vectors.
 scalarProd :: Vec -> Vec -> Double
-scalarProd (R2 a1 a2) (R2 b1 b2) = a1 * b1 + a2 * b2
+scalarProd (V2 a1 a2) (V2 b1 b2) = a1 * b1 + a2 * b2
 
 
 -- |Multiply a scalar with a vector.
 scalarMul :: Double -> Vec -> Vec
-scalarMul d (R2 a b) = R2 (a * d) (b * d)
+scalarMul d (V2 a b) = V2 (a * d) (b * d)
 
 
 -- |Construct a vector that points to a point from the origin.

@@ -63,9 +63,9 @@ data MyGUI = MkMyGUI {
   -- |Path entry widget for the quad tree.
   quadPathEntry :: Entry,
   -- |Horizontal box containing the path entry widget.
-  vbox7 :: Box,
+  vbox7 :: Graphics.UI.Gtk.Box,
   -- |Horizontal box containing the Rang search entry widgets.
-  vbox10 :: Box,
+  vbox10 :: Graphics.UI.Gtk.Box,
   -- |Range entry widget for lower x bound
   rangeXminEntry :: Entry,
   -- |Range entry widget for upper x bound
@@ -299,9 +299,9 @@ saveAndDrawDiag fp fps mygui =
         renderDiag winWidth winHeight buildDiag =
           renderDia Cairo
             (CairoOptions fps
-               (Dims (fromIntegral winWidth) (fromIntegral winHeight))
+               (mkSizeSpec2D (Just $ fromIntegral winWidth) (Just $ fromIntegral winHeight))
                SVG False)
-            (buildDiag (def{
+            (buildDiag (MyPrelude.def{
                 dotSize       = scaleVal,
                 xDimension    = fromMaybe (0, 500) xDim,
                 yDimension    = fromMaybe (0, 500) yDim,
