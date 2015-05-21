@@ -21,19 +21,19 @@ newtype PosRoundDouble = PosRoundDouble { getPRD :: Double }
   deriving (Eq, Ord, Show, Read)
 
 
-newtype RoundR2 = RoundR2 { getRR2 :: R2 }
+newtype RoundR2 = RoundR2 { getRR2 :: V2 Double }
   deriving (Eq, Ord, Show, Read)
 
 
-newtype PosRoundR2 = PosRoundR2 { getPRR2 :: R2 }
+newtype PosRoundR2 = PosRoundR2 { getPRR2 :: V2 Double }
   deriving (Eq, Ord, Show, Read)
 
 
-newtype RoundP2 = RoundP2 { getRP2 :: P2 }
+newtype RoundP2 = RoundP2 { getRP2 :: P2 Double }
   deriving (Eq, Ord, Show, Read)
 
 
-newtype PosRoundP2 = PosRoundP2 { getPRP2 :: P2 }
+newtype PosRoundP2 = PosRoundP2 { getPRP2 :: P2 Double }
   deriving (Eq, Ord, Show, Read)
 
 
@@ -72,11 +72,11 @@ instance Arbitrary PosRoundP2 where
                 <*> (arbitrary :: Gen PosRoundDouble)
 
 
-instance Arbitrary R2 where
+instance Arbitrary (V2 Double) where
   arbitrary = curry r2 <$> arbitrary <*> arbitrary
 
 
-instance Arbitrary P2 where
+instance Arbitrary (P2 Double) where
   arbitrary = curry p2 <$> arbitrary <*> arbitrary
 
 
@@ -126,51 +126,51 @@ inRangeProp6 sq@((x1, y1), (x2, y2)) (Positive a) (Positive b) =
 
 
 -- apply id function on the point
-onPTProp1 :: P2 -> Bool
+onPTProp1 :: P2 Double -> Bool
 onPTProp1 pt = onPT id pt == pt
 
 
 -- add a random value to the point coordinates
-onPTProp2 :: P2 -> Positive R2 -> Bool
-onPTProp2 pt (Positive (R2 rx ry))
+onPTProp2 :: P2 Double -> Positive (V2 Double) -> Bool
+onPTProp2 pt (Positive (V2 rx ry))
   = onPT (\(x, y) -> (x + rx, y + ry)) pt /= pt
 
 
 -- angle between two vectors both on the x-axis must be 0
-getAngleProp1 :: Positive R2 -> Positive R2 -> Bool
-getAngleProp1 (Positive (R2 x1 _)) (Positive (R2 x2 _))
-  = getAngle (R2 x1 0) (R2 x2 0) == 0
+getAngleProp1 :: Positive (V2 Double) -> Positive (V2 Double) -> Bool
+getAngleProp1 (Positive (V2 x1 _)) (Positive (V2 x2 _))
+  = getAngle (V2 x1 0) (V2 x2 0) == 0
 
 
 -- angle between two vectors both on the y-axis must be 0
-getAngleProp2 :: Positive R2 -> Positive R2 -> Bool
-getAngleProp2 (Positive (R2 _ y1)) (Positive (R2 _ y2))
-  = getAngle (R2 0 y1) (R2 0 y2) == 0
+getAngleProp2 :: Positive (V2 Double) -> Positive (V2 Double) -> Bool
+getAngleProp2 (Positive (V2 _ y1)) (Positive (V2 _ y2))
+  = getAngle (V2 0 y1) (V2 0 y2) == 0
 
 
 -- angle between two vectors both on the x-axis but with opposite direction
 -- must be pi
-getAngleProp3 :: Positive R2 -> Positive R2 -> Bool
-getAngleProp3 (Positive (R2 x1 _)) (Positive (R2 x2 _))
-  = getAngle (R2 (negate x1) 0) (R2 x2 0) == pi
+getAngleProp3 :: Positive (V2 Double) -> Positive (V2 Double) -> Bool
+getAngleProp3 (Positive (V2 x1 _)) (Positive (V2 x2 _))
+  = getAngle (V2 (negate x1) 0) (V2 x2 0) == pi
 
 
 -- angle between two vectors both on the y-axis but with opposite direction
 -- must be pi
-getAngleProp4 :: Positive R2 -> Positive R2 -> Bool
-getAngleProp4 (Positive (R2 _ y1)) (Positive (R2 _ y2))
-  = getAngle (R2 0 (negate y1)) (R2 0 y2) == pi
+getAngleProp4 :: Positive (V2 Double) -> Positive (V2 Double) -> Bool
+getAngleProp4 (Positive (V2 _ y1)) (Positive (V2 _ y2))
+  = getAngle (V2 0 (negate y1)) (V2 0 y2) == pi
 
 
 -- angle between vector in x-axis direction and y-axis direction must be
 -- p/2
-getAngleProp5 :: Positive R2 -> Positive R2 -> Bool
-getAngleProp5 (Positive (R2 x1 _)) (Positive (R2 _ y2))
-  = getAngle (R2 x1 0) (R2 0 y2) == pi / 2
+getAngleProp5 :: Positive (V2 Double) -> Positive (V2 Double) -> Bool
+getAngleProp5 (Positive (V2 x1 _)) (Positive (V2 _ y2))
+  = getAngle (V2 x1 0) (V2 0 y2) == pi / 2
 
 
 -- commutative
-getAngleProp6 :: Positive R2 -> Positive R2 -> Bool
+getAngleProp6 :: Positive (V2 Double) -> Positive (V2 Double) -> Bool
 getAngleProp6 (Positive v1) (Positive v2)
   = getAngle v1 v2 == getAngle v2 v1
 
@@ -183,7 +183,7 @@ getAngleProp7 (PosRoundR2 v)
 
 
 -- commutative
-scalarProdProp1 :: R2 -> R2 -> Bool
+scalarProdProp1 :: (V2 Double) -> (V2 Double) -> Bool
 scalarProdProp1 v1 v2 = v1 `scalarProd` v2 == v2 `scalarProd` v1
 
 
@@ -212,9 +212,9 @@ scalarProdProp4 (RoundDouble s1) (RoundDouble s2) (RoundR2 v1) (RoundR2 v2)
 
 
 -- orthogonal
-scalarProdProp5 :: Positive R2 -> Positive R2 -> Bool
-scalarProdProp5 (Positive (R2 x1 _)) (Positive (R2 _ y2))
-  = scalarProd (R2 x1 0) (R2 0 y2) == 0
+scalarProdProp5 :: Positive (V2 Double) -> Positive (V2 Double) -> Bool
+scalarProdProp5 (Positive (V2 x1 _)) (Positive (V2 _ y2))
+  = scalarProd (V2 x1 0) (V2 0 y2) == 0
 
 
 -- this is almost the same as the function definition
@@ -226,49 +226,49 @@ dimToSquareProp1 (x1, x2) (y1, y2) =
 -- multiply scalar with result of vecLength or with the vector itself...
 -- both results must be the same. We can't check against 0
 -- because of sqrt in vecLength.
-vecLengthProp1 :: PosRoundDouble -> R2 -> Bool
+vecLengthProp1 :: PosRoundDouble -> (V2 Double) -> Bool
 vecLengthProp1 (PosRoundDouble r) v
   = abs (vecLength v * r - vecLength (scalarMul r v)) < 0.0001
 
 
 -- convert to vector and back again
-pt2VecProp1 :: P2 -> Bool
+pt2VecProp1 :: P2 Double -> Bool
 pt2VecProp1 pt = (vec2Pt . pt2Vec $ pt) == pt
 
 
 -- unbox coordinates and check if equal
-pt2VecProp2 :: P2 -> Bool
+pt2VecProp2 :: P2 Double -> Bool
 pt2VecProp2 pt = (unr2 . pt2Vec $ pt) == unp2 pt
 
 
 -- convert to point and back again
-vec2PtProp1 :: R2 -> Bool
+vec2PtProp1 :: V2 Double -> Bool
 vec2PtProp1 v = (pt2Vec . vec2Pt $ v) == v
 
 
 -- unbox coordinates and check if equal
-vec2PtProp2 :: R2 -> Bool
+vec2PtProp2 :: V2 Double -> Bool
 vec2PtProp2 v = (unp2 . vec2Pt $ v) == unr2 v
 
 
 -- vector from a to b must not be the same as b to a
-vp2Prop1 :: P2 -> P2 -> Bool
+vp2Prop1 :: P2 Double -> P2 Double -> Bool
 vp2Prop1 p1' p2'
   | p1' == origin && p2' == origin = True
   | otherwise = vp2 p1' p2' /= vp2 p2' p1'
 
 
 -- negating vector from a to be must be the same as vector b to a
-vp2Prop2 :: P2 -> P2 -> Bool
+vp2Prop2 :: P2 Double -> P2 Double -> Bool
 vp2Prop2 p1' p2'
   | p1' == origin && p2' == origin = True
-  | otherwise = vp2 p1' p2' == (\(R2 x y) -> negate x ^& negate y)
+  | otherwise = vp2 p1' p2' == (\(V2 x y) -> negate x ^& negate y)
                                  (vp2 p2' p1')
                 &&
-                vp2 p2' p1' == (\(R2 x y) -> negate x ^& negate y)
+                vp2 p2' p1' == (\(V2 x y) -> negate x ^& negate y)
                                  (vp2 p1' p2')
 
 
 -- determinant of the 3 same points is always 0
-detProp1 :: P2 -> Bool
+detProp1 :: P2 Double -> Bool
 detProp1 pt' = det pt' pt' pt' == 0

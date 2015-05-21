@@ -42,9 +42,9 @@ instance Not Direction where
 
 
 -- |Construct a kd-tree from a list of points in O(n log n).
-kdTree :: [P2]      -- ^ list of points to construct the kd-tree from
+kdTree :: [P2 Double]      -- ^ list of points to construct the kd-tree from
        -> Direction -- ^ initial direction of the root-node
-       -> KDTree P2 -- ^ resulting kd-tree
+       -> KDTree (P2 Double) -- ^ resulting kd-tree
 kdTree xs' = go (sortedX xs') (sortedY xs')
   where
     go [] _ _ = KTNil
@@ -67,10 +67,10 @@ kdTree xs' = go (sortedX xs') (sortedY xs')
 -- If you want to partition against the pivot of X, then you pass
 --   partition' (pivot xs) (ys, xs)
 -- and get ((y1, y2), (x1, x2)).
-partition' :: P2                           -- ^ the pivot to partition against
-           -> (P2 -> P2 -> Ordering)       -- ^ ptCmpY or ptCmpX
-           -> ([P2], [P2])                 -- ^ both lists (X, Y) or (Y, X)
-           -> (([P2], [P2]), ([P2], [P2])) -- ^ ((x1, x2), (y1, y2)) or
+partition' :: P2 Double                           -- ^ the pivot to partition against
+           -> (P2 Double -> P2 Double -> Ordering)       -- ^ ptCmpY or ptCmpX
+           -> ([P2 Double], [P2 Double])                 -- ^ both lists (X, Y) or (Y, X)
+           -> (([P2 Double], [P2 Double]), ([P2 Double], [P2 Double])) -- ^ ((x1, x2), (y1, y2)) or
                                            --   ((y1, y2), (x1, x2))
 partition' piv cmp' (xs, ys) = ((x1, x2), (y1, y2))
   where
@@ -83,16 +83,16 @@ partition' piv cmp' (xs, ys) = ((x1, x2), (y1, y2))
 -- |Partition two sorted lists of points X and Y against the pivot of
 -- Y. This function is unsafe as it does not check if there is a valid
 -- pivot.
-partitionY :: ([P2], [P2])                 -- ^ both lists (X, Y)
-           -> (([P2], [P2]), ([P2], [P2])) -- ^ ((x1, x2), (y1, y2))
+partitionY :: ([P2 Double], [P2 Double])                 -- ^ both lists (X, Y)
+           -> (([P2 Double], [P2 Double]), ([P2 Double], [P2 Double])) -- ^ ((x1, x2), (y1, y2))
 partitionY (xs, ys) = partition' (fromJust . pivot $ ys) ptCmpY (xs, ys)
 
 
 -- |Partition two sorted lists of points X and Y against the pivot of
 -- X. This function is unsafe as it does not check if there is a valid
 -- pivot.
-partitionX :: ([P2], [P2])                 -- ^ both lists (X, Y)
-           -> (([P2], [P2]), ([P2], [P2])) -- ^ ((x1, x2), (y1, y2))
+partitionX :: ([P2 Double], [P2 Double])                 -- ^ both lists (X, Y)
+           -> (([P2 Double], [P2 Double]), ([P2 Double], [P2 Double])) -- ^ ((x1, x2), (y1, y2))
 partitionX (xs, ys) = (\(x, y) -> (y, x))
                       . partition' (fromJust . pivot $ xs) ptCmpX $ (ys, xs)
 
@@ -100,9 +100,9 @@ partitionX (xs, ys) = (\(x, y) -> (y, x))
 -- |Execute a range search in O(log n). It returns a tuple
 -- of the points found in the range and also gives back a pretty
 -- rose tree suitable for printing.
-rangeSearch :: KDTree P2                            -- ^ tree to search in
+rangeSearch :: KDTree (P2 Double)                            -- ^ tree to search in
             -> ((Double, Double), (Double, Double)) -- ^ square describing the range
-            -> ([P2], Tree String)
+            -> ([P2 Double], Tree String)
 rangeSearch kd' sq' = (goPt kd' sq', goTree kd' sq' True)
   where
     -- either y1 or x1 depending on the orientation
@@ -112,7 +112,7 @@ rangeSearch kd' sq' = (goPt kd' sq', goTree kd' sq' True)
     -- either the second or first of the tuple, depending on the orientation
     cur' dir = if' (dir == Vertical) snd fst
     -- All points in the range.
-    goPt :: KDTree P2 -> ((Double, Double), (Double, Double)) -> [P2]
+    goPt :: KDTree (P2 Double) -> ((Double, Double), (Double, Double)) -> [P2 Double]
     goPt KTNil _ = []
     goPt (KTNode ln pt dir rn) sq =
       [pt | inRange sq pt]
@@ -124,7 +124,7 @@ rangeSearch kd' sq' = (goPt kd' sq', goTree kd' sq' True)
               (goPt rn sq)
               [])
     -- A pretty rose tree suitable for printing.
-    goTree :: KDTree P2 -> ((Double, Double), (Double, Double)) -> Bool -> Tree String
+    goTree :: KDTree (P2 Double) -> ((Double, Double), (Double, Double)) -> Bool -> Tree String
     goTree KTNil _ _ = Node "nil" []
     goTree (KTNode ln pt dir rn) sq vis
       | ln == KTNil && rn == KTNil = Node treeText []
@@ -181,7 +181,7 @@ getDirection _                  = Nothing
 
 
 -- |Convert a kd-tree to a rose tree, for pretty printing.
-kdTreeToRoseTree :: KDTree P2 -> Tree String
+kdTreeToRoseTree :: KDTree (P2 Double) -> Tree String
 kdTreeToRoseTree (KTNil) = Node "nil" []
 kdTreeToRoseTree (KTNode ln val _ rn) =
   Node (show . unp2 $ val) [kdTreeToRoseTree ln, kdTreeToRoseTree rn]

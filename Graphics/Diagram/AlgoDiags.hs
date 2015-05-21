@@ -123,9 +123,9 @@ kdSquares = Diag f
       where
         -- Gets all lines that make up the kdSquares. Every line is
         -- described by two points, start and end respectively.
-        kdLines :: KDTree P2
+        kdLines :: KDTree (P2 Double)
                 -> ((Double, Double), (Double, Double)) -- ^ square
-                -> [(P2, P2)]
+                -> [(P2 Double, P2 Double)]
         kdLines (KTNode ln pt Horizontal rn) ((xmin, ymin), (xmax, ymax)) =
           (\(x, _) -> [(p2 (x, ymin), p2 (x, ymax))])
             (unp2 pt)
@@ -180,7 +180,7 @@ kdTreeDiag = Diag f
 
 
 -- |Get the quad tree corresponding to the given points and diagram properties.
-qt :: [P2] -> DiagProp -> QuadTree P2
+qt :: [P2 Double] -> DiagProp -> QuadTree (P2 Double)
 qt vt p = quadTree vt (diagDimSquare p)
 
 
@@ -194,7 +194,7 @@ quadPathSquare = Diag f
       (getSquare (stringToQuads (quadPath p)) (qt (mconcat vts) p, []))
       where
         getSquare :: [Either Quad Orient]
-                  -> QTZipper P2
+                  -> QTZipper (P2 Double)
                   -> ((Double, Double), (Double, Double))
         getSquare [] z = getSquareByZipper (diagDimSquare p) z
         getSquare (q:qs) z = case q of
@@ -212,7 +212,7 @@ gifQuadPath = GifDiag f
       <$> getSquares (stringToQuads (quadPath p)) (qt vt p, [])
       where
         getSquares :: [Either Quad Orient]
-                   -> QTZipper P2
+                   -> QTZipper (P2 Double)
                    -> [((Double, Double), (Double, Double))]
         getSquares [] z = [getSquareByZipper (diagDimSquare p) z]
         getSquares (q:qs) z = case q of
@@ -233,12 +233,12 @@ treePretty = Diag f
                       . quadPath
                       $ p)
       where
-        getCurQT :: [Either Quad Orient] -> QTZipper P2 -> QTZipper P2
+        getCurQT :: [Either Quad Orient] -> QTZipper (P2 Double) -> QTZipper (P2 Double)
         getCurQT [] z = z
         getCurQT (q:qs) z = case q of
           Right x -> getCurQT qs (fromMaybe z (findNeighbor x z))
           Left x  -> getCurQT qs (fromMaybe z (goQuad x z))
-        prettyRoseTree :: Tree String -> Diagram Cairo R2
+        prettyRoseTree :: Tree String -> Diagram Cairo
         prettyRoseTree tree =
         -- HACK: in order to give specific nodes a specific color
           renderTree (\n -> case head n of

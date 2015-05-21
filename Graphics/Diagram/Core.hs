@@ -15,18 +15,18 @@ data Diag =
   Diag
   {
     mkDiag :: DiagProp
-           -> [[P2]]
-           -> Diagram Cairo R2
+           -> [[P2 Double]]
+           -> Diagram Cairo
   }
   | GifDiag
   {
     mkGifDiag :: DiagProp
               -> Colour Double
-              -> ([P2] -> [[P2]])
-              -> [P2]
-              -> [Diagram Cairo R2]
+              -> ([P2 Double] -> [[P2 Double]])
+              -> [P2 Double]
+              -> [Diagram Cairo]
   }
-  | EmptyDiag (Diagram Cairo R2)
+  | EmptyDiag (Diagram Cairo)
 
 
 -- |Holds the properties for a Diagram, like thickness of 2d points etc.
@@ -134,7 +134,7 @@ maybeDiag b d
   | otherwise = mempty
 
 
-filterValidPT :: DiagProp -> [P2] -> [P2]
+filterValidPT :: DiagProp -> [P2 Double] -> [P2 Double]
 filterValidPT =
   filter
   . inRange
@@ -146,21 +146,21 @@ diagDimSquare p = dimToSquare (xDimension p) $ yDimension p
 
 
 -- |Draw a list of points.
-drawP :: [P2]              -- ^ the points to draw
+drawP :: [P2 Double]              -- ^ the points to draw
       -> Double            -- ^ dot size
-      -> Diagram Cairo R2  -- ^ the resulting diagram
+      -> Diagram Cairo     -- ^ the resulting diagram
 drawP [] _  = mempty
 drawP vt ds =
   position (zip vt (repeat dot))
   where
-    dot = circle ds :: Diagram Cairo R2
+    dot = circle ds :: Diagram Cairo
 
 
 -- |Create a rectangle around a diagonal line, which has sw
 -- as startpoint and nw as endpoint.
 rectByDiagonal :: (Double, Double)  -- ^ sw point
                -> (Double, Double)  -- ^ nw point
-               -> Diagram Cairo R2
+               -> Diagram Cairo
 rectByDiagonal (xmin, ymin) (xmax, ymax) =
   fromVertices [p2 (xmin, ymin)
                 , p2 (xmax, ymin)
@@ -172,7 +172,7 @@ rectByDiagonal (xmin, ymin) (xmax, ymax) =
 
 -- |Creates a Diagram from a point that shows the coordinates
 -- in text format, such as "(1.0, 2.0)".
-pointToTextCoord :: P2 -> Diagram Cairo R2
+pointToTextCoord :: P2 Double -> Diagram Cairo
 pointToTextCoord pt =
   text ("(" ++ (show . trim') x ++ ", " ++ (show . trim') y ++ ")") # scale 10
   where

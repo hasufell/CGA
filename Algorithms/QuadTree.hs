@@ -80,9 +80,9 @@ isSEchild _                 = False
 -- |Builds a quadtree of a list of points which recursively divides up 2D
 -- space into quadrants, so that every leaf-quadrant stores either zero or one
 -- point.
-quadTree :: [P2]                                 -- ^ the points to divide
+quadTree :: [P2 Double]                                 -- ^ the points to divide
          -> ((Double, Double), (Double, Double)) -- ^ the initial square around the points
-         -> QuadTree P2                          -- ^ the quad tree
+         -> QuadTree (P2 Double)                          -- ^ the quad tree
 quadTree []   _ = TNil
 quadTree [pt] _ = TLeaf pt
 quadTree pts sq = TNode (quadTree nWPT . nwSq $ sq) (quadTree nEPT . neSq $ sq)
@@ -97,7 +97,7 @@ quadTree pts sq = TNode (quadTree nWPT . nwSq $ sq) (quadTree nEPT . neSq $ sq)
 
 -- |Get all squares of a quad tree.
 quadTreeSquares :: ((Double, Double), (Double, Double))  -- ^ the initial square around the points
-                -> QuadTree P2                            -- ^ the quad tree
+                -> QuadTree (P2 Double)                            -- ^ the quad tree
                 -> [((Double, Double), (Double, Double))] -- ^ all squares of the quad tree
 quadTreeSquares sq (TNil)              = [sq]
 quadTreeSquares sq (TLeaf _)           = [sq]
@@ -203,7 +203,7 @@ lookupByNeighbors :: [Orient] -> QTZipper a -> Maybe (QTZipper a)
 lookupByNeighbors = flip (foldlM (flip findNeighbor))
 
 
-quadTreeToRoseTree :: QTZipper P2 -> Tree String
+quadTreeToRoseTree :: QTZipper (P2 Double) -> Tree String
 quadTreeToRoseTree z' = go (rootNode z')
   where
     go z = case z of

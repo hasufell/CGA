@@ -2,7 +2,7 @@
 
 module Graphics.Diagram.Gif where
 
-import Algebra.Vector(PT)
+import Algebra.Vector
 import Algorithms.GrahamScan
 import Codec.Picture.Gif
 import qualified Data.ByteString.Char8 as B
@@ -16,7 +16,7 @@ import Parser.Meshparser
 
 
 -- |Return a list of tuples used by 'gifMain' to generate an animated gif.
-gifDiag :: DiagProp -> [PT] -> [(Diagram Cairo R2, GifDelay)]
+gifDiag :: DiagProp -> [P2 Double] -> [(Diagram Cairo, GifDelay)]
 gifDiag p xs =
   fmap ((\x -> (x, 50)) . (<> nonChDiag))
    (upperHullList
@@ -35,5 +35,5 @@ gifDiag p xs =
 
 -- |Same as gifDiag, except that it takes a string containing the
 -- mesh file content instead of the the points.
-gifDiagS :: DiagProp -> B.ByteString -> [(Diagram Cairo R2, GifDelay)]
+gifDiagS :: DiagProp -> B.ByteString -> [(Diagram Cairo, GifDelay)]
 gifDiagS p = gifDiag p . filterValidPT p . meshToArr

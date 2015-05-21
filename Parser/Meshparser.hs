@@ -11,7 +11,7 @@ import Diagrams.TwoD.Types
 
 -- |Convert a text String with multiple vertices and faces into
 -- a list of vertices, ordered by the faces specification.
-facesToArr :: B.ByteString -> [[P2]]
+facesToArr :: B.ByteString -> [[P2 Double]]
 facesToArr str = fmap (fmap (\y -> meshToArr str !! (fromIntegral y - 1)))
                       (faces str)
   where
@@ -21,7 +21,7 @@ facesToArr str = fmap (fmap (\y -> meshToArr str !! (fromIntegral y - 1)))
 -- |Convert a text String with multiple vertices into
 -- an array of float tuples.
 meshToArr :: B.ByteString -- ^ the string to convert
-          -> [P2]         -- ^ the resulting vertice table
+          -> [P2 Double]         -- ^ the resulting vertice table
 meshToArr =
   fmap p2
     . rights

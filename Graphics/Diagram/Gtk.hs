@@ -2,6 +2,7 @@
 
 module Graphics.Diagram.Gtk where
 
+import Algebra.Vector
 import qualified Data.ByteString.Char8 as B
 import Data.List(find)
 import Diagrams.Backend.Cairo
@@ -45,7 +46,7 @@ diagTreAlgos =
 
 
 -- |Create the Diagram from the points.
-diag :: DiagProp -> [DiagAlgo] -> [[P2]] -> Diagram Cairo R2
+diag :: DiagProp -> [DiagAlgo] -> [[P2 Double]] -> Diagram Cairo
 diag p das vts = maybe mempty (\x -> mkDiag x p vts)
                   $ mconcat
                       -- get the actual [Diag] array
@@ -57,7 +58,7 @@ diag p das vts = maybe mempty (\x -> mkDiag x p vts)
 
 -- |Create the Diagram from a String which is supposed to be the contents
 -- of an obj file.
-diagS :: DiagProp -> B.ByteString -> Diagram Cairo R2
+diagS :: DiagProp -> B.ByteString -> Diagram Cairo
 diagS p mesh =
   diag p diagAlgos
     . fmap (filterValidPT p)
@@ -68,7 +69,7 @@ diagS p mesh =
 
 -- |Create the tree diagram from a String which is supposed to be the contents
 -- of an obj file.
-diagTreeS :: DiagProp -> B.ByteString -> Diagram Cairo R2
+diagTreeS :: DiagProp -> B.ByteString -> Diagram Cairo
 diagTreeS p mesh =
   diag p diagTreAlgos
     . fmap (filterValidPT p)
