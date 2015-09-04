@@ -18,3 +18,5 @@ cabal.sandbox.config
 _darcs/
 
 .liquid/
+
+.stack-work/
