@@ -84,11 +84,11 @@ sortLexPolys (pA'@(_:_), pB'@(_:_)) =
       -- queue and traverse the rest.
       | ptCmpY (fromMaybe negInfPT (id' <$> Q.first pA))
                (fromMaybe negInfPT (id' <$> Q.first pB)) == GT
-        = Q.pushFront (go (maybeShift . snd . Q.popFront $ pA) pB)
+        = Q.pushFront (go (maybeShift . snd . fromJust . Q.popFront $ pA) pB)
                       (fromJust . Q.first $ pA)
       -- Same as above, except that the current point of polygon B
       -- is higher.
-      | otherwise = Q.pushFront (go pA (maybeShift . snd . Q.popFront $ pB))
+      | otherwise = Q.pushFront (go pA (maybeShift . snd . fromJust . Q.popFront $ pB))
                                 (fromJust . Q.first $ pB)
 
     -- Compare the first and the last element of the queue according

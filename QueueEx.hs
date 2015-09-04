@@ -9,13 +9,13 @@ import           Data.Maybe
 -- |Shift a queue to the left, such as:
 -- [1, 2, 3] -> [2, 3, 1]
 shiftQueueLeft :: BankersDequeue a -> BankersDequeue a
-shiftQueueLeft  = (\(b, nq) -> Q.pushBack nq (fromJust b)) <$> Q.popFront
+shiftQueueLeft  = (\(Just (b, nq)) -> Q.pushBack nq b) <$> Q.popFront
 
 
 -- |Shift a queue to the right, such as:
 -- [1, 2, 3] -> [3, 1, 2]
 shiftQueueRight :: BankersDequeue a -> BankersDequeue a
-shiftQueueRight = (\(b, nq) -> Q.pushFront nq (fromJust b)) <$> Q.popBack
+shiftQueueRight = (\(Just (b, nq)) -> Q.pushFront nq b) <$> Q.popBack
 
 
 -- |Convert a Queue back to a list.
