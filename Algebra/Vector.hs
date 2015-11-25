@@ -8,7 +8,6 @@ import Control.Arrow ((***))
 import Data.List (sortBy)
 import Diagrams.Coordinates
 import Diagrams.TwoD.Types
-import Graphics.Gloss.Geometry.Line
 import GHC.Float
 import MyPrelude
 
@@ -89,24 +88,10 @@ det (coords -> ax :& ay) (coords -> bx :& by) (coords -> cx :& cy) =
   (bx - ax) * (cy - ay) - (by - ay) * (cx - ax)
 
 
--- |Get the point where two lines intesect, if any.
-intersectSeg' :: (P2 Double, P2 Double) -- ^ first segment
-              -> (P2 Double, P2 Double) -- ^ second segment
-              -> Maybe (P2 Double)
-intersectSeg' (a, b) (c, d) =
-  glossToPt <$> intersectSegSeg (ptToGloss a)
-                                (ptToGloss b)
-                                (ptToGloss c)
-                                (ptToGloss d)
-  where
-    ptToGloss = (double2Float *** double2Float) <$> unp2
-    glossToPt = p2 . (float2Double *** float2Double)
-
-
 -- |Get the point where two lines intesect, if any. Excludes the
 -- case of end-points intersecting.
-intersectSeg'' :: (P2 Double, P2 Double) -> (P2 Double, P2 Double) -> Maybe (P2 Double)
-intersectSeg'' (a, b) (c, d) = case intersectSeg' (a, b) (c, d) of
+intersectSeg :: (P2 Double, P2 Double) -> (P2 Double, P2 Double) -> Maybe (P2 Double)
+intersectSeg (a, b) (c, d) = case intersectSegSeg a b c d of
   Just x  -> if x `notElem` [a,b,c,d] then Just a else Nothing
   Nothing -> Nothing
 
@@ -187,3 +172,103 @@ posInfPT = p2 (read "Infinity", read "Infinity")
 
 negInfPT :: P2 Double
 negInfPT = p2 (negate . read $ "Infinity", negate . read $ "Infinity")
+
+
+
+-- | Given an infinite line which intersects P1 and P2,
+--      let P4 be the point on the line that is closest to P3.
+--
+--      Return an indication of where on the line P4 is relative to P1 and P2.
+--
+-- @
+--      if P4 == P1 then 0
+--      if P4 == P2 then 1
+--      if P4 is halfway between P1 and P2 then 0.5
+-- @
+--
+-- @
+--        |
+--       P1
+--        |
+--     P4 +---- P3
+--        |
+--       P2
+--        |
+-- @
+--
+{-# INLINE closestPointOnLineParam #-}
+closestPointOnLineParam
+        :: P2 Double        -- ^ `P1`
+        -> P2 Double        -- ^ `P2`
+        -> P2 Double        -- ^ `P3`
+        -> Double
+
+closestPointOnLineParam p1 p2 p3
+        = pt2Vec (p3 - p1) `scalarProd` pt2Vec (p2 - p1)
+        / pt2Vec (p2 - p1) `scalarProd` pt2Vec (p2 - p1)
+
+
+-- | Given four points specifying two lines, get the point where the two lines
+--   cross, if any. Note that the lines extend off to infinity, so the
+--   intersection point might not line between either of the two pairs of points.
+--
+-- @
+--     \\      /
+--      P1  P4
+--       \\ /
+--        +
+--       / \\
+--      P3  P2
+--     /     \\
+-- @
+--
+intersectLineLine
+        :: P2 Double        -- ^ `P1`
+        -> P2 Double        -- ^ `P2`
+        -> P2 Double        -- ^ `P3`
+        -> P2 Double        -- ^ `P4`
+        -> Maybe (P2 Double)
+
+intersectLineLine (coords -> x1 :& y1)
+                  (coords -> x2 :& y2)
+                  (coords -> x3 :& y3)
+                  (coords -> x4 :& y4)
+ = let  dx12    = x1 - x2
+        dx34    = x3 - x4
+
+        dy12    = y1 - y2
+        dy34    = y3 - y4
+
+        den     = dx12 * dy34  - dy12 * dx34
+
+   in if den == 0
+        then Nothing
+        else let
+                det12   = x1*y2 - y1*x2
+                det34   = x3*y4 - y3*x4
+
+                numx    = det12 * dx34 - dx12 * det34
+                numy    = det12 * dy34 - dy12 * det34
+             in Just $ p2 (numx / den, numy / den)
+
+
+-- | Get the point where a segment @P1-P2@ crosses another segement @P3-P4@,
+--   if any.
+intersectSegSeg
+        :: P2 Double        -- ^ `P1`
+        -> P2 Double        -- ^ `P2`
+        -> P2 Double        -- ^ `P3`
+        -> P2 Double        -- ^ `P4`
+        -> Maybe (P2 Double)
+
+intersectSegSeg p1 p2 p3 p4
+        -- TODO: merge closest point checks with intersection, reuse subterms.
+        | Just p0       <- intersectLineLine p1 p2 p3 p4
+        , t12           <- closestPointOnLineParam p1 p2 p0
+        , t23           <- closestPointOnLineParam p3 p4 p0
+        , t12 >= 0 && t12 <= 1
+        , t23 >= 0 && t23 <= 1
+        = Just p0
+
+        | otherwise
+        = Nothing

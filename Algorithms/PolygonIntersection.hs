@@ -127,7 +127,7 @@ intersectionPoints xs' = rmdups . go $ xs'
     segIntersections :: ([(P2 Double, P2 Double)], [(P2 Double, P2 Double)]) -> [P2 Double]
     segIntersections (a@(_:_), b@(_:_)) =
       catMaybes
-      . fmap (\[x, y] -> intersectSeg' x y)
+      . fmap (\[(x1, y1), (x2, y2)] -> intersectSegSeg x1 y1 x2 y2)
       $ combinations a b
     segIntersections _ = []
 

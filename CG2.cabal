@@ -86,7 +86,6 @@ executable Gtk
                        directory >=1.2,
                        filepath >= 1.3.0.2,
                        glade >=0.12,
-                       gloss >= 1.2.0.1,
                        gtk >=0.12,
                        safe >= 0.3.8,
                        transformers >=0.4
@@ -132,7 +131,6 @@ executable Gif
                        diagrams-lib >=1.3,
                        diagrams-cairo >=1.3,
                        diagrams-contrib >= 1.3.0.0,
-                       gloss >= 1.2.0.1,
                        JuicyPixels >= 3.1.7.1,
                        safe >= 0.3.8,
                        transformers >=0.4
@@ -179,7 +177,6 @@ executable Test
                        diagrams-lib >=1.3,
                        diagrams-cairo >=1.3,
                        diagrams-contrib >= 1.3.0.0,
-                       gloss >= 1.2.0.1,
                        QuickCheck >= 2.4.2,
                        safe >= 0.3.8
 

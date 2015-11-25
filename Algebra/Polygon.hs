@@ -37,7 +37,7 @@ isInsidePoly :: [P2 Double] -> (P2 Double, P2 Double) -> Bool
 isInsidePoly pts seg =
   null
     . catMaybes
-    . fmap (intersectSeg'' seg)
+    . fmap (intersectSeg seg)
     $ polySegments pts
 
 
