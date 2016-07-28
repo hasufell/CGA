@@ -14,10 +14,11 @@ import Diagrams.Backend.Cairo.Internal
 import Graphics.Diagram.Core (DiagProp(..))
 import Graphics.Diagram.Gtk
 import Graphics.UI.Gtk
-import Graphics.UI.Gtk.Glade
+import Graphics.UI.Gtk.Builder
 import MyPrelude
 import System.Directory
 import System.FilePath.Posix
+import System.Glib.UTFString
 import Text.Read
 
 
@@ -77,42 +78,38 @@ data MyGUI = MkMyGUI {
 }
 
 
--- |The glade file to load the UI from.
-gladeFile :: FilePath
-gladeFile = "GUI/gtk2.glade"
-
-
 -- |Loads the glade file and creates the MyGUI object.
 makeMyGladeGUI :: IO MyGUI
 makeMyGladeGUI = do
   -- load glade file
-  Just xml   <- xmlNew gladeFile
+  builder <- builderNew
+  builderAddFromFile builder "GUI/gtk2.xml"
 
   MkMyGUI
-    <$> xmlGetWidget xml castToWindow "window1"
-    <*> xmlGetWidget xml castToWindow "window2"
-    <*> xmlGetWidget xml castToButton "drawButton"
-    <*> xmlGetWidget xml castToButton "saveButton"
-    <*> xmlGetWidget xml castToButton "quitButton"
-    <*> xmlGetWidget xml castToFileChooserButton "filechooserButton"
-    <*> xmlGetWidget xml castToDrawingArea "drawingarea"
-    <*> xmlGetWidget xml castToDrawingArea "treedrawingarea"
-    <*> xmlGetWidget xml castToHScale "hscale"
-    <*> xmlGetWidget xml castToEntry "xlD"
-    <*> xmlGetWidget xml castToEntry "xuD"
-    <*> xmlGetWidget xml castToEntry "ylD"
-    <*> xmlGetWidget xml castToEntry "yuD"
-    <*> xmlGetWidget xml castToAboutDialog "aboutdialog"
-    <*> xmlGetWidget xml castToComboBox "comboalgo"
-    <*> xmlGetWidget xml castToCheckButton "gridcheckbutton"
-    <*> xmlGetWidget xml castToCheckButton "coordcheckbutton"
-    <*> xmlGetWidget xml castToEntry "path"
-    <*> xmlGetWidget xml castToBox "vbox7"
-    <*> xmlGetWidget xml castToBox "vbox10"
-    <*> xmlGetWidget xml castToEntry "rxMin"
-    <*> xmlGetWidget xml castToEntry "rxMax"
-    <*> xmlGetWidget xml castToEntry "ryMin"
-    <*> xmlGetWidget xml castToEntry "ryMax"
+    <$> builderGetObject builder castToWindow "window1"
+    <*> builderGetObject builder castToWindow "window2"
+    <*> builderGetObject builder castToButton "drawButton"
+    <*> builderGetObject builder castToButton "saveButton"
+    <*> builderGetObject builder castToButton "quitButton"
+    <*> builderGetObject builder castToFileChooserButton "filechooserButton"
+    <*> builderGetObject builder castToDrawingArea "drawingarea"
+    <*> builderGetObject builder castToDrawingArea "treedrawingarea"
+    <*> builderGetObject builder castToHScale "hscale"
+    <*> builderGetObject builder castToEntry "xlD"
+    <*> builderGetObject builder castToEntry "xuD"
+    <*> builderGetObject builder castToEntry "ylD"
+    <*> builderGetObject builder castToEntry "yuD"
+    <*> builderGetObject builder castToAboutDialog "aboutdialog"
+    <*> builderGetObject builder castToComboBox "comboalgo"
+    <*> builderGetObject builder castToCheckButton "gridcheckbutton"
+    <*> builderGetObject builder castToCheckButton "coordcheckbutton"
+    <*> builderGetObject builder castToEntry "path"
+    <*> builderGetObject builder castToBox "vbox7"
+    <*> builderGetObject builder castToBox "vbox10"
+    <*> builderGetObject builder castToEntry "rxMin"
+    <*> builderGetObject builder castToEntry "rxMax"
+    <*> builderGetObject builder castToEntry "ryMin"
+    <*> builderGetObject builder castToEntry "ryMax"
 
 
 -- |Main entry point for the GTK GUI routines.
@@ -158,23 +155,23 @@ makeGUI startFile = do
   -- hotkeys
   _ <- rootWin mygui `on` keyPressEvent $ tryEvent $ do
     [Control] <- eventModifier
-    "q"       <- eventKeyName
+    "q"       <- fmap glibToString eventKeyName
     liftIO mainQuit
   _ <- treeWin mygui `on` keyPressEvent $ tryEvent $ do
     [Control] <- eventModifier
-    "q"       <- eventKeyName
+    "q"       <- fmap glibToString eventKeyName
     liftIO (widgetHide $ treeWin mygui)
   _ <- rootWin mygui `on` keyPressEvent $ tryEvent $ do
     [Control] <- eventModifier
-    "s"       <- eventKeyName
+    "s"       <- fmap glibToString eventKeyName
     liftIO $ saveDiag mygui
   _ <- rootWin mygui `on` keyPressEvent $ tryEvent $ do
     [Control] <- eventModifier
-    "d"       <- eventKeyName
+    "d"       <- fmap glibToString eventKeyName
     liftIO $ drawDiag mygui
   _ <- rootWin mygui `on` keyPressEvent $ tryEvent $ do
     [Control] <- eventModifier
-    "a"       <- eventKeyName
+    "a"       <- fmap glibToString eventKeyName
     liftIO $ widgetShowAll (aboutDialog mygui)
 
   -- draw widgets and start main loop

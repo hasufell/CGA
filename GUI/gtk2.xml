@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<glade-interface>
-  <!-- interface-requires gtk+ 2.24 -->
+<interface>
+  <requires lib="gtk+" version="2.24"/>
   <!-- interface-naming-policy project-wide -->
-  <widget class="GtkAboutDialog" id="aboutdialog">
+  <object class="GtkAboutDialog" id="aboutdialog">
     <property name="can_focus">False</property>
     <property name="border_width">5</property>
     <property name="type_hint">dialog</property>
@@ -353,16 +353,16 @@ Public License instead of this License.
 </property>
     <property name="authors">Julian Ospald &lt;hasufell@hasufell.de&gt;</property>
     <child internal-child="vbox">
-      <widget class="GtkVBox" id="dialog-vbox1">
+      <object class="GtkVBox" id="dialog-vbox1">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="spacing">2</property>
         <child internal-child="action_area">
-          <widget class="GtkHButtonBox" id="dialog-action_area1">
+          <object class="GtkHButtonBox" id="dialog-action_area1">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="layout_style">end</property>
-          </widget>
+          </object>
           <packing>
             <property name="expand">True</property>
             <property name="fill">True</property>
@@ -372,10 +372,16 @@ Public License instead of this License.
         <child>
           <placeholder/>
         </child>
-      </widget>
+      </object>
     </child>
-  </widget>
-  <widget class="GtkWindow" id="window1">
+  </object>
+  <object class="GtkAdjustment" id="adjustment1">
+    <property name="lower">0.10000000000000001</property>
+    <property name="upper">10</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">10</property>
+  </object>
+  <object class="GtkWindow" id="window1">
     <property name="width_request">600</property>
     <property name="height_request">750</property>
     <property name="can_focus">False</property>
@@ -383,15 +389,15 @@ Public License instead of this License.
     <property name="window_position">mouse</property>
     <property name="type_hint">dialog</property>
     <child>
-      <widget class="GtkVBox" id="vbox1">
+      <object class="GtkVBox" id="vbox1">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <child>
-          <widget class="GtkFileChooserButton" id="filechooserButton">
+          <object class="GtkFileChooserButton" id="filechooserButton">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="create_folders">False</property>
-          </widget>
+          </object>
           <packing>
             <property name="expand">False</property>
             <property name="fill">False</property>
@@ -399,12 +405,12 @@ Public License instead of this License.
           </packing>
         </child>
         <child>
-          <widget class="GtkDrawingArea" id="drawingarea">
+          <object class="GtkDrawingArea" id="drawingarea">
             <property name="width_request">600</property>
             <property name="height_request">600</property>
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-          </widget>
+          </object>
           <packing>
             <property name="expand">True</property>
             <property name="fill">True</property>
@@ -412,16 +418,16 @@ Public License instead of this License.
           </packing>
         </child>
         <child>
-          <widget class="GtkHBox" id="hbox1">
+          <object class="GtkHBox" id="hbox1">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <child>
-              <widget class="GtkButton" id="drawButton">
+              <object class="GtkButton" id="drawButton">
                 <property name="label" translatable="yes">Draw</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
-              </widget>
+              </object>
               <packing>
                 <property name="expand">True</property>
                 <property name="fill">True</property>
@@ -429,12 +435,12 @@ Public License instead of this License.
               </packing>
             </child>
             <child>
-              <widget class="GtkButton" id="saveButton">
+              <object class="GtkButton" id="saveButton">
                 <property name="label" translatable="yes">Save</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
-              </widget>
+              </object>
               <packing>
                 <property name="expand">True</property>
                 <property name="fill">True</property>
@@ -442,19 +448,19 @@ Public License instead of this License.
               </packing>
             </child>
             <child>
-              <widget class="GtkButton" id="quitButton">
+              <object class="GtkButton" id="quitButton">
                 <property name="label" translatable="yes">Quit</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
-              </widget>
+              </object>
               <packing>
                 <property name="expand">True</property>
                 <property name="fill">True</property>
                 <property name="position">2</property>
               </packing>
             </child>
-          </widget>
+          </object>
           <packing>
             <property name="expand">False</property>
             <property name="fill">False</property>
@@ -462,10 +468,10 @@ Public License instead of this License.
           </packing>
         </child>
         <child>
-          <widget class="GtkHSeparator" id="hseparator2">
+          <object class="GtkHSeparator" id="hseparator2">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-          </widget>
+          </object>
           <packing>
             <property name="expand">False</property>
             <property name="fill">True</property>
@@ -474,23 +480,23 @@ Public License instead of this License.
           </packing>
         </child>
         <child>
-          <widget class="GtkHBox" id="hbox2">
+          <object class="GtkHBox" id="hbox2">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <child>
-              <widget class="GtkHBox" id="hbox3">
+              <object class="GtkHBox" id="hbox3">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <child>
-                  <widget class="GtkVBox" id="vbox2">
+                  <object class="GtkVBox" id="vbox2">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <child>
-                      <widget class="GtkLabel" id="label1">
+                      <object class="GtkLabel" id="label1">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="label" translatable="yes">X min</property>
-                      </widget>
+                      </object>
                       <packing>
                         <property name="expand">True</property>
                         <property name="fill">True</property>
@@ -498,7 +504,7 @@ Public License instead of this License.
                       </packing>
                     </child>
                     <child>
-                      <widget class="GtkEntry" id="xlD">
+                      <object class="GtkEntry" id="xlD">
                         <property name="width_request">5</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
@@ -509,14 +515,14 @@ Public License instead of this License.
                         <property name="secondary_icon_activatable">False</property>
                         <property name="primary_icon_sensitive">True</property>
                         <property name="secondary_icon_sensitive">True</property>
-                      </widget>
+                      </object>
                       <packing>
                         <property name="expand">True</property>
                         <property name="fill">True</property>
                         <property name="position">1</property>
                       </packing>
                     </child>
-                  </widget>
+                  </object>
                   <packing>
                     <property name="expand">True</property>
                     <property name="fill">True</property>
@@ -524,15 +530,15 @@ Public License instead of this License.
                   </packing>
                 </child>
                 <child>
-                  <widget class="GtkVBox" id="vbox3">
+                  <object class="GtkVBox" id="vbox3">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <child>
-                      <widget class="GtkLabel" id="label2">
+                      <object class="GtkLabel" id="label2">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="label" translatable="yes">X max</property>
-                      </widget>
+                      </object>
                       <packing>
                         <property name="expand">True</property>
                         <property name="fill">True</property>
@@ -540,7 +546,7 @@ Public License instead of this License.
                       </packing>
                     </child>
                     <child>
-                      <widget class="GtkEntry" id="xuD">
+                      <object class="GtkEntry" id="xuD">
                         <property name="width_request">5</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
@@ -551,21 +557,21 @@ Public License instead of this License.
                         <property name="secondary_icon_activatable">False</property>
                         <property name="primary_icon_sensitive">True</property>
                         <property name="secondary_icon_sensitive">True</property>
-                      </widget>
+                      </object>
                       <packing>
                         <property name="expand">True</property>
                         <property name="fill">True</property>
                         <property name="position">1</property>
                       </packing>
                     </child>
-                  </widget>
+                  </object>
                   <packing>
                     <property name="expand">True</property>
                     <property name="fill">True</property>
                     <property name="position">1</property>
                   </packing>
                 </child>
-              </widget>
+              </object>
               <packing>
                 <property name="expand">True</property>
                 <property name="fill">True</property>
@@ -573,19 +579,19 @@ Public License instead of this License.
               </packing>
             </child>
             <child>
-              <widget class="GtkHBox" id="hbox4">
+              <object class="GtkHBox" id="hbox4">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <child>
-                  <widget class="GtkVBox" id="vbox4">
+                  <object class="GtkVBox" id="vbox4">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <child>
-                      <widget class="GtkLabel" id="label3">
+                      <object class="GtkLabel" id="label3">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="label" translatable="yes">Y min</property>
-                      </widget>
+                      </object>
                       <packing>
                         <property name="expand">True</property>
                         <property name="fill">True</property>
@@ -593,7 +599,7 @@ Public License instead of this License.
                       </packing>
                     </child>
                     <child>
-                      <widget class="GtkEntry" id="ylD">
+                      <object class="GtkEntry" id="ylD">
                         <property name="width_request">5</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
@@ -604,14 +610,14 @@ Public License instead of this License.
                         <property name="secondary_icon_activatable">False</property>
                         <property name="primary_icon_sensitive">True</property>
                         <property name="secondary_icon_sensitive">True</property>
-                      </widget>
+                      </object>
                       <packing>
                         <property name="expand">True</property>
                         <property name="fill">True</property>
                         <property name="position">1</property>
                       </packing>
                     </child>
-                  </widget>
+                  </object>
                   <packing>
                     <property name="expand">True</property>
                     <property name="fill">True</property>
@@ -619,15 +625,15 @@ Public License instead of this License.
                   </packing>
                 </child>
                 <child>
-                  <widget class="GtkVBox" id="vbox5">
+                  <object class="GtkVBox" id="vbox5">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <child>
-                      <widget class="GtkLabel" id="label4">
+                      <object class="GtkLabel" id="label4">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="label" translatable="yes">Y max</property>
-                      </widget>
+                      </object>
                       <packing>
                         <property name="expand">True</property>
                         <property name="fill">True</property>
@@ -635,7 +641,7 @@ Public License instead of this License.
                       </packing>
                     </child>
                     <child>
-                      <widget class="GtkEntry" id="yuD">
+                      <object class="GtkEntry" id="yuD">
                         <property name="width_request">5</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
@@ -646,21 +652,21 @@ Public License instead of this License.
                         <property name="secondary_icon_activatable">False</property>
                         <property name="primary_icon_sensitive">True</property>
                         <property name="secondary_icon_sensitive">True</property>
-                      </widget>
+                      </object>
                       <packing>
                         <property name="expand">True</property>
                         <property name="fill">True</property>
                         <property name="position">1</property>
                       </packing>
                     </child>
-                  </widget>
+                  </object>
                   <packing>
                     <property name="expand">True</property>
                     <property name="fill">True</property>
                     <property name="position">1</property>
                   </packing>
                 </child>
-              </widget>
+              </object>
               <packing>
                 <property name="expand">True</property>
                 <property name="fill">True</property>
@@ -668,15 +674,15 @@ Public License instead of this License.
               </packing>
             </child>
             <child>
-              <widget class="GtkVBox" id="vbox6">
+              <object class="GtkVBox" id="vbox6">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <child>
-                  <widget class="GtkLabel" id="label5">
+                  <object class="GtkLabel" id="label5">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="label" translatable="yes">point thickness</property>
-                  </widget>
+                  </object>
                   <packing>
                     <property name="expand">True</property>
                     <property name="fill">True</property>
@@ -684,20 +690,21 @@ Public License instead of this License.
                   </packing>
                 </child>
                 <child>
-                  <widget class="GtkHScale" id="hscale">
+                  <object class="GtkHScale" id="hscale">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
-                    <property name="adjustment">2 0.10000000000000001 10 0.5 0.5 0</property>
+                    <property name="adjustment">adjustment1</property>
+                    <property name="fill_level">999999999999999</property>
                     <property name="round_digits">1</property>
                     <property name="value_pos">left</property>
-                  </widget>
+                  </object>
                   <packing>
                     <property name="expand">True</property>
                     <property name="fill">True</property>
                     <property name="position">1</property>
                   </packing>
                 </child>
-              </widget>
+              </object>
               <packing>
                 <property name="expand">True</property>
                 <property name="fill">True</property>
@@ -705,15 +712,15 @@ Public License instead of this License.
               </packing>
             </child>
             <child>
-              <widget class="GtkVBox" id="vbox8">
+              <object class="GtkVBox" id="vbox8">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <child>
-                  <widget class="GtkLabel" id="label6">
+                  <object class="GtkLabel" id="label6">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="label" translatable="yes">options</property>
-                  </widget>
+                  </object>
                   <packing>
                     <property name="expand">True</property>
                     <property name="fill">True</property>
@@ -721,17 +728,17 @@ Public License instead of this License.
                   </packing>
                 </child>
                 <child>
-                  <widget class="GtkHBox" id="hbox6">
+                  <object class="GtkHBox" id="hbox6">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <child>
-                      <widget class="GtkCheckButton" id="gridcheckbutton">
+                      <object class="GtkCheckButton" id="gridcheckbutton">
                         <property name="label" translatable="yes">grid</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
                         <property name="draw_indicator">True</property>
-                      </widget>
+                      </object>
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">False</property>
@@ -739,34 +746,34 @@ Public License instead of this License.
                       </packing>
                     </child>
                     <child>
-                      <widget class="GtkCheckButton" id="coordcheckbutton">
+                      <object class="GtkCheckButton" id="coordcheckbutton">
                         <property name="label" translatable="yes">coord</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
                         <property name="draw_indicator">True</property>
-                      </widget>
+                      </object>
                       <packing>
                         <property name="expand">True</property>
                         <property name="fill">True</property>
                         <property name="position">1</property>
                       </packing>
                     </child>
-                  </widget>
+                  </object>
                   <packing>
                     <property name="expand">True</property>
                     <property name="fill">True</property>
                     <property name="position">1</property>
                   </packing>
                 </child>
-              </widget>
+              </object>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">False</property>
                 <property name="position">3</property>
               </packing>
             </child>
-          </widget>
+          </object>
           <packing>
             <property name="expand">False</property>
             <property name="fill">False</property>
@@ -774,10 +781,10 @@ Public License instead of this License.
           </packing>
         </child>
         <child>
-          <widget class="GtkHSeparator" id="hseparator1">
+          <object class="GtkHSeparator" id="hseparator1">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-          </widget>
+          </object>
           <packing>
             <property name="expand">False</property>
             <property name="fill">True</property>
@@ -786,19 +793,19 @@ Public License instead of this License.
           </packing>
         </child>
         <child>
-          <widget class="GtkVBox" id="vbox7">
+          <object class="GtkVBox" id="vbox7">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <child>
-              <widget class="GtkHBox" id="hbox5">
+              <object class="GtkHBox" id="hbox5">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <child>
-                  <widget class="GtkLabel" id="pathlabel">
+                  <object class="GtkLabel" id="pathlabel">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="label" translatable="yes">QuadTree Path</property>
-                  </widget>
+                  </object>
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">False</property>
@@ -807,7 +814,7 @@ Public License instead of this License.
                   </packing>
                 </child>
                 <child>
-                  <widget class="GtkEntry" id="path">
+                  <object class="GtkEntry" id="path">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="invisible_char">●</property>
@@ -815,14 +822,14 @@ Public License instead of this License.
                     <property name="secondary_icon_activatable">False</property>
                     <property name="primary_icon_sensitive">True</property>
                     <property name="secondary_icon_sensitive">True</property>
-                  </widget>
+                  </object>
                   <packing>
                     <property name="expand">True</property>
                     <property name="fill">True</property>
                     <property name="position">1</property>
                   </packing>
                 </child>
-              </widget>
+              </object>
               <packing>
                 <property name="expand">True</property>
                 <property name="fill">True</property>
@@ -830,10 +837,10 @@ Public License instead of this License.
               </packing>
             </child>
             <child>
-              <widget class="GtkHSeparator" id="hseparator3">
+              <object class="GtkHSeparator" id="hseparator3">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-              </widget>
+              </object>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
@@ -841,7 +848,7 @@ Public License instead of this License.
                 <property name="position">1</property>
               </packing>
             </child>
-          </widget>
+          </object>
           <packing>
             <property name="expand">False</property>
             <property name="fill">False</property>
@@ -849,19 +856,19 @@ Public License instead of this License.
           </packing>
         </child>
         <child>
-          <widget class="GtkVBox" id="vbox10">
+          <object class="GtkVBox" id="vbox10">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <child>
-              <widget class="GtkHBox" id="hbox7">
+              <object class="GtkHBox" id="hbox7">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <child>
-                  <widget class="GtkLabel" id="label11">
+                  <object class="GtkLabel" id="label11">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="label" translatable="yes">Range search</property>
-                  </widget>
+                  </object>
                   <packing>
                     <property name="expand">True</property>
                     <property name="fill">True</property>
@@ -870,15 +877,15 @@ Public License instead of this License.
                   </packing>
                 </child>
                 <child>
-                  <widget class="GtkVBox" id="vbox11">
+                  <object class="GtkVBox" id="vbox11">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <child>
-                      <widget class="GtkLabel" id="label7">
+                      <object class="GtkLabel" id="label7">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="label" translatable="yes">X min</property>
-                      </widget>
+                      </object>
                       <packing>
                         <property name="expand">True</property>
                         <property name="fill">True</property>
@@ -886,7 +893,7 @@ Public License instead of this License.
                       </packing>
                     </child>
                     <child>
-                      <widget class="GtkEntry" id="rxMin">
+                      <object class="GtkEntry" id="rxMin">
                         <property name="width_request">5</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
@@ -895,14 +902,14 @@ Public License instead of this License.
                         <property name="secondary_icon_activatable">False</property>
                         <property name="primary_icon_sensitive">True</property>
                         <property name="secondary_icon_sensitive">True</property>
-                      </widget>
+                      </object>
                       <packing>
                         <property name="expand">True</property>
                         <property name="fill">True</property>
                         <property name="position">1</property>
                       </packing>
                     </child>
-                  </widget>
+                  </object>
                   <packing>
                     <property name="expand">True</property>
                     <property name="fill">True</property>
@@ -910,15 +917,15 @@ Public License instead of this License.
                   </packing>
                 </child>
                 <child>
-                  <widget class="GtkVBox" id="vbox12">
+                  <object class="GtkVBox" id="vbox12">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <child>
-                      <widget class="GtkLabel" id="label8">
+                      <object class="GtkLabel" id="label8">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="label" translatable="yes">X max</property>
-                      </widget>
+                      </object>
                       <packing>
                         <property name="expand">True</property>
                         <property name="fill">True</property>
@@ -926,7 +933,7 @@ Public License instead of this License.
                       </packing>
                     </child>
                     <child>
-                      <widget class="GtkEntry" id="rxMax">
+                      <object class="GtkEntry" id="rxMax">
                         <property name="width_request">5</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
@@ -935,14 +942,14 @@ Public License instead of this License.
                         <property name="secondary_icon_activatable">False</property>
                         <property name="primary_icon_sensitive">True</property>
                         <property name="secondary_icon_sensitive">True</property>
-                      </widget>
+                      </object>
                       <packing>
                         <property name="expand">True</property>
                         <property name="fill">True</property>
                         <property name="position">1</property>
                       </packing>
                     </child>
-                  </widget>
+                  </object>
                   <packing>
                     <property name="expand">True</property>
                     <property name="fill">True</property>
@@ -950,15 +957,15 @@ Public License instead of this License.
                   </packing>
                 </child>
                 <child>
-                  <widget class="GtkVBox" id="vbox13">
+                  <object class="GtkVBox" id="vbox13">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <child>
-                      <widget class="GtkLabel" id="label9">
+                      <object class="GtkLabel" id="label9">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="label" translatable="yes">Y min</property>
-                      </widget>
+                      </object>
                       <packing>
                         <property name="expand">True</property>
                         <property name="fill">True</property>
@@ -966,7 +973,7 @@ Public License instead of this License.
                       </packing>
                     </child>
                     <child>
-                      <widget class="GtkEntry" id="ryMin">
+                      <object class="GtkEntry" id="ryMin">
                         <property name="width_request">5</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
@@ -975,14 +982,14 @@ Public License instead of this License.
                         <property name="secondary_icon_activatable">False</property>
                         <property name="primary_icon_sensitive">True</property>
                         <property name="secondary_icon_sensitive">True</property>
-                      </widget>
+                      </object>
                       <packing>
                         <property name="expand">True</property>
                         <property name="fill">True</property>
                         <property name="position">1</property>
                       </packing>
                     </child>
-                  </widget>
+                  </object>
                   <packing>
                     <property name="expand">True</property>
                     <property name="fill">True</property>
@@ -990,15 +997,15 @@ Public License instead of this License.
                   </packing>
                 </child>
                 <child>
-                  <widget class="GtkVBox" id="vbox14">
+                  <object class="GtkVBox" id="vbox14">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <child>
-                      <widget class="GtkLabel" id="label10">
+                      <object class="GtkLabel" id="label10">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="label" translatable="yes">Y max</property>
-                      </widget>
+                      </object>
                       <packing>
                         <property name="expand">True</property>
                         <property name="fill">True</property>
@@ -1006,7 +1013,7 @@ Public License instead of this License.
                       </packing>
                     </child>
                     <child>
-                      <widget class="GtkEntry" id="ryMax">
+                      <object class="GtkEntry" id="ryMax">
                         <property name="width_request">5</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
@@ -1015,21 +1022,21 @@ Public License instead of this License.
                         <property name="secondary_icon_activatable">False</property>
                         <property name="primary_icon_sensitive">True</property>
                         <property name="secondary_icon_sensitive">True</property>
-                      </widget>
+                      </object>
                       <packing>
                         <property name="expand">True</property>
                         <property name="fill">True</property>
                         <property name="position">1</property>
                       </packing>
                     </child>
-                  </widget>
+                  </object>
                   <packing>
                     <property name="expand">True</property>
                     <property name="fill">True</property>
                     <property name="position">4</property>
                   </packing>
                 </child>
-              </widget>
+              </object>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">False</property>
@@ -1037,17 +1044,17 @@ Public License instead of this License.
               </packing>
             </child>
             <child>
-              <widget class="GtkHSeparator" id="hseparator4">
+              <object class="GtkHSeparator" id="hseparator4">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-              </widget>
+              </object>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
                 <property name="position">1</property>
               </packing>
             </child>
-          </widget>
+          </object>
           <packing>
             <property name="expand">False</property>
             <property name="fill">False</property>
@@ -1055,37 +1062,39 @@ Public License instead of this License.
           </packing>
         </child>
         <child>
-          <widget class="GtkComboBox" id="comboalgo">
+          <object class="GtkComboBoxText" id="comboalgo">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="items" translatable="yes">Show points
-Show convex hull
-Show polygons
-Show polygons intersection
-Show quad tree squares
-Show kd tree squares
-Polygon Triangulation</property>
-          </widget>
+            <items>
+              <item>Show points</item>
+              <item>Show convex hull</item>
+              <item>Show polygons</item>
+              <item>Show polygons intersection</item>
+              <item>Show quad tree squares</item>
+              <item>Show kd tree squares</item>
+              <item>Polygon Triangulation</item>
+            </items>
+          </object>
           <packing>
             <property name="expand">False</property>
             <property name="fill">False</property>
             <property name="position">8</property>
           </packing>
         </child>
-      </widget>
+      </object>
     </child>
-  </widget>
-  <widget class="GtkWindow" id="window2">
+  </object>
+  <object class="GtkWindow" id="window2">
     <property name="width_request">800</property>
     <property name="height_request">500</property>
     <property name="can_focus">False</property>
     <property name="title" translatable="yes">Tree</property>
     <property name="type_hint">dialog</property>
     <child>
-      <widget class="GtkDrawingArea" id="treedrawingarea">
+      <object class="GtkDrawingArea" id="treedrawingarea">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
-      </widget>
+      </object>
     </child>
-  </widget>
-</glade-interface>
+  </object>
+</interface>
