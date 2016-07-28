@@ -1,4 +1,7 @@
 {-# OPTIONS_HADDOCK ignore-exports #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE FlexibleContexts #-}
+
 
 module Graphics.Diagram.AlgoDiags where
 
