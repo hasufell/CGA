@@ -3,7 +3,6 @@ module QueueEx where
 import           Control.Applicative
 import           Data.Dequeue (BankersDequeue)
 import qualified Data.Dequeue           as Q
-import           Data.Maybe
 
 
 -- |Shift a queue to the left, such as:
@@ -20,4 +19,4 @@ shiftQueueRight = (\(Just (b, nq)) -> Q.pushFront nq b) <$> Q.popBack
 
 -- |Convert a Queue back to a list.
 queueToList :: BankersDequeue a -> [a]
-queueToList q = Q.takeFront (Q.length q) q
+queueToList q = Q.takeFront (length q) q
